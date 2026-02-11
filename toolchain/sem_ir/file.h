@@ -7,66 +7,177 @@
 
 #include "common/error.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/FormatVariadic.h"
-#include "toolchain/base/canonical_value_store.h"
-#include "toolchain/base/int.h"
-#include "toolchain/base/relational_value_store.h"
 #include "toolchain/base/shared_value_stores.h"
 #include "toolchain/base/value_store.h"
 #include "toolchain/base/yaml.h"
 #include "toolchain/parse/tree.h"
-#include "toolchain/sem_ir/associated_constant.h"
-#include "toolchain/sem_ir/class.h"
-#include "toolchain/sem_ir/constant.h"
-#include "toolchain/sem_ir/cpp_file.h"
-#include "toolchain/sem_ir/cpp_global_var.h"
-#include "toolchain/sem_ir/cpp_overload_set.h"
-#include "toolchain/sem_ir/entity_name.h"
-#include "toolchain/sem_ir/facet_type_info.h"
 #include "toolchain/sem_ir/function.h"
-#include "toolchain/sem_ir/generic.h"
 #include "toolchain/sem_ir/ids.h"
-#include "toolchain/sem_ir/impl.h"
-#include "toolchain/sem_ir/import_cpp.h"
-#include "toolchain/sem_ir/import_ir.h"
 #include "toolchain/sem_ir/inst.h"
-#include "toolchain/sem_ir/interface.h"
-#include "toolchain/sem_ir/name.h"
-#include "toolchain/sem_ir/name_scope.h"
-#include "toolchain/sem_ir/named_constraint.h"
-#include "toolchain/sem_ir/require_impls.h"
 #include "toolchain/sem_ir/singleton_insts.h"
-#include "toolchain/sem_ir/specific_interface.h"
-#include "toolchain/sem_ir/struct_type_field.h"
 #include "toolchain/sem_ir/type.h"
-#include "toolchain/sem_ir/type_info.h"
-#include "toolchain/sem_ir/vtable.h"
+
+// TODO: Implement your language's semantic IR file representation here.
+// See the Carbon Language compiler for reference implementation patterns.
 
 namespace Carbon::SemIR {
 
-// An expression that may contain control flow, represented as a
-// single-entry/single-exit region. `block_ids` are the blocks that are part of
-// evaluation of the expression, and `result_id` represents the result of
-// evaluating the expression. `block_ids` consists of all blocks that are
-// dominated by `block_ids.front()` and post-dominated by `block_ids.back()`,
-// and should be in lexical order. `result_id` will be in `block_ids.back()` or
-// some block that dominates it.
-//
-// `block_ids` cannot be empty. If it has a single element, then the region
-// should be used via a `SpliceBlock` inst. Otherwise, the region should be used
-// by branching to the entry block, and the last inst in the exit block will
-// likewise be a branch.
-struct ExprRegion {
-  llvm::SmallVector<InstBlockId> block_ids;
-  InstId result_id;
+// Stores constant values for instructions. Maps InstId -> ConstantId.
+class ConstantValueStore : public Yaml::Printable<ConstantValueStore> {
+ public:
+  explicit ConstantValueStore(ConstantId default_value, InstStore* insts)
+      : default_(default_value), insts_(insts) {}
+
+  // Returns the constant value for an instruction.
+  auto Get(InstId inst_id) const -> ConstantId {
+    auto index = insts_->GetRawIndex(inst_id);
+    if (static_cast<size_t>(index) >= values_.size()) {
+      return default_;
+    }
+    return values_[index];
+  }
+
+  // Sets the constant value for an instruction.
+  auto Set(InstId inst_id, ConstantId value) -> void {
+    auto index = insts_->GetRawIndex(inst_id);
+    if (static_cast<size_t>(index) >= values_.size()) {
+      values_.resize(index + 1, default_);
+    }
+    values_[index] = value;
+  }
+
+  // Returns the instruction ID for a concrete constant.
+  auto GetInstId(ConstantId constant_id) const -> InstId {
+    if (!constant_id.has_value() || !constant_id.is_constant()) {
+      return InstId::None;
+    }
+    if (constant_id.is_concrete()) {
+      return constant_id.concrete_inst_id();
+    }
+    // TODO: Handle symbolic constants.
+    return InstId::None;
+  }
+
+  // Returns the constant instruction ID for the given instruction.
+  auto GetConstantInstId(InstId inst_id) const -> InstId {
+    return GetInstId(Get(inst_id));
+  }
+
+  // Returns the instruction ID if the constant is valid, otherwise None.
+  auto GetInstIdIfValid(ConstantId constant_id) const -> InstId {
+    if (!constant_id.has_value() || !constant_id.is_constant()) {
+      return InstId::None;
+    }
+    return GetInstId(constant_id);
+  }
+
+  // Returns the unattached form of a constant. For the boilerplate, this
+  // just returns the constant as-is.
+  auto GetUnattachedConstant(ConstantId constant_id) const -> ConstantId {
+    // TODO: Handle symbolic constants with attached types.
+    return constant_id;
+  }
+
+  auto OutputYaml(bool /*include_singletons*/ = false) const
+      -> Yaml::OutputMapping {
+    return Yaml::OutputMapping([&](Yaml::OutputMapping::Map map) {
+      for (size_t i = 0; i < values_.size(); ++i) {
+        if (values_[i].has_value() && values_[i].is_constant()) {
+          map.Add(PrintToString(InstId(static_cast<int32_t>(i))),
+                  Yaml::OutputScalar(values_[i]));
+        }
+      }
+    });
+  }
+
+  auto CollectMemUsage(MemUsage& mem_usage, llvm::StringRef label) const
+      -> void {
+    mem_usage.Collect(MemUsage::ConcatLabel(label, "values_"), values_);
+  }
+
+ private:
+  ConstantId default_;
+  InstStore* insts_;
+  llvm::SmallVector<ConstantId> values_;
 };
 
-using ExprRegionStore = ValueStore<ExprRegionId, ExprRegion, Tag<CheckIRId>>;
+// Stores computed global constants (e.g. types).
+class ConstantStore {
+ public:
+  explicit ConstantStore(File* /*file*/) {}
 
-using CustomLayoutStore =
-    BlockValueStore<CustomLayoutId, uint64_t, Tag<CheckIRId>>;
+  // TODO: Implement constant deduplication and storage.
+  // See the Carbon Language compiler for reference implementation patterns.
+
+  auto CollectMemUsage(MemUsage& mem_usage, llvm::StringRef label) const
+      -> void {
+    mem_usage.Collect(MemUsage::ConcatLabel(label, "insts_"), insts_);
+  }
+
+ private:
+  llvm::SmallVector<InstId> insts_;
+};
+
+// An entity name binding.
+struct EntityName : public Printable<EntityName> {
+  NameId name_id;
+  NameScopeId parent_scope_id;
+
+  auto Print(llvm::raw_ostream& out) const -> void {
+    out << "{name: " << name_id << ", parent_scope: " << parent_scope_id << "}";
+  }
+};
+
+using EntityNameStore = ValueStore<EntityNameId, EntityName, Tag<CheckIRId>>;
+
+// A scope in which names can be looked up.
+struct NameScope : public Printable<NameScope> {
+  NameId name_id;
+  NameScopeId parent_scope_id;
+  InstId inst_id;
+
+  auto Print(llvm::raw_ostream& out) const -> void {
+    out << "{name: " << name_id << ", parent_scope: " << parent_scope_id << "}";
+  }
+};
+
+// Stores name scopes.
+class NameScopeStore {
+ public:
+  explicit NameScopeStore(File* /*file*/) {}
+
+  auto Add(InstId inst_id, NameId name_id, NameScopeId parent_scope_id)
+      -> NameScopeId {
+    auto id = NameScopeId(static_cast<int32_t>(scopes_.size()));
+    scopes_.push_back(
+        {.name_id = name_id,
+         .parent_scope_id = parent_scope_id,
+         .inst_id = inst_id});
+    return id;
+  }
+
+  auto Get(NameScopeId id) const -> const NameScope& { return scopes_[id.index]; }
+  auto Get(NameScopeId id) -> NameScope& { return scopes_[id.index]; }
+
+  auto OutputYaml() const -> Yaml::OutputMapping {
+    return Yaml::OutputMapping([&](Yaml::OutputMapping::Map map) {
+      for (size_t i = 0; i < scopes_.size(); ++i) {
+        map.Add(PrintToString(NameScopeId(static_cast<int32_t>(i))),
+                Yaml::OutputScalar(scopes_[i]));
+      }
+    });
+  }
+
+  auto CollectMemUsage(MemUsage& mem_usage, llvm::StringRef label) const
+      -> void {
+    mem_usage.Collect(MemUsage::ConcatLabel(label, "scopes_"), scopes_);
+  }
+
+ private:
+  llvm::SmallVector<NameScope> scopes_;
+};
 
 // The semantic IR for a single file.
 class File : public Printable<File> {
@@ -83,8 +194,7 @@ class File : public Printable<File> {
   // Verifies that invariants of the semantics IR hold.
   auto Verify() const -> ErrorOr<Success>;
 
-  // Prints the full IR. Allow omitting singletons so that changes to the list
-  // of singletons won't churn golden test file content.
+  // Prints the full IR.
   auto Print(llvm::raw_ostream& out, bool include_singletons = false) const
       -> void {
     Yaml::Print(out, OutputYaml(include_singletons));
@@ -95,26 +205,10 @@ class File : public Printable<File> {
   auto CollectMemUsage(MemUsage& mem_usage, llvm::StringRef label) const
       -> void;
 
-  // Returns array bound value from the bound instruction.
-  // TODO: Move this function elsewhere.
-  auto GetArrayBoundValue(InstId bound_id) const -> std::optional<uint64_t> {
-    if (auto bound = insts().TryGetAs<IntValue>(
-            constant_values().GetConstantInstId(bound_id))) {
-      return ints().Get(bound->int_id).getZExtValue();
-    }
-    return std::nullopt;
-  }
-
   // Gets the pointee type of the given type, which must be a pointer type.
-  // TODO: Move this function elsewhere.
   auto GetPointeeType(TypeId pointer_id) const -> TypeId {
     return types().GetTypeIdForTypeInstId(
         types().GetAs<PointerType>(pointer_id).pointee_id);
-  }
-
-  // Returns true if this file is an `impl`.
-  auto is_impl() -> bool {
-    return import_irs().Get(ImportIRId::ApiForImpl).sem_ir != nullptr;
   }
 
   auto check_ir_id() const -> CheckIRId { return check_ir_id_; }
@@ -154,100 +248,14 @@ class File : public Printable<File> {
 
   auto entity_names() -> EntityNameStore& { return entity_names_; }
   auto entity_names() const -> const EntityNameStore& { return entity_names_; }
-  auto cpp_global_vars() -> CppGlobalVarStore& { return cpp_global_vars_; }
-  auto cpp_global_vars() const -> const CppGlobalVarStore& {
-    return cpp_global_vars_;
-  }
   auto functions() -> FunctionStore& { return functions_; }
   auto functions() const -> const FunctionStore& { return functions_; }
-  auto cpp_overload_sets() -> CppOverloadSetStore& {
-    return cpp_overload_sets_;
-  }
-  auto cpp_overload_sets() const -> const CppOverloadSetStore& {
-    return cpp_overload_sets_;
-  }
-  auto classes() -> ClassStore& { return classes_; }
-  auto classes() const -> const ClassStore& { return classes_; }
-  auto interfaces() -> InterfaceStore& { return interfaces_; }
-  auto interfaces() const -> const InterfaceStore& { return interfaces_; }
-  auto named_constraints() -> NamedConstraintStore& {
-    return named_constraints_;
-  }
-  auto named_constraints() const -> const NamedConstraintStore& {
-    return named_constraints_;
-  }
-  auto require_impls() -> RequireImplsStore& { return require_impls_; }
-  auto require_impls() const -> const RequireImplsStore& {
-    return require_impls_;
-  }
-  auto require_impls_blocks() -> RequireImplsBlockStore& {
-    return require_impls_blocks_;
-  }
-  auto require_impls_blocks() const -> const RequireImplsBlockStore& {
-    return require_impls_blocks_;
-  }
-  auto associated_constants() -> AssociatedConstantStore& {
-    return associated_constants_;
-  }
-  auto associated_constants() const -> const AssociatedConstantStore& {
-    return associated_constants_;
-  }
-  // TODO: Rename these to `facet_type_infos`.
-  auto facet_types() -> FacetTypeInfoStore& { return facet_types_; }
-  auto facet_types() const -> const FacetTypeInfoStore& { return facet_types_; }
-  auto identified_facet_types() -> IdentifiedFacetTypeStore& {
-    return identified_facet_types_;
-  }
-  auto identified_facet_types() const -> const IdentifiedFacetTypeStore& {
-    return identified_facet_types_;
-  }
-  auto impls() -> ImplStore& { return impls_; }
-  auto impls() const -> const ImplStore& { return impls_; }
-  auto specific_interfaces() -> SpecificInterfaceStore& {
-    return specific_interfaces_;
-  }
-  auto specific_interfaces() const -> const SpecificInterfaceStore& {
-    return specific_interfaces_;
-  }
-  auto generics() -> GenericStore& { return generics_; }
-  auto generics() const -> const GenericStore& { return generics_; }
-  auto specifics() -> SpecificStore& { return specifics_; }
-  auto specifics() const -> const SpecificStore& { return specifics_; }
-  auto import_irs() -> ImportIRStore& { return import_irs_; }
-  auto import_irs() const -> const ImportIRStore& { return import_irs_; }
-  auto import_ir_insts() -> ImportIRInstStore& { return import_ir_insts_; }
-  auto import_ir_insts() const -> const ImportIRInstStore& {
-    return import_ir_insts_;
-  }
-  auto cpp_file() -> SemIR::CppFile* { return cpp_file_.get(); }
-  auto cpp_file() const -> const SemIR::CppFile* { return cpp_file_.get(); }
-  // TODO: We should be able to create the initial C++ AST before creating the
-  // `File` and initialize the pointer in the constructor instead of using a
-  // setter.
-  auto set_cpp_file(std::unique_ptr<SemIR::CppFile> cpp_file) -> void;
-  auto clang_decls() -> ClangDeclStore& { return clang_decls_; }
-  auto clang_decls() const -> const ClangDeclStore& { return clang_decls_; }
-  auto names() const -> NameStoreWrapper {
-    return NameStoreWrapper(&identifiers());
-  }
   auto name_scopes() -> NameScopeStore& { return name_scopes_; }
   auto name_scopes() const -> const NameScopeStore& { return name_scopes_; }
-  auto struct_type_fields() -> StructTypeFieldsStore& {
-    return struct_type_fields_;
-  }
-  auto struct_type_fields() const -> const StructTypeFieldsStore& {
-    return struct_type_fields_;
-  }
-  auto custom_layouts() -> CustomLayoutStore& { return custom_layouts_; }
-  auto custom_layouts() const -> const CustomLayoutStore& {
-    return custom_layouts_;
-  }
   auto types() -> TypeStore& { return types_; }
   auto types() const -> const TypeStore& { return types_; }
   auto insts() -> InstStore& { return insts_; }
   auto insts() const -> const InstStore& { return insts_; }
-  auto vtables() -> VtableStore& { return vtables_; }
-  auto vtables() const -> const VtableStore& { return vtables_; }
   auto constant_values() -> ConstantValueStore& { return constant_values_; }
   auto constant_values() const -> const ConstantValueStore& {
     return constant_values_;
@@ -256,18 +264,6 @@ class File : public Printable<File> {
   auto inst_blocks() const -> const InstBlockStore& { return inst_blocks_; }
   auto constants() -> ConstantStore& { return constants_; }
   auto constants() const -> const ConstantStore& { return constants_; }
-
-  auto expr_regions() -> ExprRegionStore& { return expr_regions_; }
-  auto expr_regions() const -> const ExprRegionStore& { return expr_regions_; }
-
-  using ClangSourceLocStore =
-      ValueStore<ClangSourceLocId, clang::SourceLocation, Tag<CheckIRId>>;
-  auto clang_source_locs() -> ClangSourceLocStore& {
-    return clang_source_locs_;
-  }
-  auto clang_source_locs() const -> const ClangSourceLocStore& {
-    return clang_source_locs_;
-  }
 
   auto top_inst_block_id() const -> InstBlockId { return top_inst_block_id_; }
   auto set_top_inst_block_id(InstBlockId block_id) -> void {
@@ -308,79 +304,17 @@ class File : public Printable<File> {
   llvm::BumpPtrAllocator allocator_;
 
   // The associated filename.
-  // TODO: If SemIR starts linking back to tokens, reuse its filename.
   std::string filename_;
 
-  // Storage for EntityNames.
+  // Storage for entity names.
   EntityNameStore entity_names_;
-
-  // For imported C++ global variables, the Clang decl to use for mangling.
-  CppGlobalVarStore cpp_global_vars_;
 
   // Storage for callable objects.
   FunctionStore functions_;
 
-  // Storage for CppOverloadSet.
-  CppOverloadSetStore cpp_overload_sets_;
-
-  // Storage for classes.
-  ClassStore classes_;
-
-  // Storage for interfaces.
-  InterfaceStore interfaces_;
-
-  // Storage for named constraints.
-  NamedConstraintStore named_constraints_;
-
-  // Storage for interface requirements.
-  RequireImplsStore require_impls_;
-
-  // Storage for blocks of RequireImpls.
-  RequireImplsBlockStore require_impls_blocks_;
-
-  // Storage for associated constants.
-  AssociatedConstantStore associated_constants_;
-
-  // Storage for facet types.
-  FacetTypeInfoStore facet_types_;
-
-  // Storage for identified facet types.
-  IdentifiedFacetTypeStore identified_facet_types_;
-
-  // Storage for impls.
-  ImplStore impls_;
-
-  // Storage for specific interfaces, which are an individual unit of impl
-  // lookup for a single interface.
-  SpecificInterfaceStore specific_interfaces_;
-
-  // Storage for generics.
-  GenericStore generics_;
-
-  // Storage for specifics.
-  SpecificStore specifics_;
-
-  // Related IRs. There are some fixed entries at the start; see ImportIRId.
-  ImportIRStore import_irs_;
-
-  // Related IR instructions. These are created for LocIds for instructions
-  // that are import-related.
-  ImportIRInstStore import_ir_insts_;
-
-  // The C++ file to use when looking up `Cpp` names. Null if there are no `Cpp`
-  // imports.
-  std::unique_ptr<SemIR::CppFile> cpp_file_;
-
-  // Clang AST declarations pointing to the AST and their mapped Carbon
-  // instructions. When calling `Lookup()`, `inst_id` is ignored. `Add()` will
-  // not add multiple entries with the same `decl` and different `inst_id`.
-  ClangDeclStore clang_decls_;
-
   // All instructions. The first entries will always be the singleton
   // instructions.
   InstStore insts_;
-
-  VtableStore vtables_;
 
   // Storage for name scopes.
   NameScopeStore name_scopes_ = NameScopeStore(this);
@@ -402,21 +336,8 @@ class File : public Printable<File> {
   // types.
   ConstantStore constants_;
 
-  // Storage for StructTypeField lists.
-  StructTypeFieldsStore struct_type_fields_;
-
-  // Storage for custom layouts.
-  CustomLayoutStore custom_layouts_;
-
   // Descriptions of types used in this file.
   TypeStore types_ = TypeStore(this);
-
-  // Single-entry/single-exit regions that are referenced as units, e.g. because
-  // they represent expressions.
-  ExprRegionStore expr_regions_;
-
-  // C++ source locations for C++ interop.
-  ClangSourceLocStore clang_source_locs_;
 };
 
 }  // namespace Carbon::SemIR

@@ -20,7 +20,6 @@
 #include "toolchain/sem_ir/id_kind.h"
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/inst_kind.h"
-#include "toolchain/sem_ir/singleton_insts.h"
 #include "toolchain/sem_ir/typed_insts.h"
 
 namespace Carbon::SemIR {

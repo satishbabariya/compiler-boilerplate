@@ -6,20 +6,19 @@
 #define CARBON_TOOLCHAIN_LANGUAGE_SERVER_LANGUAGE_SERVER_H_
 
 #include "common/ostream.h"
-#include "toolchain/base/install_paths.h"
 #include "toolchain/diagnostics/consumer.h"
+
+// TODO: Implement your language's LSP server here.
+// See the Carbon Language compiler for reference implementation patterns.
 
 namespace Carbon::LanguageServer {
 
 // Start the language server. input_stream and output_stream are used by LSP;
 // error_stream is primarily for errors that don't fit into LSP. Returns true if
 // the server cleanly exits.
-//
-// This is thread-hostile because `clangd::LoggingSession` relies on a global.
-auto Run(const InstallPaths& installation, FILE* input_stream,
-         llvm::raw_ostream& output_stream, llvm::raw_ostream& error_stream,
-         llvm::raw_ostream* vlog_stream, Diagnostics::Consumer& consumer)
-    -> bool;
+auto Run(FILE* input_stream, llvm::raw_ostream& output_stream,
+         llvm::raw_ostream& error_stream, llvm::raw_ostream* vlog_stream,
+         Diagnostics::Consumer& consumer) -> bool;
 
 }  // namespace Carbon::LanguageServer
 

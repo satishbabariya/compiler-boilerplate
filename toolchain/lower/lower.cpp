@@ -5,34 +5,44 @@
 #include "toolchain/lower/lower.h"
 
 #include <memory>
-#include <optional>
 
 #include "common/vlog.h"
+#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Verifier.h"
-#include "toolchain/lower/context.h"
-#include "toolchain/lower/file_context.h"
+
+// TODO: Implement your language's SemIR-to-LLVM-IR lowering here.
+// See the Carbon Language compiler for reference implementation patterns.
+//
+// The lowerer walks the SemIR and builds LLVM IR instructions.
+// Key responsibilities include:
+// - Creating LLVM functions from SemIR function definitions
+// - Lowering SemIR types to LLVM types
+// - Lowering SemIR instructions to LLVM IR instructions
+// - Handling control flow (branches, returns)
 
 namespace Carbon::Lower {
 
-auto LowerToLLVM(
-    llvm::LLVMContext& llvm_context,
-    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs,
-    const Parse::GetTreeAndSubtreesStore& tree_and_subtrees_getters,
-    const SemIR::File& sem_ir, int total_ir_count,
-    const LowerToLLVMOptions& options) -> std::unique_ptr<llvm::Module> {
-  Context context(
-      &llvm_context, std::move(fs), options.want_debug_info,
-      &tree_and_subtrees_getters,
-      sem_ir.cpp_file() ? sem_ir.cpp_file()->GetCodeGenerator() : nullptr,
-      sem_ir.filename(), total_ir_count, options.opt_level,
-      options.vlog_stream);
+auto LowerToLLVM(llvm::LLVMContext& llvm_context,
+                 llvm::StringRef module_name,
+                 const SemIR::File& sem_ir,
+                 const LowerToLLVMOptions& options)
+    -> std::unique_ptr<llvm::Module> {
+  auto module = std::make_unique<llvm::Module>(module_name, llvm_context);
 
-  // TODO: Consider disabling instruction naming by default if we're not
-  // producing textual LLVM IR.
-  SemIR::InstNamer inst_namer(&sem_ir, total_ir_count);
-  context.GetFileContext(&sem_ir, &inst_namer).LowerDefinitions();
+  CARBON_VLOG_TO(options.vlog_stream, "*** Lowering: {0} ***\n",
+                 sem_ir.filename());
 
-  std::unique_ptr<llvm::Module> module = std::move(context).Finalize();
+  // TODO: Walk the SemIR and build LLVM IR.
+  // For each SemIR function, create an LLVM function and lower its body.
+  //
+  // Example implementation steps:
+  // 1. Lower all SemIR types to LLVM types
+  // 2. Create LLVM function declarations for all SemIR functions
+  // 3. For each function with a body:
+  //    a. Create basic blocks for each SemIR block
+  //    b. Lower each SemIR instruction to LLVM IR
+  //    c. Handle branches and returns
+  // 4. Run the LLVM verifier on the result
 
   if (options.vlog_stream) {
     CARBON_VLOG_TO(options.vlog_stream, "*** llvm::Module ***\n");

@@ -1,4 +1,4 @@
-# Carbon Language: <br/> An experimental successor to C++
+# Compiler Boilerplate
 
 <!--
 Part of the Carbon Language project, under the Apache License v2.0 with LLVM
@@ -6,452 +6,179 @@ Exceptions. See /LICENSE for license information.
 SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 -->
 
-<p align="center">
-  <a href="#why-build-carbon">Why?</a> |
-  <a href="#language-goals">Goals</a> |
-  <a href="#project-status">Status</a> |
-  <a href="#getting-started">Getting started</a> |
-  <a href="#join-us">Join us</a>
-</p>
-
-**See our [announcement video](https://youtu.be/omrY53kbVoA) from
-[CppNorth](https://cppnorth.ca/).** Note that Carbon is
-[not ready for use](#project-status).
-
-<a href="docs/images/snippets.md#quicksort">
-<!--
-Edit snippet in docs/images/snippets.md and:
-https://drive.google.com/drive/folders/1QrBXiy_X74YsOueeC0IYlgyolWIhvusB
--->
-<img src="docs/images/quicksort_snippet.svg" align="right" width="575"
-     alt="Quicksort code in Carbon. Follow the link to read more.">
-</a>
-
-<!--
-Don't let the text wrap too narrowly to the left of the above image.
-The `div` reduces the vertical height. The `picture` prevents autolinking.
--->
-<div><picture><img src="docs/images/bumper.png" alt=""></picture></div>
-
-**Fast and works with C++**
-
--   Performance matching C++ using LLVM, with low-level access to bits and
-    addresses
--   Interoperate with your existing C++ code, from inheritance to templates
--   Fast and scalable builds that work with your existing C++ build systems
-
-**Modern and evolving**
-
--   Solid language foundations that are easy to learn, especially if you have
-    used C++
--   Easy, tool-based upgrades between Carbon versions
--   Safer fundamentals, and an incremental path towards a memory-safe subset
-
-**Welcoming open-source community**
-
--   Clear goals and priorities with robust governance
--   Community that works to be welcoming, inclusive, and friendly
--   Batteries-included approach: compiler, libraries, docs, tools, package
-    manager, and more
-
-## Why build Carbon?
-
-C++ remains the dominant programming language for performance-critical software,
-with massive and growing codebases and investments. However, it is struggling to
-improve and meet developers' needs, as outlined above, in no small part due to
-accumulating decades of technical debt. Incrementally improving C++ is
-[extremely difficult](/docs/project/difficulties_improving_cpp.md), both due to
-the technical debt itself and challenges with its evolution process. The best
-way to address these problems is to avoid inheriting the legacy of C or C++
-directly, and instead start with solid language foundations like
-[modern generics system](#generics), modular code organization, and consistent,
-simple syntax.
-
-Existing modern languages already provide an excellent developer experience: Go,
-Swift, Kotlin, Rust, and many more. **Developers that _can_ use one of these
-existing languages _should_.** Unfortunately, the designs of these languages
-present significant barriers to adoption and migration from C++. These barriers
-range from changes in the idiomatic design of software to performance overhead.
-
-Carbon is fundamentally **a successor language approach**, rather than an
-attempt to incrementally evolve C++. It is designed around interoperability with
-C++ as well as large-scale adoption and migration for existing C++ codebases and
-developers. A successor language for C++ requires:
-
--   **Performance matching C++**, an essential property for our developers.
--   **Seamless, bidirectional interoperability with C++**, such that a library
-    anywhere in an existing C++ stack can adopt Carbon without porting the rest.
--   **A gentle learning curve** with reasonable familiarity for C++ developers.
--   **Comparable expressivity** and support for existing software's design and
-    architecture.
--   **Scalable migration**, with some level of source-to-source translation for
-    idiomatic C++ code.
-
-With this approach, we can build on top of C++'s existing ecosystem, and bring
-along existing investments, codebases, and developer populations. There are a
-few languages that have followed this model for other ecosystems, and Carbon
-aims to fill an analogous role for C++:
-
--   JavaScript → TypeScript
--   Java → Kotlin
--   C++ → **_Carbon_**
-
-## Language Goals
-
-We are designing Carbon to support:
-
--   Performance-critical software
--   Software and language evolution
--   Code that is easy to read, understand, and write
--   Practical safety and testing mechanisms
--   Fast and scalable development
--   Modern OS platforms, hardware architectures, and environments
--   Interoperability with and migration from existing C++ code
-
-While many languages share subsets of these goals, what distinguishes Carbon is
-their combination.
-
-We also have explicit _non-goals_ for Carbon, notably including:
-
--   A stable
-    [application binary interface](https://en.wikipedia.org/wiki/Application_binary_interface)
-    (ABI) for the entire language and library
--   Perfect backwards or forwards compatibility
-
-Our detailed [goals](/docs/project/goals.md) document fleshes out these ideas
-and provides a deeper view into our goals for the Carbon project and language.
-
-## Project status
-
-Carbon Language is currently an experimental project. We are hard at work on a
-toolchain implementation with compiler and linker. You can try out the current
-state at [compiler-explorer.com](http://carbon.compiler-explorer.com/).
-
-We want to better understand whether we can build a language that meets our
-successor language criteria, and whether the resulting language can gather a
-critical mass of interest within the larger C++ industry and community.
-
-Currently, we have fleshed out several core aspects of both Carbon the project
-and the language:
-
--   The strategy of the Carbon Language and project.
--   An open-source project structure, governance model, and evolution process.
--   Critical and foundational aspects of the language design informed by our
-    experience with C++ and the most difficult challenges we anticipate. This
-    includes designs for:
-    -   Generics
-    -   Class types
-    -   Inheritance
-    -   Operator overloading
-    -   Lexical and syntactic structure
-    -   Code organization and modular structure
--   An under-development [compiler and toolchain](/toolchain/) that will compile
-    Carbon (and eventually C++ code as well) into standard executable code. This
-    is where most of our current implementation efforts are directed.
-    -   Historically, there was also a prototype
-        [explorer](https://github.com/carbon-language/explorer) interpreter that
-        implemented an older version of the Carbon language design, but is no
-        longer under development and has been archived.
-
-If you're interested in contributing, we're currently focused on developing the
-Carbon toolchain until it can
-[support Carbon ↔ C++ interop](/docs/project/roadmap.md#access-most-non-template-c-apis-in-carbon).
-Beyond that, we plan to continue developing the design and toolchain until we
-can ship the
-[0.1 language](/docs/project/milestones.md#milestone-01-a-minimum-viable-product-mvp-for-evaluation)
-and support evaluating Carbon in more detail.
-
-You can see our [full roadmap](/docs/project/roadmap.md) for more details.
-
-## Carbon and C++
-
-If you're already a C++ developer, Carbon should have a gentle learning curve.
-It is built out of a consistent set of language constructs that should feel
-familiar and be easy to read and understand.
-
-The Carbon code here is hypothetical and meant to show the look and feel of the
-language.
-
-C++ code like this:
-
-<a href="docs/images/snippets.md#c">
-<!--
-Edit snippet in docs/images/snippets.md and:
-https://drive.google.com/drive/folders/1QrBXiy_X74YsOueeC0IYlgyolWIhvusB
--->
-<img src="docs/images/cpp_snippet.svg" width="600"
-     alt="A snippet of C++ code. Follow the link to read it.">
-</a>
-
-corresponds to this Carbon code:
-
-<a href="docs/images/snippets.md#carbon">
-<!--
-Edit snippet in docs/images/snippets.md and:
-https://drive.google.com/drive/folders/1QrBXiy_X74YsOueeC0IYlgyolWIhvusB
--->
-<img src="docs/images/carbon_snippet.svg" width="600"
-     alt="A snippet of converted Carbon code. Follow the link to read it.">
-</a>
-
-You can call Carbon from C++ without overhead and the other way around. This
-means you migrate a single C++ library to Carbon within an application, or write
-new Carbon on top of your existing C++ investment. For example:
-
-<a href="docs/images/snippets.md#mixed">
-<!--
-Edit snippet in docs/images/snippets.md and:
-https://drive.google.com/drive/folders/1QrBXiy_X74YsOueeC0IYlgyolWIhvusB
--->
-<img src="docs/images/mixed_snippet.svg" width="600"
-     alt="A snippet of mixed Carbon and C++ code. Follow the link to read it.">
-</a>
-
-Read more about
-[C++ interop in Carbon](/docs/design/interoperability/philosophy_and_goals.md).
-
-Beyond interoperability between Carbon and C++, we're also planning to support
-migration tools that will mechanically translate idiomatic C++ code into Carbon
-code to help you switch an existing C++ codebase to Carbon.
-
-## Generics
-
-Carbon provides a
-**[modern generics system](/docs/design/generics/overview.md#what-are-generics)**
-with checked definitions, while still **supporting opt-in
-[templates](/docs/design/templates.md) for seamless C++ interop**. Checked
-generics provide several advantages compared to C++ templates:
-
--   **Generic definitions are fully type-checked**, removing the need to
-    instantiate to check for errors and giving greater confidence in code.
-    -   Avoids the compile-time cost of re-checking the definition for every
-        instantiation.
-    -   When using a definition-checked generic, usage error messages are
-        clearer, directly showing which requirements are not met.
--   **Enables automatic, opt-in type erasure and dynamic dispatch** without a
-    separate implementation. This can reduce the binary size and enables
-    constructs like heterogeneous containers.
--   **Strong, checked interfaces** mean fewer accidental dependencies on
-    implementation details and a clearer contract for consumers.
-
-Without sacrificing these advantages, **Carbon generics support
-specialization**, ensuring it can fully address performance-critical use cases
-of C++ templates. For more details about Carbon's generics, see their
-[design](/docs/design/generics).
-
-In addition to easy and powerful interop with C++, Carbon templates can be
-constrained and incrementally migrated to checked generics at a fine granularity
-and with a smooth evolutionary path.
-
-## Memory safety
-
-Safety, and especially
-[memory safety](https://en.wikipedia.org/wiki/Memory_safety), remains a key
-challenge for C++ and something a successor language needs to address.
-
-We plan to support a two step migration process:
-
-1. Highly automated, minimal supervision migration from C++ to a dialect of
-   Carbon designed for C++ interop and migration.
-2. Incremental refactoring of the Carbon code to adopt memory-safe designs,
-   patterns, and APIs.
-
-We also want to address important, low-hanging fruit in the safety space
-immediately when migrating into Carbon:
-
--   Tracking uninitialized states better, increased enforcement of
-    initialization, and hardening against initialization bugs when needed.
--   Designing fundamental APIs and idioms to support dynamic bounds checking.
--   Switching from undefined behavior to erroneous behavior wherever possible,
-    and marking the remaining undefined behavior with visible `unsafe` syntax.
--   Having a default debug build mode that has less runtime overhead while being
-    more comprehensive than existing C++ debug build modes combined with
-    [Address Sanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer).
-
-For more details, see our [safety design](/docs/design/safety).
-
-## Getting started
-
-To try out Carbon immediately in your browser, you can use the toolchain at:
-[carbon.compiler-explorer.com](http://carbon.compiler-explorer.com/).
-
-We are developing a traditional toolchain for Carbon that can compile and link
-programs. However, Carbon is still an early, experimental project, and so we
-only have very experimental nightly releases of the Carbon toolchain available
-to download, and only on limited platforms. If you are using a recent Ubuntu
-Linux or similar (Debian, WSL, etc.), you can try these out by going to our
-[releases](https://github.com/carbon-language/carbon-lang/releases) page and
-download the latest nightly toolchain tar file:
-`carbon_toolchain-0.0.0-0.nightly.YYYY.MM.DD.tar.gz`. Then you can try it out:
-
-```shell
-# A variable with the nightly version from yesterday:
-VERSION="$(date -d yesterday +0.0.0-0.nightly.%Y.%m.%d)"
-
-# Get the release
-wget https://github.com/carbon-language/carbon-lang/releases/download/v${VERSION}/carbon_toolchain-${VERSION}.tar.gz
-
-# Unpack the toolchain:
-tar -xvf carbon_toolchain-${VERSION}.tar.gz
-
-# Create a simple Carbon source file:
-echo "import Core library \"io\"; fn Run() { Core.Print(42); }" > forty_two.carbon
-
-# Compile to an object file:
-./carbon_toolchain-${VERSION}/bin/carbon compile \
-  --output=forty_two.o forty_two.carbon
-
-# Install minimal system libraries used for linking. Note that installing `gcc`
-# or `g++` for compiling C/C++ code with GCC will also be sufficient, these are
-# just the specific system libraries Carbon linking still uses.
-sudo apt install libgcc-11-dev
-
-# Link to an executable:
-./carbon_toolchain-${VERSION}/bin/carbon link \
-  --output=forty_two forty_two.o
-
-# Run it:
-./forty_two
+A clean, modular compiler boilerplate built on LLVM with a fully working Bazel
+build system. Derived from the
+[Carbon Language](https://github.com/carbon-language/carbon-lang) compiler
+infrastructure, this project provides a ready-to-use foundation for building
+your own LLVM-based compiled language.
+
+## What You Get
+
+- **Complete Bazel + LLVM build system** -- pre-configured and ready to go
+- **Modular compiler pipeline**: Lex -> Parse -> Check -> SemIR -> Lower ->
+  CodeGen
+- **Rich utility library** (`common/`): hashing, maps, sets, ostream helpers,
+  command-line parsing, error handling, and more
+- **Testing infrastructure**: file-based tests, fuzzing support, test helpers
+- **Language server protocol (LSP)** skeleton
+- **Formatter** skeleton
+- **Diagnostics system** with source locations and formatting
+
+## Project Structure
+
+```
+compiler-boilerplate/
+├── common/              # Generic utilities (keep as-is, very reusable)
+├── toolchain/
+│   ├── base/            # Value stores, index types, shared infrastructure
+│   ├── source/          # Source buffer (reading source files)
+│   ├── diagnostics/     # Error/warning reporting system
+│   ├── lex/             # Lexer skeleton (tokenization)
+│   ├── parse/           # Parser skeleton (AST construction)
+│   ├── check/           # Semantic analysis skeleton
+│   ├── sem_ir/          # Semantic IR (intermediate representation)
+│   ├── lower/           # LLVM IR lowering skeleton
+│   ├── codegen/         # LLVM code generation (machine code output)
+│   ├── driver/          # Compiler driver (CLI entry point)
+│   ├── language_server/ # LSP server skeleton
+│   ├── format/          # Code formatter skeleton
+│   ├── install/         # Installation path handling
+│   └── testing/         # Test infrastructure
+├── core/                # Language core library stubs
+├── examples/            # Example source files
+├── testing/             # Shared test infrastructure
+├── bazel/               # Bazel rules, toolchains, LLVM integration
+├── third_party/         # Third-party dependencies
+├── scripts/             # Build and utility scripts
+└── docs/                # Documentation
 ```
 
-As a reminder, the toolchain is still very early and many things don't yet work.
-Please hold off on filing lots of bugs: we know many parts of this don't work
-yet or may not work on all systems. We expect to have releases that are much
-more robust and reliable that you can try out when we reach our
-[0.1 milestone](/docs/project/milestones.md#milestone-01-a-minimum-viable-product-mvp-for-evaluation).
+## Getting Started
 
-If you want to build Carbon's toolchain yourself or are thinking about
-contributing fixes or improvements to Carbon, you'll need to install our
-[build dependencies](/docs/project/contribution_tools.md#setup-commands) (Clang,
-LLD, libc++) and check out the Carbon repository. For example, on Debian or
-Ubuntu:
+### Prerequisites
+
+You need the following tools installed:
+
+- [Bazel](https://bazel.build/) (via Bazelisk recommended)
+- Clang/LLVM toolchain
+- LLD (LLVM linker)
+- libc++ (LLVM C++ standard library)
+
+On Debian/Ubuntu:
 
 ```shell
-# Update apt.
 sudo apt update
-
-# Install tools.
-sudo apt install \
-  clang \
-  libc++-dev \
-  libc++abi-dev \
-  lld
-
-# Download Carbon's code.
-$ git clone https://github.com/carbon-language/carbon-lang
-$ cd carbon-lang
+sudo apt install clang libc++-dev libc++abi-dev lld
 ```
 
-Then you can try out our toolchain which has a very early-stage compiler for
-Carbon:
+On macOS (with Homebrew):
 
 ```shell
-# Build and run the toolchain's help to get documentation on the command line.
-$ ./scripts/run_bazelisk.py run //toolchain -- help
+brew install llvm
 ```
 
-For complete instructions, including installing dependencies on various
-different platforms, see our
-[contribution tools documentation](/docs/project/contribution_tools.md).
+### Building
 
-Learn more about the Carbon project:
+```shell
+# Build the entire toolchain
+bazel build //toolchain
 
--   [Project goals](/docs/project/goals.md)
--   [Language design overview](/docs/design)
--   [Carbon Toolchain](/toolchain)
--   [FAQ](/docs/project/faq.md)
+# Build specific stages
+bazel build //toolchain/lex/...
+bazel build //toolchain/parse/...
+bazel build //toolchain/check/...
+bazel build //toolchain/lower/...
+bazel build //toolchain/driver/...
 
-## Conference talks
+# Run the compiler
+./scripts/run_bazelisk.py run //toolchain -- help
 
-Carbon focused talks from the community:
+# Run tests
+bazel test //toolchain/...
+```
 
-### 2026
+## How to Build Your Language
 
--   Benchmarking and optimizing the Carbon compiler, NDC {Toronto} (May 5-8)
--   Carbon: graduating from the experiment, NDC {Toronto} (May 5-8)
+Each compiler stage has stub implementations marked with `TODO` comments. Here
+is how to extend each stage:
 
-### 2025
+### 1. Define Your Tokens (`toolchain/lex/`)
 
--   Carbon: from C++ to Memory Safety, REBASE - ICFP/SPLASH
-    ([slides](https://chandlerc.blog/slides/2025-rebase-carbon))
--   Memory safety everywhere with both Carbon and Rust, RustConf
-    ([video](https://youtu.be/FYLuom6gg_s),
-    [slides](https://chandlerc.blog/slides/2025-rustconf-memory-safety-everywhere))
+Edit `token_kind.def` to add your language's tokens (keywords, operators,
+punctuation). Implement the lexer logic in `lex.cpp` to tokenize source text
+into a `TokenizedBuffer`.
 
-### 2024
+### 2. Define Your Grammar (`toolchain/parse/`)
 
--   Generic implementation strategies in Carbon and Clang, LLVM Developers'
-    Meeting ([video](https://youtu.be/j0BL52NdjAU),
-    [slides](https://chandlerc.blog/slides/2024-llvm-generic-implementation/#/))
--   The Carbon Language: Road to 0.1, NDC {TechTown}
-    ([video](https://youtu.be/bBvLmDJrzvI),
-    [slides](https://chandlerc.blog/slides/2024-ndc-techtown-carbon-road-to-0-dot-1))
--   How designing Carbon with C++ interop taught me about C++ variadics and
-    overloads, CppNorth ([video](https://youtu.be/8SGMy9ENGz8),
-    [slides](https://chandlerc.blog/slides/2024-cppnorth-design-stories))
--   Generic Arity: Definition-Checked Variadics in Carbon, C++Now
-    ([video](https://youtu.be/Y_px536l_80),
-    [slides](https://docs.google.com/presentation/d/10aM1mFMN6Cd5ZkE4OfeiZtSnkVNbo33N-V0et21umww/edit))
--   Carbon: An experiment in different tradeoffs, panel session, EuroLLVM
-    ([video](https://youtu.be/Za_KWj5RMR8),
-    [slides](https://llvm.org/devmtg/2024-04/slides/LightningTalks/Smith-Carbons-high-level-semanticIR.pdf))
-    -   [Alex Bradbury's notes](https://muxup.com/2024q2/notes-from-the-carbon-panel-session-at-eurollvm)
--   Carbon's high-level semantic IR lightning talk, EuroLLVM
-    ([video](https://youtu.be/vIWT4RhUcyw))
+Edit `node_kind.def` to define your AST node types. Implement the parser in
+`parse.cpp` to build a parse tree from the token stream.
 
-### 2023
+### 3. Implement Semantic Analysis (`toolchain/check/`)
 
--   Carbon’s Successor Strategy: From C++ interop to memory safety, C++Now
-    ([video](https://youtu.be/1ZTJ9omXOQ0),
-    [slides](https://chandlerc.blog/slides/2023-cppnow-carbon-strategy/index.html#/))
--   Definition-Checked Generics, C++Now
-    -   Part 1 ([video](https://youtu.be/FKC8WACSMP0),
-        [slides](https://chandlerc.blog/slides/2023-cppnow-generics-1/#/))
-    -   Part 2 ([video](https://youtu.be/VxQ3PwxiSzk),
-        [slides](https://chandlerc.blog/slides/2023-cppnow-generics-2/#/))
--   Modernizing Compiler Design for Carbon’s Toolchain, C++Now
-    ([video](https://youtu.be/ZI198eFghJk),
-    [slides](https://chandlerc.blog/slides/2023-cppnow-compiler/index.html#/))
+Implement type checking, name resolution, and semantic validation in
+`check.cpp`. This stage walks the parse tree and produces SemIR.
 
-### 2022
+### 4. Define Your IR (`toolchain/sem_ir/`)
 
--   Carbon Language: Syntax and trade-offs, Core C++
-    ([video](https://youtu.be/9Y2ivB8VaIs),
-    [slides](https://docs.google.com/presentation/d/1znvL12xCuEfcsP6tpPdrQPnh-UoPFOLnC_RVXZteYaM/edit))
--   Carbon Language: An experimental successor to C++, CppNorth
-    ([video](https://youtu.be/omrY53kbVoA),
-    [slides](https://chandlerc.blog/slides/2022-07-19-cppnorth-keynote/#/))
+Edit `inst_kind.def` to define your semantic IR instructions. The SemIR
+represents your program in a form suitable for lowering to LLVM IR.
 
-### Other videos
+### 5. Lower to LLVM IR (`toolchain/lower/`)
 
-We additionally have [toolchain videos](/toolchain/docs/README.md#videos).
+Implement the translation from your SemIR to LLVM IR in `lower.cpp`. This is
+where your language semantics get mapped to LLVM's instruction set.
 
-## Join us
+### 6. Code Generation (`toolchain/codegen/`)
 
-We'd love to have folks join us and contribute to the project. Carbon is
-committed to a welcoming and inclusive environment where everyone can
-contribute.
+The code generation stage is already functional -- it uses LLVM's backend to
+produce machine code from LLVM IR. You generally do not need to modify this.
 
--   Most of Carbon's design discussions occur on
-    [Discord](https://discord.gg/ZjVdShJDAs).
--   To watch for major release announcements, subscribe to our
-    [Carbon release post on GitHub](https://github.com/carbon-language/carbon-lang/discussions/1020)
-    and [star carbon-lang](https://github.com/carbon-language/carbon-lang).
--   See our [code of conduct](CODE_OF_CONDUCT.md) and
-    [contributing guidelines](CONTRIBUTING.md) for information about the Carbon
-    development community.
+### 7. Add Diagnostics (`toolchain/diagnostics/`)
 
-### Contributing
+Add error and warning messages in `kind.def` for each compiler stage. The
+diagnostics system supports source locations, fix-it hints, and formatting.
 
-You can also directly:
+## Architecture
 
--   [Contribute to the language design](CONTRIBUTING.md#contributing-to-the-language-design):
-    feedback on design, new design proposal
--   [Contribute to the language implementation](CONTRIBUTING.md#contributing-to-the-language-implementation)
-    -   [Carbon Toolchain](/toolchain/), and project infrastructure
+The compiler follows a traditional multi-pass architecture:
 
-You can **check out some
-["good first issues"](https://github.com/carbon-language/carbon-lang/labels/good%20first%20issue)**,
-or join the `#contributing-help` channel on
-[Discord](https://discord.gg/ZjVdShJDAs). See our full
-[`CONTRIBUTING`](CONTRIBUTING.md) documentation for more details.
+```
+Source File
+    │
+    ▼
+┌─────────┐
+│  Lexer   │  Source text → Token stream
+└────┬─────┘
+     │
+     ▼
+┌─────────┐
+│  Parser  │  Token stream → Parse tree
+└────┬─────┘
+     │
+     ▼
+┌─────────┐
+│  Check   │  Parse tree → Semantic IR
+└────┬─────┘
+     │
+     ▼
+┌─────────┐
+│  Lower   │  Semantic IR → LLVM IR
+└────┬─────┘
+     │
+     ▼
+┌─────────┐
+│ CodeGen  │  LLVM IR → Object file
+└─────────┘
+```
+
+## License
+
+This project is licensed under the Apache License v2.0 with LLVM Exceptions.
+See [LICENSE](LICENSE) for details.
+
+## Acknowledgments
+
+This boilerplate is derived from the
+[Carbon Language](https://github.com/carbon-language/carbon-lang) compiler. The
+build infrastructure, utility libraries, and compiler architecture are based on
+the Carbon team's excellent work.

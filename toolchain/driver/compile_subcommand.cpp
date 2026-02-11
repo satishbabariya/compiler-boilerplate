@@ -39,7 +39,7 @@ auto CompileOptions::Build(CommandLine::CommandBuilder& b) -> void {
       {
           .name = "FILE",
           .help = R"""(
-The input Carbon source file to compile.
+The input source file to compile.
 )""",
       },
       [&](auto& arg_b) {
@@ -71,44 +71,10 @@ compile to machine code.
 
   b.AddStringOption(
       {
-          .name = "clang-arg",
-          .value_name = "CLANG-ARG",
-          .help = R"""(
-An argument to pass to the Clang compiler for use when compiling imported C++
-code.
-
-All flags that are accepted by the Clang driver are supported. However, you
-cannot specify arguments that would result in additional compilations being
-performed. Use `carbon clang` instead to compile additional source files.
-)""",
-      },
-      [&](auto& arg_b) { arg_b.Append(&clang_args); });
-
-  b.AddStringPositionalArg(
-      {
-          .name = "CLANG-ARG",
-          .help = R"""(
-Additional Clang arguments. See help for `--clang-arg` for details.
-)""",
-      },
-      [&](auto& arg_b) { arg_b.Append(&clang_args); });
-
-  // TODO: Rearrange the code setting this option and two related ones to
-  // allow them to reference each other instead of hard-coding their names.
-  b.AddStringOption(
-      {
           .name = "output",
           .value_name = "FILE",
           .help = R"""(
 The output filename for codegen.
-
-When this is a file name, either textual assembly or a binary object will be
-written to it based on the flag `--asm-output`. The default is to write a binary
-object file.
-
-Passing `--output=-` will write the output to stdout. In that case, the flag
-`--asm-output` is ignored and the output defaults to textual assembly. Binary
-object output can be forced by enabling `--force-obj-output`.
 )""",
       },
       [&](auto& arg_b) { arg_b.Set(&output_filename); });
@@ -123,15 +89,6 @@ Selects the amount of optimization to perform.
       [&](auto& arg_b) {
         arg_b.SetOneOf(
             {
-                // We intentionally don't expose O2 and Os. The difference
-                // between these levels tends to reflect what achieves the
-                // best speed for a specific application, as they all
-                // largely optimize for speed as the primary factor.
-                //
-                // Instead of controlling this with more nuanced flags, we
-                // plan to support profile and in-source hints to the
-                // optimizer to adjust its strategy in the specific places
-                // where the default doesn't have the desired results.
                 arg_b.OneOfValue("none", Lower::OptimizationLevel::None),
                 arg_b.OneOfValue("debug", Lower::OptimizationLevel::Debug),
                 arg_b.OneOfValue("speed", Lower::OptimizationLevel::Speed),
@@ -140,123 +97,75 @@ Selects the amount of optimization to perform.
             &opt_level);
       });
 
-  // Include the common code generation options at this point to render it
-  // after the more common options above, but before the more unusual options
-  // below.
   codegen_options.Build(b);
 
   b.AddFlag(
       {
           .name = "asm-output",
-          .help = R"""(
-Write textual assembly rather than a binary object file to the code generation
-output.
-
-This flag only applies when writing to a file. When writing to stdout, the
-default is textual assembly and this flag is ignored.
-)""",
+          .help = "Write textual assembly rather than a binary object file.",
       },
       [&](auto& arg_b) { arg_b.Set(&asm_output); });
 
   b.AddFlag(
       {
           .name = "force-obj-output",
-          .help = R"""(
-Force binary object output, even with `--output=-`.
-
-When `--output=-` is set, the default is textual assembly; this forces printing
-of a binary object file instead. Ignored for other `--output` values.
-)""",
+          .help = "Force binary object output, even with `--output=-`.",
       },
       [&](auto& arg_b) { arg_b.Set(&force_obj_output); });
 
   b.AddFlag(
       {
           .name = "stream-errors",
-          .help = R"""(
-Stream error messages to stderr as they are generated rather than sorting them
-and displaying them in source order.
-)""",
+          .help = "Stream error messages to stderr as generated.",
       },
       [&](auto& arg_b) { arg_b.Set(&stream_errors); });
 
   b.AddFlag(
       {
           .name = "dump-shared-values",
-          .help = R"""(
-Dumps shared values. These aren't owned by any particular file or phase.
-)""",
+          .help = "Dumps shared values.",
       },
       [&](auto& arg_b) { arg_b.Set(&dump_shared_values); });
   b.AddFlag(
       {
           .name = "dump-tokens",
-          .help = R"""(
-Dump the tokens to stdout when lexed.
-)""",
+          .help = "Dump the tokens to stdout when lexed.",
       },
       [&](auto& arg_b) { arg_b.Set(&dump_tokens); });
-
   b.AddFlag(
       {
           .name = "omit-file-boundary-tokens",
-          .help = R"""(
-For `--dump-tokens`, omit file start and end boundary tokens.
-)""",
+          .help = "For `--dump-tokens`, omit file start and end tokens.",
       },
       [&](auto& arg_b) { arg_b.Set(&omit_file_boundary_tokens); });
-
   b.AddFlag(
       {
           .name = "dump-parse-tree",
-          .help = R"""(
-Dump the parse tree to stdout when parsed.
-)""",
+          .help = "Dump the parse tree to stdout when parsed.",
       },
       [&](auto& arg_b) { arg_b.Set(&dump_parse_tree); });
   b.AddFlag(
       {
           .name = "preorder-parse-tree",
-          .help = R"""(
-When dumping the parse tree, reorder it so that it is in preorder rather than
-postorder.
-)""",
+          .help = "When dumping the parse tree, use preorder instead.",
       },
       [&](auto& arg_b) { arg_b.Set(&preorder_parse_tree); });
   b.AddFlag(
       {
           .name = "dump-raw-sem-ir",
-          .help = R"""(
-Dump the raw JSON structure of SemIR to stdout when built.
-)""",
+          .help = "Dump the raw JSON structure of SemIR to stdout.",
       },
       [&](auto& arg_b) { arg_b.Set(&dump_raw_sem_ir); });
   b.AddFlag(
       {
           .name = "dump-sem-ir",
-          .help = R"""(
-Dump the full SemIR to stdout when built.
-)""",
+          .help = "Dump the full SemIR to stdout when built.",
       },
       [&](auto& arg_b) { arg_b.Set(&dump_sem_ir); });
-  b.AddFlag(
-      {
-          .name = "dump-cpp-ast",
-          .help = R"""(
-Dump the full C++ AST to stdout when built.
-)""",
-      },
-      [&](auto& arg_b) { arg_b.Set(&dump_cpp_ast); });
-
   b.AddOneOfOption(
       {
           .name = "dump-sem-ir-ranges",
-          .help = R"""(
-Selects handling of `//@dump-sem-ir-[begin|end]` markers when dumping SemIR.
-By default, `if-present` prints ranges for files that have them, and full SemIR
-for files that don't. `only` skips files with no ranges, and `ignore` always
-prints full SemIR.
-)""",
+          .help = "Selects handling of SemIR range markers when dumping.",
       },
       [&](auto& arg_b) {
         using DumpSemIRRanges = Check::CheckParseTreesOptions::DumpSemIRRanges;
@@ -269,90 +178,56 @@ prints full SemIR.
             },
             &dump_sem_ir_ranges);
       });
-
   b.AddFlag(
       {
           .name = "builtin-sem-ir",
-          .help = R"""(
-Include the SemIR for builtins when dumping it.
-)""",
+          .help = "Include the SemIR for builtins when dumping it.",
       },
       [&](auto& arg_b) { arg_b.Set(&builtin_sem_ir); });
   b.AddFlag(
       {
           .name = "dump-llvm-ir",
-          .help = R"""(
-Dump the LLVM IR to stdout after lowering.
-)""",
+          .help = "Dump the LLVM IR to stdout after lowering.",
       },
       [&](auto& arg_b) { arg_b.Set(&dump_llvm_ir); });
   b.AddFlag(
       {
           .name = "dump-asm",
-          .help = R"""(
-Dump the generated assembly to stdout after codegen.
-)""",
+          .help = "Dump the generated assembly to stdout after codegen.",
       },
       [&](auto& arg_b) { arg_b.Set(&dump_asm); });
   b.AddFlag(
       {
           .name = "dump-mem-usage",
-          .help = R"""(
-Dumps the amount of memory used.
-)""",
+          .help = "Dumps the amount of memory used.",
       },
       [&](auto& arg_b) { arg_b.Set(&dump_mem_usage); });
   b.AddFlag(
       {
           .name = "dump-timings",
-          .help = R"""(
-Dumps the duration of each phase for each compilation unit.
-)""",
+          .help = "Dumps the duration of each phase.",
       },
       [&](auto& arg_b) { arg_b.Set(&dump_timings); });
   b.AddFlag(
       {
           .name = "prelude-import",
-          .help = R"""(
-Whether to use the implicit prelude import. Enabled by default.
-)""",
-      },
-      [&](auto& arg_b) {
-        arg_b.Default(true);
-        arg_b.Set(&prelude_import);
-      });
-  b.AddFlag(
-      {
-          .name = "custom-core",
-          .value_name = "CUSTOM_CORE",
-          .help = R"""(
-Whether to use a custom Core package, the files for which must all be included
-in the compile command line.
-
-The prelude library in the Core package is imported automatically. By default,
-the Core package shipped with the toolchain is used, and its files do not need
-to be specified in the compile command line.
-)""",
+          .help = "Whether to use the implicit prelude import.",
       },
       [&](auto& arg_b) {
         arg_b.Default(false);
-        arg_b.Set(&custom_core);
+        arg_b.Set(&prelude_import);
       });
   b.AddStringOption(
       {
           .name = "exclude-dump-file-prefix",
           .value_name = "PREFIX",
-          .help = R"""(
-Excludes files with the given prefix from dumps.
-)""",
+          .help = "Excludes files with the given prefix from dumps.",
       },
       [&](auto& arg_b) { arg_b.Append(&exclude_dump_file_prefixes); });
   b.AddFlag(
       {
           .name = "debug-info",
-          .help = R"""(
-Whether to emit DWARF debug information.
-)""",
+          .help = "Whether to emit DWARF debug information.",
       },
       [&](auto& arg_b) {
         arg_b.Default(true);
@@ -361,32 +236,20 @@ Whether to emit DWARF debug information.
   b.AddFlag(
       {
           .name = "verify-llvm-ir",
-          .help = R"""(
-Whether to run the LLVM verifier on modules.
-)""",
+          .help = "Whether to run the LLVM verifier on modules.",
       },
       [&](auto& arg_b) {
         arg_b.Default(true);
         arg_b.Set(&run_llvm_verifier);
       });
-  b.AddStringOption(
-      {
-          .name = "sem-ir-crash-dump",
-          .value_name = "PATH",
-          .help = R"""(
-Where to write a dump of the raw SemIR emitted so far, in the event of a crash
-in the check phase. If empty, the dump is not written.
-)""",
-      },
-      [&](auto& arg_b) { arg_b.Set(&sem_ir_crash_dump); });
 }
 
 static constexpr CommandLine::CommandInfo SubcommandInfo = {
     .name = "compile",
     .help = R"""(
-Compile Carbon source code.
+Compile source code.
 
-This subcommand runs the Carbon compiler over input source code, checking it for
+This subcommand runs the compiler over input source code, checking it for
 errors and producing the requested output.
 
 Error messages are written to the standard error stream.
@@ -398,7 +261,6 @@ can be written to standard output as these phases progress.
 
 CompileSubcommand::CompileSubcommand() : DriverSubcommand(SubcommandInfo) {}
 
-// Returns a string for printing the phase in a diagnostic.
 static auto PhaseToString(CompileOptions::Phase phase) -> std::string {
   switch (phase) {
     case CompileOptions::Phase::Lex:
@@ -437,11 +299,6 @@ auto CompileSubcommand::ValidateOptions(
                      PhaseToString(options_.phase));
         return false;
       }
-      if (options_.dump_cpp_ast) {
-        emitter.Emit(CompilePhaseFlagConflict, "C++ AST",
-                     PhaseToString(options_.phase));
-        return false;
-      }
       [[fallthrough]];
     case Phase::Check:
       if (options_.dump_llvm_ir) {
@@ -453,7 +310,6 @@ auto CompileSubcommand::ValidateOptions(
     case Phase::Lower:
     case Phase::Optimize:
     case Phase::CodeGen:
-      // Everything can be dumped in these phases.
       break;
   }
   return true;
@@ -461,58 +317,27 @@ auto CompileSubcommand::ValidateOptions(
 
 namespace {
 
-class MultiUnitCache;
-
 // Ties together information for a file being compiled.
 class CompilationUnit {
  public:
-  // `driver_env`, `options`, `consumer`, and `target` must be non-null.
   explicit CompilationUnit(SemIR::CheckIRId check_ir_id, int total_ir_count,
                            DriverEnv* driver_env, const CompileOptions* options,
                            Diagnostics::Consumer* consumer,
                            llvm::StringRef input_filename,
                            const llvm::Target* target);
 
-  // Sets the multi-unit cache and initializes dependent member state.
-  auto SetMultiUnitCache(MultiUnitCache* cache) -> void;
-
-  // Loads source and lexes it. Returns true on success.
   auto RunLex() -> void;
-
-  // Parses tokens. Returns true on success.
   auto RunParse() -> void;
-
-  // Returns information needed to check this unit.
   auto GetCheckUnit() -> Check::Unit;
-
-  // Runs post-check logic. Returns true if checking succeeded for the IR.
   auto PostCheck() -> void;
-
-  // Lower SemIR to LLVM IR.
   auto RunLower() -> void;
-
-  // Runs the optimization pipeline.
   auto RunOptimize() -> void;
-
-  // Runs post-lowering-to-LLVM-IR logic. This is always called if we do any
-  // lowering work, after we've finished building the IR in RunLower() and,
-  // optionally, RunOptimize().
   auto PostLower() -> void;
-
   auto RunCodeGen() -> void;
-
-  // Runs post-compile logic. This is always called, and called after all other
-  // actions on the CompilationUnit.
   auto PostCompile() -> void;
 
-  // Flushes diagnostics, specifically as part of generating stack trace
-  // information.
   auto FlushForStackTrace() -> void { consumer_->Flush(); }
-
   auto input_filename() -> llvm::StringRef { return input_filename_; }
-  auto has_include_in_dumps() -> bool {
-    return tokens_ && tokens_->has_include_in_dumps();
-  }
   auto success() -> bool { return success_; }
   auto has_source() -> bool { return source_.has_value(); }
   auto get_trees_and_subtrees() -> Parse::GetTreeAndSubtreesFn {
@@ -520,29 +345,15 @@ class CompilationUnit {
   }
 
  private:
-  // Do codegen. Returns true on success.
   auto RunCodeGenHelper() -> bool;
-
-  // The TreeAndSubtrees is mainly used for debugging and diagnostics, and has
-  // significant overhead. Avoid constructing it when unused.
   auto GetParseTreeAndSubtrees() -> const Parse::TreeAndSubtrees&;
-
-  // Wraps a call with log statements to indicate start and end. Typically logs
-  // with the actual function name, but marks timings with the appropriate
-  // phase.
   auto LogCall(llvm::StringLiteral logging_label,
                llvm::StringLiteral timing_label,
                llvm::function_ref<auto()->void> fn) -> void;
-
-  // Returns true if the current file should be included in debug dumps.
   auto IncludeInDumps() -> bool;
-
-  // Builds the LLVM target machine.
   auto MakeTargetMachine() -> void;
 
-  // The index of the unit amongst all units.
   SemIR::CheckIRId check_ir_id_;
-  // The number of units in total.
   int total_ir_count_;
 
   DriverEnv* driver_env_;
@@ -550,30 +361,17 @@ class CompilationUnit {
   const llvm::Target* target_;
 
   SharedValueStores value_stores_;
-
-  // The input filename from the command line. For most diagnostics, we
-  // typically use `source_->filename()`, which includes a `-` -> `<stdin>`
-  // translation. However, logging and some diagnostics use the command line
-  // argument.
   std::string input_filename_;
-
-  // Copied from driver_ for CARBON_VLOG.
   llvm::raw_pwrite_stream* vlog_stream_;
 
-  // Diagnostics are sent to consumer_, with optional sorting.
   std::optional<Diagnostics::SortingConsumer> sorting_consumer_;
   Diagnostics::Consumer* consumer_;
 
   bool success_ = true;
 
-  // Initialized by `SetMultiUnitCache`.
-  MultiUnitCache* cache_ = nullptr;
-  // Tracks memory usage of the compile.
   std::optional<MemUsage> mem_usage_;
-  // Tracks timings of the compile.
   std::optional<Timings> timings_;
 
-  // These are initialized as steps are run.
   std::optional<SourceBuffer> source_;
   std::optional<Lex::TokenizedBuffer> tokens_;
   std::optional<Parse::Tree> parse_tree_;
@@ -584,82 +382,6 @@ class CompilationUnit {
   std::optional<SemIR::File> sem_ir_;
   std::unique_ptr<llvm::Module> module_;
   std::unique_ptr<llvm::TargetMachine> target_machine_;
-};
-
-// Caches lists that are shared cross-unit. Accessors do lazy caching because
-// they may not be used.
-class MultiUnitCache {
- public:
-  using IncludeInDumpsStore = FixedSizeValueStore<SemIR::CheckIRId, bool>;
-  using TreeAndSubtreesGettersStore = Parse::GetTreeAndSubtreesStore;
-
-  // This relies on construction after `units` are all initialized, which is
-  // reflected by the `ArrayRef` here.
-  explicit MultiUnitCache(
-      const CompileOptions* options,
-      llvm::ArrayRef<std::unique_ptr<CompilationUnit>> units)
-      : options_(options), units_(units) {}
-
-  // If `include_in_dumps` is in use, we need to apply per-file include
-  // settings.
-  auto ApplyPerFileIncludeInDumps() -> void {
-    if (!include_in_dumps_) {
-      // No cached value to update.
-      return;
-    }
-    for (const auto& [i, unit] : llvm::enumerate(units_)) {
-      if (unit->has_include_in_dumps()) {
-        include_in_dumps_->Set(SemIR::CheckIRId(i), true);
-      }
-    }
-  }
-
-  auto include_in_dumps() -> const IncludeInDumpsStore& {
-    if (!include_in_dumps_) {
-      include_in_dumps_.emplace(
-          IncludeInDumpsStore::MakeWithExplicitSize(units_.size(), false));
-      for (const auto& [i, unit] : llvm::enumerate(units_)) {
-        // If this is first accessed after lexing is complete, we need to apply
-        // per-file includes. Otherwise, this is based only on the exclude
-        // option.
-        bool include =
-            unit->has_include_in_dumps() ||
-            llvm::none_of(options_->exclude_dump_file_prefixes,
-                          [&](auto prefix) {
-                            return unit->input_filename().starts_with(prefix);
-                          });
-        include_in_dumps_->Set(SemIR::CheckIRId(i), include);
-      }
-    }
-    return *include_in_dumps_;
-  }
-
-  auto tree_and_subtrees_getters() -> const TreeAndSubtreesGettersStore& {
-    if (!tree_and_subtrees_getters_) {
-      tree_and_subtrees_getters_.emplace(
-          TreeAndSubtreesGettersStore::MakeWithExplicitSize(units_.size(),
-                                                            nullptr));
-      for (const auto& [i, unit] : llvm::enumerate(units_)) {
-        if (unit->has_source()) {
-          tree_and_subtrees_getters_->Set(SemIR::CheckIRId(i),
-                                          unit->get_trees_and_subtrees());
-        }
-      }
-    }
-    return *tree_and_subtrees_getters_;
-  }
-
- private:
-  const CompileOptions* options_;
-
-  // The units being compiled.
-  llvm::ArrayRef<std::unique_ptr<CompilationUnit>> units_;
-
-  // For each unit, whether it's included in dumps. Used cross-phase.
-  std::optional<IncludeInDumpsStore> include_in_dumps_;
-
-  // For each unit, the `TreeAndSubtrees` getter. Used by lowering.
-  std::optional<TreeAndSubtreesGettersStore> tree_and_subtrees_getters_;
 };
 
 }  // namespace
@@ -683,30 +405,23 @@ CompilationUnit::CompilationUnit(SemIR::CheckIRId check_ir_id,
     sorting_consumer_ = Diagnostics::SortingConsumer(*consumer);
     consumer_ = &*sorting_consumer_;
   }
-}
 
-auto CompilationUnit::IncludeInDumps() -> bool {
-  return cache_->include_in_dumps().Get(check_ir_id_);
-}
-
-auto CompilationUnit::SetMultiUnitCache(MultiUnitCache* cache) -> void {
-  CARBON_CHECK(!cache_, "Called SetMultiUnitCache twice");
-  cache_ = cache;
-
-  if (options_->dump_mem_usage && IncludeInDumps()) {
-    CARBON_CHECK(!mem_usage_);
+  if (options_->dump_mem_usage) {
     mem_usage_ = MemUsage();
   }
-  if (options_->dump_timings && IncludeInDumps()) {
-    CARBON_CHECK(!timings_);
+  if (options_->dump_timings) {
     timings_ = Timings();
   }
 }
 
-auto CompilationUnit::RunLex() -> void {
-  CARBON_CHECK(cache_, "Must call SetMultiUnitCache first");
-  CARBON_CHECK(!tokens_, "Called RunLex twice");
+auto CompilationUnit::IncludeInDumps() -> bool {
+  return llvm::none_of(options_->exclude_dump_file_prefixes,
+                       [&](auto prefix) {
+                         return input_filename_.starts_with(prefix.str());
+                       });
+}
 
+auto CompilationUnit::RunLex() -> void {
   LogCall("SourceBuffer::MakeFromFileOrStdin", "source", [&] {
     source_ = SourceBuffer::MakeFromFileOrStdin(*driver_env_->fs,
                                                 input_filename_, *consumer_);
@@ -782,10 +497,6 @@ auto CompilationUnit::GetCheckUnit() -> Check::Unit {
 
 auto CompilationUnit::PostCheck() -> void {
   CARBON_CHECK(sem_ir_, "Must call GetCheckUnit first");
-
-  // We've finished all steps that can produce diagnostics. Emit the
-  // diagnostics now, so that the developer sees them sooner and doesn't need
-  // to wait for code generation.
   consumer_->Flush();
 
   if (mem_usage_) {
@@ -808,9 +519,8 @@ auto CompilationUnit::RunLower() -> void {
     options.want_debug_info = options_->include_debug_info;
     options.vlog_stream = vlog_stream_;
     options.opt_level = options_->opt_level;
-    module_ = Lower::LowerToLLVM(*llvm_context_, driver_env_->fs,
-                                 cache_->tree_and_subtrees_getters(), *sem_ir_,
-                                 total_ir_count_, options);
+    module_ = Lower::LowerToLLVM(*llvm_context_, input_filename_,
+                                 *sem_ir_, options);
   });
 }
 
@@ -818,13 +528,9 @@ auto CompilationUnit::MakeTargetMachine() -> void {
   CARBON_CHECK(module_, "Must call RunLower first");
   CARBON_CHECK(!target_machine_, "Should not call this multiple times");
 
-  // Set the target on the module.
-  // TODO: We should do this earlier. Lower should be passed the target triple
-  // so it can create the module with this already set.
   llvm::Triple target_triple(options_->codegen_options.target);
   module_->setTargetTriple(target_triple);
 
-  // TODO: Provide flags to control these.
   constexpr llvm::StringLiteral CPU = "generic";
   constexpr llvm::StringLiteral Features = "";
 
@@ -833,7 +539,6 @@ auto CompilationUnit::MakeTargetMachine() -> void {
       target_triple, CPU, Features, target_opts, llvm::Reloc::PIC_));
 }
 
-// Get the LLVM optimization level corresponding to a Carbon optimization level.
 static auto GetLLVMOptimizationLevel(Lower::OptimizationLevel opt_level)
     -> llvm::OptimizationLevel {
   switch (opt_level) {
@@ -848,42 +553,15 @@ static auto GetLLVMOptimizationLevel(Lower::OptimizationLevel opt_level)
   }
 }
 
-// Get the `-O` flag corresponding to an optimization level.
-static auto GetClangOptimizationFlag(Lower::OptimizationLevel opt_level)
-    -> llvm::StringLiteral {
-  switch (opt_level) {
-    case Lower::OptimizationLevel::None:
-      return "-O0";
-    case Lower::OptimizationLevel::Debug:
-      return "-O1";
-    case Lower::OptimizationLevel::Size:
-      return "-Oz";
-    case Lower::OptimizationLevel::Speed:
-      return "-O3";
-  }
-}
-
 auto CompilationUnit::RunOptimize() -> void {
   CARBON_CHECK(module_, "Must call RunLower first");
 
-  // TODO: A lot of the work done here duplicates work done by Clang setting up
-  // its pass manager. Moreover, we probably want to pick up Clang's
-  // customizations and make use of its flags for controlling LLVM passes. We
-  // should consider whether we would be better off running Clang's pass
-  // pipeline rather than building one of our own, or factoring out enough of
-  // Clang's pipeline builder that we can reuse and further customize it.
-
   MakeTargetMachine();
 
-  // TODO: There's no way to set these automatically from an
-  // llvm::OptimizationLevel. Add such a mechanism to LLVM and use it from
-  // here. For now we reconstruct what Clang does by default.
   llvm::PipelineTuningOptions pto;
   bool opt_for_speed = options_->opt_level == Lower::OptimizationLevel::Speed;
   bool opt_for_size_or_speed =
       opt_for_speed || options_->opt_level == Lower::OptimizationLevel::Size;
-  // Loop unrolling is enabled by `--optimize=size` but isn't actually performed
-  // because we add `optsize` attributes to the function definitions we emit.
   pto.LoopUnrolling = opt_for_size_or_speed;
   pto.LoopInterleaving = opt_for_size_or_speed;
   pto.LoopVectorization = opt_for_speed;
@@ -896,8 +574,6 @@ auto CompilationUnit::RunOptimize() -> void {
 
   llvm::PassInstrumentationCallbacks pic;
 
-  // Register standard pass instrumentations. This adds support for things like
-  // `-print-after-all`.
   llvm::StandardInstrumentations si(module_->getContext(),
                                     /*DebugLogging=*/false);
   si.registerCallbacks(pic);
@@ -905,9 +581,6 @@ auto CompilationUnit::RunOptimize() -> void {
   llvm::PassBuilder builder(target_machine_.get(), pto,
                             /*PGOOpt=*/std::nullopt, &pic);
 
-  // TODO: Add an AssignmentTrackingPass for at least `--optimize=debug`.
-
-  // Set up target library information and add an analysis pass to supply it.
   std::unique_ptr<llvm::TargetLibraryInfoImpl> tlii(llvm::driver::createTLII(
       module_->getTargetTriple(), llvm::driver::VectorLibrary::NoLibrary));
   fam.registerPass([&] { return llvm::TargetLibraryAnalysis(*tlii); });
@@ -969,9 +642,6 @@ auto CompilationUnit::PostCompile() -> void {
     Yaml::Print(*driver_env_->output_stream,
                 timings_->OutputYaml(input_filename_));
   }
-
-  // The diagnostics consumer must be flushed before compilation artifacts are
-  // destructed, because diagnostics can refer to their state.
   consumer_->Flush();
 }
 
@@ -986,9 +656,6 @@ auto CompilationUnit::RunCodeGenHelper() -> bool {
   }
 
   if (options_->output_filename == "-") {
-    // TODO: The output file name, forcing object output, and requesting
-    // textual assembly output are all somewhat linked flags. We should add
-    // some validation that they are used correctly.
     if (options_->force_obj_output) {
       if (!codegen.EmitObject(*driver_env_->output_stream)) {
         return false;
@@ -1002,9 +669,6 @@ auto CompilationUnit::RunCodeGenHelper() -> bool {
     llvm::SmallString<256> output_filename = options_->output_filename;
     if (output_filename.empty()) {
       if (!source_->is_regular_file()) {
-        // Don't invent file names like `-.o` or `/dev/stdin.o`.
-        // TODO: Consider rephrasing the diagnostic to use the file as the
-        // `Emit` location.
         CARBON_DIAGNOSTIC(CompileInputNotRegularFile, Error,
                           "output file name must be specified for input `{0}` "
                           "that is not a regular file",
@@ -1015,12 +679,6 @@ auto CompilationUnit::RunCodeGenHelper() -> bool {
       output_filename = input_filename_;
       llvm::sys::path::replace_extension(output_filename,
                                          options_->asm_output ? ".s" : ".o");
-    } else {
-      // TODO: Handle the case where multiple input files were specified
-      // along with an output file name. That should either be an error or
-      // should produce a single LLVM IR module containing all inputs.
-      // Currently each unit overwrites the output from the previous one in
-      // this case.
     }
     CARBON_VLOG("Writing output to: {0}\n", output_filename);
 
@@ -1028,8 +686,6 @@ auto CompilationUnit::RunCodeGenHelper() -> bool {
     llvm::raw_fd_ostream output_file(output_filename, ec,
                                      llvm::sys::fs::OF_None);
     if (ec) {
-      // TODO: Consider rephrasing the diagnostic to use the file as the `Emit`
-      // location.
       CARBON_DIAGNOSTIC(CompileOutputFileOpenError, Error,
                         "could not open output file `{0}`: {1}", std::string,
                         std::string);
@@ -1079,7 +735,7 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
     return {.success = false};
   }
 
-  // Validate the target before passing it to Clang.
+  // Validate the target.
   std::string target_error;
   const llvm::Target* target = llvm::TargetRegistry::lookupTarget(
       llvm::Triple(options_.codegen_options.target), target_error);
@@ -1090,101 +746,41 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
     return {.success = false};
   }
 
+  // Build a clang invocation for C++ interop support.
   std::shared_ptr<clang::CompilerInvocation> clang_invocation;
-  // Build a clang invocation. We do this regardless of whether we're running
-  // check, because this is essentially performing further option validation,
-  // and we generally validate all options even if we're not using them for the
-  // selected phases of compilation.
-  // TODO: Share any arguments we specify here with the `carbon clang`
-  // subcommand.
   {
-    if (driver_env.fuzzing && !options_.clang_args.empty()) {
-      // Parsing specific Clang arguments can reach deep into
-      // external libraries that aren't fuzz clean.
-      TestAndDiagnoseIfFuzzingExternalLibraries(driver_env, "compile");
-      return {.success = false};
-    }
-
-    // TODO: Move this into `BuildClangInvocation` when it can accept an
-    // optimization level.
-    llvm::SmallVector<llvm::StringRef> clang_args = {
-        // Propagate our optimization level to Clang as a default. This can be
-        // overridden by Clang arguments, but doing so will only have an effect
-        // if those arguments affect Clang's IR, not its pass pipeline.
-        GetClangOptimizationFlag(options_.opt_level),
-    };
-    clang_args.append(options_.clang_args);
     clang_invocation = BuildClangInvocation(
         driver_env.consumer, driver_env.fs, *driver_env.installation,
-        options_.codegen_options.target, clang_args);
+        options_.codegen_options.target);
     if (!clang_invocation) {
       return {.success = false};
     }
-    // We will run our own pass pipeline over the IR in the `Optimize` phase, so
-    // disable Clang's pipeline to avoid optimizing C++ code twice.
     clang_invocation->getCodeGenOpts().DisableLLVMPasses = true;
   }
 
-  // Find the files comprising the prelude if we are importing it.
-  // TODO: Replace this with a search for library api files in a
-  // package-specific search path based on the library name.
-  llvm::SmallVector<std::string> prelude;
-  if (options_.prelude_import && !options_.custom_core &&
-      options_.phase >= CompileOptions::Phase::Check) {
-    if (auto find = driver_env.installation->ReadPreludeManifest(); find.ok()) {
-      prelude = std::move(*find);
-    } else {
-      // TODO: Change ReadPreludeManifest to produce diagnostics.
-      CARBON_DIAGNOSTIC(CompilePreludeManifestError, Error, "{0}", std::string);
-      driver_env.emitter.Emit(CompilePreludeManifestError,
-                              PrintToString(find.error()));
-      return {.success = false};
-    }
-  }
-
-  // Prepare CompilationUnits before building scope exit handlers.
+  // Create CompilationUnits.
   llvm::SmallVector<std::unique_ptr<CompilationUnit>> units;
-  int total_unit_count = prelude.size() + options_.input_filenames.size();
-  int unit_index = -1;
-  auto unit_builder = [&](llvm::StringRef filename) {
-    ++unit_index;
-    return std::make_unique<CompilationUnit>(
-        SemIR::CheckIRId(unit_index), total_unit_count, &driver_env, &options_,
-        &driver_env.consumer, filename, target);
-  };
-  llvm::append_range(units, llvm::map_range(prelude, unit_builder));
-  llvm::append_range(units,
-                     llvm::map_range(options_.input_filenames, unit_builder));
-  CARBON_CHECK(units.size() == static_cast<size_t>(total_unit_count));
-
-  // Add the cache to all units. This must be done after all units are created.
-  MultiUnitCache cache(&options_, units);
-  for (auto& unit : units) {
-    unit->SetMultiUnitCache(&cache);
+  int total_unit_count = options_.input_filenames.size();
+  for (int i = 0; i < total_unit_count; ++i) {
+    units.push_back(std::make_unique<CompilationUnit>(
+        SemIR::CheckIRId(i), total_unit_count, &driver_env, &options_,
+        &driver_env.consumer, options_.input_filenames[i], target));
   }
 
   auto on_exit = llvm::scope_exit([&]() {
-    // Finish compilation units. This flushes their diagnostics in the order in
-    // which they were specified on the command line.
     for (auto& unit : units) {
       unit->PostCompile();
     }
-
     driver_env.consumer.Flush();
   });
 
   PrettyStackTraceFunction flush_on_crash([&](llvm::raw_ostream& out) {
-    // When crashing, flush diagnostics. If sorting diagnostics, they can be
-    // redirected to the crash stream; if streaming, the original stream is
-    // flushed.
-    // TODO: Eventually we'll want to limit the count.
     if (options_.stream_errors) {
       out << "Flushing diagnostics\n";
     } else {
       out << "Pending diagnostics:\n";
       driver_env.consumer.set_stream(&out);
     }
-
     for (auto& unit : units) {
       unit->FlushForStackTrace();
     }
@@ -1192,7 +788,6 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
     driver_env.consumer.set_stream(driver_env.error_stream);
   });
 
-  // Returns a DriverResult object. Called whenever Compile returns.
   auto make_result = [&]() {
     DriverResult result = {.success = true};
     for (const auto& unit : units) {
@@ -1210,10 +805,6 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
   if (options_.phase == CompileOptions::Phase::Lex) {
     return make_result();
   }
-  cache.ApplyPerFileIncludeInDumps();
-  // Parse and check phases examine `has_source` because they want to proceed if
-  // lex failed, but not if source doesn't exist. Later steps are skipped if
-  // anything failed, so don't need this.
 
   // Parse.
   for (auto& unit : units) {
@@ -1225,7 +816,7 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
     return make_result();
   }
 
-  // Gather Check::Units.
+  // Check.
   llvm::SmallVector<Check::Unit> check_units;
   check_units.reserve(units.size());
   for (auto& unit : units) {
@@ -1234,32 +825,44 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
     }
   }
 
-  // Execute the actual checking.
   CARBON_VLOG_TO(driver_env.vlog_stream, "*** Check::CheckParseTrees ***\n");
-  Check::CheckParseTreesOptions options;
-  options.prelude_import = options_.prelude_import;
-  options.vlog_stream = driver_env.vlog_stream;
-  options.fuzzing = driver_env.fuzzing;
-  if (options.vlog_stream || options_.dump_sem_ir || options_.dump_cpp_ast ||
-      options_.dump_raw_sem_ir) {
-    options.include_in_dumps = &cache.include_in_dumps();
+  Check::CheckParseTreesOptions check_options;
+  check_options.prelude_import = options_.prelude_import;
+  check_options.vlog_stream = driver_env.vlog_stream;
+  check_options.fuzzing = driver_env.fuzzing;
+
+  // Set up tree_and_subtrees_getters for checking.
+  auto tree_and_subtrees_getters =
+      Parse::GetTreeAndSubtreesStore::MakeWithExplicitSize(units.size(),
+                                                            nullptr);
+  for (const auto& [i, unit] : llvm::enumerate(units)) {
+    if (unit->has_source()) {
+      tree_and_subtrees_getters.Set(SemIR::CheckIRId(i),
+                                    unit->get_trees_and_subtrees());
+    }
+  }
+
+  // Set up include_in_dumps for checking.
+  auto include_in_dumps =
+      FixedSizeValueStore<SemIR::CheckIRId, bool>::MakeWithExplicitSize(
+          units.size(), true);
+
+  if (driver_env.vlog_stream || options_.dump_sem_ir || options_.dump_raw_sem_ir) {
+    check_options.include_in_dumps = &include_in_dumps;
     if (options_.dump_sem_ir) {
-      options.dump_stream = driver_env.output_stream;
+      check_options.dump_stream = driver_env.output_stream;
     }
-    if (options_.dump_cpp_ast) {
-      options.dump_cpp_ast_stream = driver_env.output_stream;
-    }
-    if (options.vlog_stream || options_.dump_sem_ir) {
-      options.dump_sem_ir_ranges = options_.dump_sem_ir_ranges;
+    if (driver_env.vlog_stream || options_.dump_sem_ir) {
+      check_options.dump_sem_ir_ranges = options_.dump_sem_ir_ranges;
     }
     if (options_.dump_raw_sem_ir) {
-      options.raw_dump_stream = driver_env.output_stream;
-      options.dump_raw_sem_ir_builtins = options_.builtin_sem_ir;
+      check_options.raw_dump_stream = driver_env.output_stream;
+      check_options.dump_raw_sem_ir_builtins = options_.builtin_sem_ir;
     }
-    options.sem_ir_crash_dump = options_.sem_ir_crash_dump;
   }
-  Check::CheckParseTrees(check_units, cache.tree_and_subtrees_getters(),
-                         driver_env.fs, options, clang_invocation);
+
+  Check::CheckParseTrees(check_units, tree_and_subtrees_getters,
+                         driver_env.fs, check_options, clang_invocation);
   CARBON_VLOG_TO(driver_env.vlog_stream,
                  "*** Check::CheckParseTrees done ***\n");
   for (auto& unit : units) {
@@ -1271,7 +874,7 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
     return make_result();
   }
 
-  // Unlike previous steps, errors block further progress.
+  // Errors block further progress.
   if (llvm::any_of(units, [&](const auto& unit) { return !unit->success(); })) {
     CARBON_VLOG_TO(driver_env.vlog_stream,
                    "*** Stopping before lowering due to errors ***\n");

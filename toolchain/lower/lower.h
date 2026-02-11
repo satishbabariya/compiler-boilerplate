@@ -9,19 +9,19 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "toolchain/lower/options.h"
-#include "toolchain/parse/tree_and_subtrees.h"
 #include "toolchain/sem_ir/file.h"
-#include "toolchain/sem_ir/inst_namer.h"
+
+// TODO: Implement your language's SemIR-to-LLVM-IR lowering here.
+// See the Carbon Language compiler for reference implementation patterns.
 
 namespace Carbon::Lower {
 
 // Lowers SemIR to LLVM IR.
-auto LowerToLLVM(
-    llvm::LLVMContext& llvm_context,
-    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs,
-    const Parse::GetTreeAndSubtreesStore& tree_and_subtrees_getters,
-    const SemIR::File& sem_ir, int total_ir_count,
-    const LowerToLLVMOptions& options) -> std::unique_ptr<llvm::Module>;
+auto LowerToLLVM(llvm::LLVMContext& llvm_context,
+                 llvm::StringRef module_name,
+                 const SemIR::File& sem_ir,
+                 const LowerToLLVMOptions& options)
+    -> std::unique_ptr<llvm::Module>;
 
 }  // namespace Carbon::Lower
 

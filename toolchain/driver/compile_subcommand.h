@@ -44,18 +44,15 @@ struct CompileOptions {
 
   llvm::StringRef output_filename;
   llvm::SmallVector<llvm::StringRef> input_filenames;
-  llvm::SmallVector<llvm::StringRef> clang_args;
 
   bool asm_output = false;
   bool force_obj_output = false;
-  bool custom_core = false;
   bool dump_shared_values = false;
   bool dump_tokens = false;
   bool omit_file_boundary_tokens = false;
   bool dump_parse_tree = false;
   bool dump_raw_sem_ir = false;
   bool dump_sem_ir = false;
-  bool dump_cpp_ast = false;
   bool dump_llvm_ir = false;
   bool dump_asm = false;
   bool dump_mem_usage = false;
@@ -68,8 +65,6 @@ struct CompileOptions {
   bool run_llvm_verifier = true;
 
   llvm::SmallVector<llvm::StringRef> exclude_dump_file_prefixes;
-
-  llvm::StringRef sem_ir_crash_dump;
 };
 
 // Implements the compile subcommand of the driver.
@@ -84,9 +79,6 @@ class CompileSubcommand : public DriverSubcommand {
   auto Run(DriverEnv& driver_env) -> DriverResult override;
 
  private:
-  // Does custom validation of the compile-subcommand options structure beyond
-  // what the command line parsing library supports. Diagnoses and returns false
-  // on failure.
   auto ValidateOptions(Diagnostics::NoLocEmitter& emitter) const -> bool;
 
   CompileOptions options_;

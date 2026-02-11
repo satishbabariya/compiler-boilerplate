@@ -5,15 +5,16 @@
 #ifndef CARBON_TOOLCHAIN_CHECK_CHECK_H_
 #define CARBON_TOOLCHAIN_CHECK_CHECK_H_
 
-#include "clang/Frontend/CompilerInvocation.h"
 #include "common/ostream.h"
 #include "toolchain/base/shared_value_stores.h"
 #include "toolchain/base/timings.h"
-#include "toolchain/check/diagnostic_emitter.h"
 #include "toolchain/diagnostics/emitter.h"
 #include "toolchain/parse/tree_and_subtrees.h"
 #include "toolchain/sem_ir/file.h"
 #include "toolchain/sem_ir/ids.h"
+
+// TODO: Implement your language's semantic checking here.
+// See the Carbon Language compiler for reference implementation patterns.
 
 namespace Carbon::Check {
 
@@ -42,13 +43,10 @@ struct CheckParseTreesOptions {
   // If set, enables verbose output.
   llvm::raw_ostream* vlog_stream = nullptr;
 
-  // Whether fuzzing is being run. Used to disable features we don't want to
-  // fuzz.
+  // Whether fuzzing is being run.
   bool fuzzing = false;
 
-  // Whether to include each unit in dumps. This is required when dumping
-  // (either of `dump_stream` or `raw_dump_stream`), and must have entries based
-  // on CheckIRId.
+  // Whether to include each unit in dumps.
   const FixedSizeValueStore<SemIR::CheckIRId, bool>* include_in_dumps = nullptr;
 
   // If set, SemIR will be dumped to this.
@@ -57,8 +55,7 @@ struct CheckParseTreesOptions {
   // If set, C++ AST will be dumped to this.
   llvm::raw_ostream* dump_cpp_ast_stream = nullptr;
 
-  // When dumping textual SemIR (or printing it to for verbose output), whether
-  // to use ranges.
+  // When dumping textual SemIR, whether to use ranges.
   enum class DumpSemIRRanges : int8_t {
     IfPresent,
     Only,
@@ -79,9 +76,6 @@ struct CheckParseTreesOptions {
 
 // Checks a group of parse trees. This will use imports to decide the order of
 // checking.
-//
-// `units` will only contain units which should be checked, and is not indexed
-// by `CheckIRId`.
 auto CheckParseTrees(
     llvm::MutableArrayRef<Unit> units,
     const Parse::GetTreeAndSubtreesStore& tree_and_subtrees_getters,

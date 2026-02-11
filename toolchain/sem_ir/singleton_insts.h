@@ -5,72 +5,50 @@
 #ifndef CARBON_TOOLCHAIN_SEM_IR_SINGLETON_INSTS_H_
 #define CARBON_TOOLCHAIN_SEM_IR_SINGLETON_INSTS_H_
 
+#include <array>
+
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/inst_kind.h"
 
 namespace Carbon::SemIR {
 
-// The canonical list of singleton kinds. The order of `TypeType` is
-// significant because other singletons use it as a type.
-static constexpr std::array SingletonInstKinds = {
-    InstKind::TypeType,
-    InstKind::AutoType,
-    InstKind::BoolType,
-    InstKind::BoundMethodType,
-    InstKind::CharLiteralType,
+// The list of singleton instruction kinds. Singleton instructions are created
+// once in the File constructor and are always available. Each singleton
+// instruction has a fixed InstId equal to its index in this array.
+inline constexpr std::array SingletonInstKinds = {
     InstKind::ErrorInst,
-    InstKind::FloatLiteralType,
-    InstKind::FormType,
-    InstKind::InstType,
+    InstKind::BoolType,
     InstKind::IntLiteralType,
     InstKind::NamespaceType,
-    InstKind::RequireSpecificDefinitionType,
-    InstKind::SpecificFunctionType,
-    InstKind::VtableType,
-    InstKind::WitnessType,
+    InstKind::TypeType,
 };
 
-// Returns true if the InstKind is a singleton.
-constexpr auto IsSingletonInstKind(InstKind kind) -> bool;
-
-// Provides the TypeInstId for singleton instructions. These are exposed as
-// `InstT::TypeInstId` in `typed_insts.h`.
-template <InstKind::RawEnumType Kind>
-  requires(IsSingletonInstKind(InstKind::Make(Kind)))
-constexpr auto MakeSingletonTypeInstId() -> TypeInstId;
-
-// Returns true if the InstId corresponds to a singleton inst.
-constexpr auto IsSingletonInstId(InstId id) -> bool {
-  return id.index >= 0 &&
-         id.index < static_cast<int32_t>(SingletonInstKinds.size());
-}
-
-// Only implementation details are below.
-
-namespace Internal {
-
-// Returns the index for a singleton instruction, or -1 if it's not a singleton.
-constexpr auto GetSingletonInstIndex(InstKind kind) -> int32_t {
-  for (int32_t i = 0; i < static_cast<int32_t>(SingletonInstKinds.size());
-       ++i) {
-    if (SingletonInstKinds[i] == kind) {
-      return i;
+// Returns whether the given instruction kind is a singleton.
+constexpr auto IsSingletonInstKind(InstKind kind) -> bool {
+  for (auto singleton_kind : SingletonInstKinds) {
+    if (kind == singleton_kind) {
+      return true;
     }
   }
-  return -1;
+  return false;
 }
 
-}  // namespace Internal
-
-constexpr auto IsSingletonInstKind(InstKind kind) -> bool {
-  return Internal::GetSingletonInstIndex(kind) >= 0;
+// Returns whether the given instruction ID refers to a singleton instruction.
+constexpr auto IsSingletonInstId(InstId id) -> bool {
+  return id.has_value() && id.index >= 0 &&
+         static_cast<size_t>(id.index) < SingletonInstKinds.size();
 }
 
-template <InstKind::RawEnumType Kind>
-  requires(IsSingletonInstKind(InstKind::Make(Kind)))
+// Returns the TypeInstId for a singleton type instruction kind. The TypeInstId
+// is derived from the position of the kind in SingletonInstKinds.
+template <const auto& Kind>
 constexpr auto MakeSingletonTypeInstId() -> TypeInstId {
-  auto index = Internal::GetSingletonInstIndex(InstKind::Make(Kind));
-  return TypeInstId(index);
+  for (size_t i = 0; i < SingletonInstKinds.size(); ++i) {
+    if (SingletonInstKinds[i] == Kind) {
+      return TypeInstId::UnsafeMake(InstId(static_cast<int32_t>(i)));
+    }
+  }
+  return TypeInstId::None;
 }
 
 }  // namespace Carbon::SemIR

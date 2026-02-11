@@ -4,13 +4,21 @@
 
 #include "toolchain/format/format.h"
 
-#include "toolchain/format/formatter.h"
+// TODO: Implement your language's source code formatter here.
+// See the Carbon Language compiler for reference implementation patterns.
+//
+// A typical formatter implementation:
+// 1. Walks the token stream
+// 2. Applies formatting rules (indentation, spacing, line breaks)
+// 3. Writes the formatted output to the stream
 
 namespace Carbon::Format {
 
-auto Format(const Lex::TokenizedBuffer& tokens, llvm::raw_ostream& out)
+auto Format(const Lex::TokenizedBuffer& /*tokens*/, llvm::raw_ostream& /*out*/)
     -> bool {
-  return Formatter(&tokens, &out).Run();
+  // TODO: Implement formatting logic.
+  // For now, return false to indicate formatting is not yet implemented.
+  return false;
 }
 
 }  // namespace Carbon::Format

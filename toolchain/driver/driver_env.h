@@ -9,12 +9,9 @@
 #include <utility>
 
 #include "common/ostream.h"
-#include "llvm/Support/ThreadPool.h"
-#include "llvm/Support/Threading.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "toolchain/base/install_paths.h"
 #include "toolchain/diagnostics/emitter.h"
-#include "toolchain/driver/runtimes_cache.h"
 
 namespace Carbon {
 
@@ -48,14 +45,10 @@ struct DriverEnv {
   // Error output; stderr.
   llvm::raw_pwrite_stream* error_stream;
 
-  // Tracks when the driver is being fuzzed. This allows specific commands to
-  // error rather than perform operations that aren't well behaved during
-  // fuzzing.
+  // Tracks when the driver is being fuzzed.
   bool fuzzing;
 
-  // Tracks whether the driver can leak resources, typically because it is being
-  // invoked as part of a single command line program execution. Defaults to
-  // `false` for safe and correct library execution.
+  // Tracks whether the driver can leak resources.
   bool enable_leaking = false;
 
   // A diagnostic consumer, to be able to connect output.
@@ -64,17 +57,8 @@ struct DriverEnv {
   // A diagnostic emitter that has no locations.
   Diagnostics::NoLocEmitter emitter;
 
-  // Thread pool available for use when concurrency is needed.
-  llvm::ThreadPoolInterface* thread_pool;
-
   // For CARBON_VLOG.
   llvm::raw_pwrite_stream* vlog_stream = nullptr;
-
-  // Cached runtimes.
-  Runtimes::Cache runtimes_cache;
-
-  // Prebuilt runtimes.
-  std::optional<Runtimes> prebuilt_runtimes;
 };
 
 }  // namespace Carbon

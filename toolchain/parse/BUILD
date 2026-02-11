@@ -2,21 +2,9 @@
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-load("//bazel/cc_rules:defs.bzl", "cc_library", "cc_test")
-load("//bazel/manifest:defs.bzl", "manifest")
-load("//testing/fuzzing:rules.bzl", "cc_fuzz_test")
+load("//bazel/cc_rules:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
-
-filegroup(
-    name = "testdata",
-    srcs = glob(["testdata/**/*.carbon"]),
-)
-
-manifest(
-    name = "testdata.txt",
-    srcs = [":testdata"],
-)
 
 cc_library(
     name = "node_category",
@@ -50,96 +38,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "typed_nodes_test",
-    size = "small",
-    srcs = ["typed_nodes_test.cpp"],
-    deps = [
-        ":node_kind",
-        ":parse",
-        ":tree",
-        "//testing/base:gtest_main",
-        "//toolchain/diagnostics:emitter",
-        "//toolchain/diagnostics:mocks",
-        "//toolchain/lex",
-        "//toolchain/lex:tokenized_buffer",
-        "//toolchain/testing:compile_helper",
-        "@googletest//:gtest",
-    ],
-)
-
-cc_library(
-    name = "context",
-    srcs = ["context.cpp"],
-    hdrs = ["context.h"],
-    deps = [
-        ":node_kind",
-        ":precedence",
-        ":state",
-        ":tree",
-        "//common:check",
-        "//common:ostream",
-        "//common:vlog",
-        "//toolchain/diagnostics:emitter",
-        "//toolchain/diagnostics:format_providers",
-        "//toolchain/lex:token_kind",
-        "//toolchain/lex:tokenized_buffer",
-        "@llvm-project//llvm:Support",
-    ],
-)
-
-cc_library(
-    name = "parse",
-    srcs = ["parse.cpp"] +
-    # Glob handler files to avoid missing any.
-    glob([
-        "handle_*.cpp",
-    ]),
-    hdrs = [
-        "handle.h",
-        "parse.h",
-    ],
-    deps = [
-        ":context",
-        ":dump",
-        ":node_kind",
-        ":state",
-        ":tree",
-        "//common:check",
-        "//common:ostream",
-        "//common:pretty_stack_trace_function",
-        "//toolchain/base:shared_value_stores",
-        "//toolchain/diagnostics:emitter",
-        "//toolchain/diagnostics:format_providers",
-        "//toolchain/lex:token_index",
-        "//toolchain/lex:token_kind",
-        "//toolchain/lex:tokenized_buffer",
-    ],
-)
-
-cc_library(
-    name = "dump",
-    srcs = ["dump.cpp"],
-    hdrs = ["dump.h"],
-    deps = [
-        ":context",
-        ":tree",
-        "//common:ostream",
-        "//common:raw_string_ostream",
-        "//toolchain/lex:dump",
-    ],
-    # Always link dump methods.
-    alwayslink = 1,
-)
-
-cc_library(
-    name = "state",
-    srcs = ["state.cpp"],
-    hdrs = ["state.h"],
-    textual_hdrs = ["state.def"],
-    deps = ["//common:enum_base"],
-)
-
 cc_library(
     name = "tree",
     srcs = [
@@ -166,83 +64,32 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "tree_test",
-    size = "small",
-    srcs = ["tree_test.cpp"],
+cc_library(
+    name = "dump",
+    srcs = ["dump.cpp"],
+    hdrs = ["dump.h"],
     deps = [
-        ":node_kind",
-        ":parse",
         ":tree",
         "//common:ostream",
         "//common:raw_string_ostream",
-        "//testing/base:gtest_main",
-        "//toolchain/base:shared_value_stores",
-        "//toolchain/diagnostics:emitter",
-        "//toolchain/diagnostics:mocks",
-        "//toolchain/lex",
-        "//toolchain/lex:tokenized_buffer",
-        "//toolchain/testing:compile_helper",
-        "//toolchain/testing:yaml_test_helpers",
-        "@googletest//:gtest",
-        "@llvm-project//llvm:Support",
+        "//toolchain/lex:dump",
     ],
-)
-
-cc_fuzz_test(
-    name = "parse_fuzzer",
-    size = "small",
-    srcs = ["parse_fuzzer.cpp"],
-    corpus = glob(["fuzzer_corpus/*"]),
-    deps = [
-        ":parse",
-        "//common:check",
-        "//testing/fuzzing:libfuzzer_header",
-        "//toolchain/base:shared_value_stores",
-        "//toolchain/diagnostics:emitter",
-        "//toolchain/diagnostics:null_diagnostics",
-        "//toolchain/lex",
-        "@llvm-project//llvm:Support",
-    ],
+    # Always link dump methods.
+    alwayslink = 1,
 )
 
 cc_library(
-    name = "precedence",
-    srcs = ["precedence.cpp"],
-    hdrs = ["precedence.h"],
+    name = "parse",
+    srcs = ["parse.cpp"],
+    hdrs = ["parse.h"],
     deps = [
-        "//common:check",
-        "//toolchain/lex:token_kind",
-        "@llvm-project//llvm:Support",
-    ],
-)
-
-cc_test(
-    name = "precedence_test",
-    size = "small",
-    srcs = ["precedence_test.cpp"],
-    deps = [
-        ":precedence",
-        "//testing/base:gtest_main",
-        "//toolchain/lex:token_kind",
-        "@googletest//:gtest",
-    ],
-)
-
-cc_test(
-    name = "coverage_test",
-    size = "small",
-    srcs = ["coverage_test.cpp"],
-    args = ["--testdata_manifest=$(location :testdata.txt)"],
-    data = [
-        ":testdata",
-        ":testdata.txt",
-    ],
-    deps = [
+        ":dump",
         ":node_kind",
-        "//testing/base:gtest_main",
-        "//toolchain/testing:coverage_helper",
-        "@abseil-cpp//absl/flags:flag",
-        "@googletest//:gtest",
+        ":tree",
+        "//common:check",
+        "//common:ostream",
+        "//toolchain/diagnostics:emitter",
+        "//toolchain/lex:token_kind",
+        "//toolchain/lex:tokenized_buffer",
     ],
 )

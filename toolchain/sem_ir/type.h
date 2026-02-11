@@ -5,39 +5,78 @@
 #ifndef CARBON_TOOLCHAIN_SEM_IR_TYPE_H_
 #define CARBON_TOOLCHAIN_SEM_IR_TYPE_H_
 
-#include "llvm/ADT/STLExtras.h"
+#include "common/map.h"
+#include "llvm/ADT/SmallVector.h"
 #include "toolchain/base/shared_value_stores.h"
-#include "toolchain/sem_ir/constant.h"
+#include "toolchain/base/yaml.h"
 #include "toolchain/sem_ir/ids.h"
-#include "toolchain/sem_ir/inst.h"
-#include "toolchain/sem_ir/type_info.h"
+#include "toolchain/sem_ir/inst_kind.h"
+
+// TODO: Implement your language's type system here.
+// See the Carbon Language compiler for reference implementation patterns.
 
 namespace Carbon::SemIR {
 
-#define CARBON_TYPE_QUALIFIERS(X) \
-  X(Const)                        \
-  X(MaybeUnformed)                \
-  X(Partial)
+// Forward declaration.
+class File;
+class Inst;
 
-CARBON_DEFINE_RAW_ENUM_MASK(TypeQualifiers, uint8_t) {
-  CARBON_TYPE_QUALIFIERS(CARBON_RAW_ENUM_MASK_ENUMERATOR)
+// The value representation for a type describes how values of that type are
+// represented at compile time and at run time.
+struct ValueRepr : public Printable<ValueRepr> {
+  enum Kind : int8_t {
+    // An unknown representation. This is used for incomplete types.
+    Unknown,
+    // The type has no representation. This is used for empty types, such as
+    // empty tuples and empty structs.
+    None,
+    // The value representation is a copy of the value. On call boundaries,
+    // the value itself is passed.
+    Copy,
+    // The value representation is a pointer to the object representation.
+    // On call boundaries, the address of the object representation is passed.
+    Pointer,
+    // A custom representation. Used for types whose representation is
+    // determined externally, such as C++ types.
+    Custom,
+  };
+
+  auto Print(llvm::raw_ostream& out) const -> void {
+    out << "{kind: ";
+    switch (kind) {
+      case Unknown:
+        out << "unknown";
+        break;
+      case None:
+        out << "none";
+        break;
+      case Copy:
+        out << "copy";
+        break;
+      case Pointer:
+        out << "pointer";
+        break;
+      case Custom:
+        out << "custom";
+        break;
+    }
+    out << ", type: " << type_id << "}";
+  }
+
+  Kind kind = Unknown;
+  TypeId type_id = TypeId::None;
 };
 
-// Represents a set of keyword modifiers, using a separate bit per modifier.
-class TypeQualifiers : public CARBON_ENUM_MASK_BASE(TypeQualifiers) {
- public:
-  CARBON_TYPE_QUALIFIERS(CARBON_ENUM_MASK_CONSTANT_DECL)
+// Information about a complete type.
+struct CompleteTypeInfo {
+  ValueRepr value_repr = {.kind = ValueRepr::Unknown};
+  ClassId abstract_class_id = ClassId::None;
 };
-
-#define CARBON_TYPE_QUALIFIERS_WITH_TYPE(X) \
-  CARBON_ENUM_MASK_CONSTANT_DEFINITION(TypeQualifiers, X)
-CARBON_TYPE_QUALIFIERS(CARBON_TYPE_QUALIFIERS_WITH_TYPE)
-#undef CARBON_TYPE_QUALIFIERS_WITH_TYPE
 
 // Provides a ValueStore wrapper with an API specific to types.
 class TypeStore : public Yaml::Printable<TypeStore> {
  public:
-  // Used to return information about an integer type in `GetIntTypeInfo`.
+  // Used to return information about an integer type.
   struct IntTypeInfo {
     bool is_signed;
     IntId bit_width;
@@ -46,40 +85,16 @@ class TypeStore : public Yaml::Printable<TypeStore> {
   explicit TypeStore(File* file) : file_(file) {}
 
   // Returns the ID of the constant used to define the specified type.
-  auto GetConstantId(TypeId type_id) const -> ConstantId {
-    if (!type_id.has_value()) {
-      // TODO: Investigate replacing this with a CHECK or returning `None`.
-      return ConstantId::NotConstant;
-    }
-    return type_id.AsConstantId();
-  }
+  auto GetConstantId(TypeId type_id) const -> ConstantId;
 
-  // Returns the type ID for a constant that is a type value, i.e. it is a value
-  // of type `TypeType`.
-  //
-  // Facet values are of the same typishness as types, but are not themselves
-  // types, so they can not be passed here. They should be converted to a type
-  // through an `as type` conversion, that is, to a value of type `TypeType`.
+  // Returns the type ID for a constant that is a type value.
   auto GetTypeIdForTypeConstantId(ConstantId constant_id) const -> TypeId;
 
-  // Like GetTypeIdForTypeConstantId() but returns None if the constant is not a
-  // value of type `TypeType`.
-  auto TryGetTypeIdForTypeConstantId(ConstantId constant_id) const -> TypeId;
-
-  // Returns the type ID for an instruction whose constant value is a type
-  // value, i.e. it is a value of type `TypeType`.
-  //
-  // Instructions whose values are facet values (see `FacetValue`) produce a
-  // value of the same typishness as types, but which are themselves not types,
-  // so they can not be passed here. They should be converted to a type through
-  // an `as type` conversion, such as to a `FacetAccessType` instruction whose
-  // value is of type `TypeType`.
+  // Returns the type ID for an instruction whose constant value is a type.
   auto GetTypeIdForTypeInstId(InstId inst_id) const -> TypeId;
   auto GetTypeIdForTypeInstId(TypeInstId inst_id) const -> TypeId;
 
-  // Converts an `InstId` to a `TypeInstId` of the same id value. This process
-  // involves checking that the type of the instruction's value is `TypeType`,
-  // and then this check is encoded in the type system via `TypeInstId`.
+  // Converts an `InstId` to a `TypeInstId`.
   auto GetAsTypeInstId(InstId inst_id) const -> TypeInstId;
 
   // Returns the ID of the instruction used to define the specified type.
@@ -91,61 +106,22 @@ class TypeStore : public Yaml::Printable<TypeStore> {
   // Returns the unattached form of the given type.
   auto GetUnattachedType(TypeId type_id) const -> TypeId;
 
-  // Converts an ArrayRef of `InstId`s to a range of `TypeInstId`s via
-  // GetAsTypeInstId().
-  auto GetBlockAsTypeInstIds(llvm::ArrayRef<InstId> array
-                             [[clang::lifetimebound]]) const -> auto {
-    return llvm::map_range(array, [&](InstId type_inst_id) {
-      return GetAsTypeInstId(type_inst_id);
-    });
-  }
-
-  // Converts an ArrayRef of `InstId`s to a range of `TypeId`s via
-  // GetTypeIdForTypeInstId().
-  auto GetBlockAsTypeIds(llvm::ArrayRef<InstId> array
-                         [[clang::lifetimebound]]) const -> auto {
-    return llvm::map_range(array, [&](InstId type_inst_id) {
-      return GetTypeIdForTypeInstId(type_inst_id);
-    });
-  }
-
-  // Returns whether the specified kind of instruction was used to define the
-  // type.
+  // Returns whether the specified kind of instruction was used to define
+  // the type.
   template <typename InstT>
-  auto Is(TypeId type_id) const -> bool {
-    return GetAsInst(type_id).Is<InstT>();
-  }
-
-  // Returns whether one of the specified kinds of instruction was used to
-  // define the type.
-  template <typename... InstTs>
-  auto IsOneOf(TypeId type_id) const -> bool {
-    return GetAsInst(type_id).IsOneOf<InstTs...>();
-  }
+  auto Is(TypeId type_id) const -> bool;
 
   // Returns the instruction used to define the specified type, which is known
-  // to be a particular kind of instruction.
+  // to be a particular kind.
   template <typename InstT>
-  auto GetAs(TypeId type_id) const -> InstT {
-    return GetAsInst(type_id).As<InstT>();
-  }
+  auto GetAs(TypeId type_id) const -> InstT;
 
   // Returns the instruction used to define the specified type, if it is of a
   // particular kind.
   template <typename InstT>
-  auto TryGetAs(TypeId type_id) const -> std::optional<InstT> {
-    return GetAsInst(type_id).TryAs<InstT>();
-  }
+  auto TryGetAs(TypeId type_id) const -> std::optional<InstT>;
 
-  // Returns whether two type IDs represent the same type. This includes the
-  // case where they might be in different generics and thus might have
-  // different ConstantIds, but are still symbolically equal.
-  auto AreEqualAcrossDeclarations(TypeId a, TypeId b) const -> bool {
-    return GetTypeInstId(a) == GetTypeInstId(b);
-  }
-
-  // Gets the value representation to use for a type. This returns an
-  // `None` type if the given type is not complete.
+  // Gets the value representation to use for a type.
   auto GetValueRepr(TypeId type_id) const -> ValueRepr {
     if (auto type_info = complete_type_info_.Lookup(type_id)) {
       return type_info.value().value_repr;
@@ -153,8 +129,7 @@ class TypeStore : public Yaml::Printable<TypeStore> {
     return {.kind = ValueRepr::Unknown};
   }
 
-  // Gets the `CompleteTypeInfo` for a type, with an empty value if the type is
-  // not complete.
+  // Gets the `CompleteTypeInfo` for a type.
   auto GetCompleteTypeInfo(TypeId type_id) const -> CompleteTypeInfo {
     if (auto type_info = complete_type_info_.Lookup(type_id)) {
       return type_info.value();
@@ -162,82 +137,20 @@ class TypeStore : public Yaml::Printable<TypeStore> {
     return {.value_repr = {.kind = ValueRepr::Unknown}};
   }
 
-  // Sets the `CompleteTypeInfo` associated with a type, marking it as complete.
-  // This can be used with abstract types.
+  // Sets the `CompleteTypeInfo` associated with a type.
   auto SetComplete(TypeId type_id, const CompleteTypeInfo& info) -> void {
     CARBON_CHECK(info.value_repr.kind != ValueRepr::Unknown);
     auto insert_info = complete_type_info_.Insert(type_id, info);
     CARBON_CHECK(insert_info.is_inserted(), "Type {0} completed more than once",
                  type_id);
     complete_types_.push_back(type_id);
-    CARBON_CHECK(IsComplete(type_id));
   }
 
-  // Get the object representation associated with a type. For a non-class type,
-  // this is the type itself. `None` is returned if the object representation
-  // cannot be determined because the type is not complete.
-  auto GetObjectRepr(TypeId type_id) const -> TypeId;
-
-  // Get the type that the given type adapts, or `None` if the type is not known
-  // to be an adapter, including the case where the type is an incomplete class.
-  auto GetAdaptedType(TypeId type_id) const -> TypeId;
-
-  // Returns the non-adapter type that is compatible with the specified type.
-  auto GetTransitiveAdaptedType(TypeId type_id) const -> TypeId;
-
-  // Determines whether the given type is known to be complete. This does not
-  // determine whether the type could be completed, only whether it has been.
+  // Determines whether the given type is known to be complete.
   auto IsComplete(TypeId type_id) const -> bool {
     return complete_type_info_.Contains(type_id);
   }
 
-  // Removes any top-level qualifiers from a type.
-  auto GetUnqualifiedType(TypeId type_id) const -> TypeId {
-    return GetUnqualifiedTypeAndQualifiers(type_id).first;
-  }
-
-  // Removes any top-level qualifiers from a type and returns the unqualified
-  // type and qualifiers.
-  auto GetUnqualifiedTypeAndQualifiers(TypeId type_id) const
-      -> std::pair<TypeId, TypeQualifiers>;
-
-  // Returns the non-adapter unqualified type that is compatible with the
-  // specified type.
-  auto GetTransitiveUnqualifiedAdaptedType(TypeId type_id) const
-      -> std::pair<TypeId, TypeQualifiers>;
-
-  // Determines whether the given type is a signed integer type. This includes
-  // the case where the type is `Core.IntLiteral` or a class type whose object
-  // representation is a signed integer type.
-  auto IsSignedInt(TypeId int_type_id) const -> bool;
-
-  // Returns integer type information from a type ID that is known to represent
-  // an integer type. Abstracts away the difference between an `IntType`
-  // instruction defined type, a singleton instruction defined type, and a class
-  // adapting such a type. Uses IntId::None for types that have a
-  // non-constant width and for IntLiteral.
-  auto GetIntTypeInfo(TypeId int_type_id) const -> IntTypeInfo;
-
-  // Similar to `GetIntTypeInfo`, except allows non-`IntType` types to be
-  // handled.
-  auto TryGetIntTypeInfo(TypeId int_type_id) const
-      -> std::optional<IntTypeInfo>;
-
-  // Returns whether `type_id` represents a valid facet type.
-  auto IsFacetType(TypeId type_id) const -> bool {
-    return type_id == TypeType::TypeId || Is<FacetType>(type_id);
-  }
-
-  // Returns whether `type_id` represents any kind of facet type, including the
-  // error instruction, which can be used as a type and so should be treated as
-  // a facet type in some contexts.
-  auto IsFacetTypeOrError(TypeId type_id) const -> bool {
-    return IsFacetType(type_id) || type_id == ErrorInst::TypeId;
-  }
-
-  // Returns a list of types that were completed in this file, in the order in
-  // which they were completed. Earlier types in this list cannot contain
-  // instances of later types.
   auto complete_types() const -> llvm::ArrayRef<TypeId> {
     return complete_types_;
   }
@@ -249,10 +162,6 @@ class TypeStore : public Yaml::Printable<TypeStore> {
         map.Add(PrintToString(type_id),
                 Yaml::OutputMapping([&](Yaml::OutputMapping::Map map2) {
                   map2.Add("value_repr", Yaml::OutputScalar(info.value_repr));
-                  if (info.abstract_class_id.has_value()) {
-                    map2.Add("abstract_class_id",
-                             Yaml::OutputScalar(info.abstract_class_id));
-                  }
                 }));
       }
     });
@@ -271,9 +180,6 @@ class TypeStore : public Yaml::Printable<TypeStore> {
   Map<TypeId, CompleteTypeInfo> complete_type_info_;
   llvm::SmallVector<TypeId> complete_types_;
 };
-
-// Returns the scrutinee type of `type_id`, which must be a `PatternType`.
-auto ExtractScrutineeType(const File& sem_ir, TypeId type_id) -> TypeId;
 
 }  // namespace Carbon::SemIR
 

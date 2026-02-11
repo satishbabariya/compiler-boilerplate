@@ -1,13 +1,12 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the compiler boilerplate, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
-// AUTOUPDATE
+
+// TODO: Define your language's prelude here.
+// The prelude is automatically imported into every source file.
+// Typical contents include:
+// - Built-in type definitions (Int, Bool, String, etc.)
+// - Core operators and interfaces
+// - Fundamental functions
 
 package Core library "prelude";
-
-export import library "prelude/copy";
-export import library "prelude/destroy";
-export import library "prelude/iterate";
-export import library "prelude/operators";
-export import library "prelude/types";
