@@ -82,7 +82,6 @@ class TokenKind : public MYLANG_ENUM_BASE(TokenKind) {
   // Test whether this kind of token is a sized type literal.
   auto is_sized_type_literal() const -> bool {
     return *this == TokenKind::IntTypeLiteral ||
-           *this == TokenKind::UnsignedIntTypeLiteral ||
            *this == TokenKind::FloatTypeLiteral;
   }
 

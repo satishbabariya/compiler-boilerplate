@@ -13,14 +13,6 @@
 
 namespace MyLang::Lex {
 
-// A character as a unicode code point.
-//
-// Unicode requires 21 bits, which should fit inside `TokenInfo::PayloadBits`,
-// so we store the value directly.
-struct CharLiteralValue {
-  int32_t value;
-};
-
 // Storage for the information about a specific token, as an implementation
 // detail of `TokenizedBuffer`.
 //
@@ -77,22 +69,11 @@ class TokenInfo {
     return StringLiteralValueId(token_payload_);
   }
 
-  auto char_literal() const -> CharLiteralValue {
-    MYLANG_DCHECK(kind() == TokenKind::CharLiteral);
-    return CharLiteralValue(token_payload_);
-  }
-
   auto int_id() const -> IntId {
     MYLANG_DCHECK(kind() == TokenKind::IntLiteral ||
                   kind() == TokenKind::IntTypeLiteral ||
-                  kind() == TokenKind::UnsignedIntTypeLiteral ||
                   kind() == TokenKind::FloatTypeLiteral);
     return IntId::MakeFromTokenPayload(token_payload_);
-  }
-
-  auto real_id() const -> RealId {
-    MYLANG_DCHECK(kind() == TokenKind::RealLiteral);
-    return RealId(token_payload_);
   }
 
   auto closing_token_index() const -> TokenIndex {

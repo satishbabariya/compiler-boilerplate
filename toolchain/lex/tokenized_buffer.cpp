@@ -18,8 +18,6 @@
 #include "toolchain/base/shared_value_stores.h"
 #include "toolchain/diagnostics/emitter.h"
 #include "toolchain/lex/character_set.h"
-#include "toolchain/lex/numeric_literal.h"
-#include "toolchain/lex/string_literal.h"
 
 namespace MyLang::Lex {
 
@@ -69,25 +67,13 @@ auto TokenizedBuffer::GetTokenText(TokenIndex token) const -> llvm::StringRef {
                                   token_info.error_length());
   }
 
-  // Refer back to the source text to preserve oddities like radix or digit
-  // separators the author included.
+  // For IntLiteral and StringLiteral, refer back to the source text to
+  // preserve the original spelling.
   if (token_info.kind() == TokenKind::IntLiteral ||
-      token_info.kind() == TokenKind::RealLiteral) {
-    std::optional<NumericLiteral> relexed_token =
-        NumericLiteral::Lex(source_->text().substr(token_info.byte_offset()),
-                            token_info.kind() == TokenKind::RealLiteral);
-    MYLANG_CHECK(relexed_token, "Could not reform numeric literal token.");
-    return relexed_token->text();
-  }
-
-  // Refer back to the source text to find the original spelling, including
-  // escape sequences etc.
-  if (token_info.kind() == TokenKind::StringLiteral ||
-      token_info.kind() == TokenKind::CharLiteral) {
-    std::optional<StringLiteral> relexed_token =
-        StringLiteral::Lex(source_->text().substr(token_info.byte_offset()));
-    MYLANG_CHECK(relexed_token, "Could not reform string literal token.");
-    return relexed_token->text();
+      token_info.kind() == TokenKind::StringLiteral) {
+    // TODO: Re-lex the token from source text to find its extent.
+    // For now, return a placeholder.
+    return source_->text().substr(token_info.byte_offset(), 1);
   }
 
   // Refer back to the source text to avoid needing to reconstruct the
@@ -123,27 +109,12 @@ auto TokenizedBuffer::GetIntLiteral(TokenIndex token) const -> IntId {
   return token_info.int_id();
 }
 
-auto TokenizedBuffer::GetRealLiteral(TokenIndex token) const -> RealId {
-  const auto& token_info = token_infos_.Get(token);
-  MYLANG_CHECK(token_info.kind() == TokenKind::RealLiteral, "{0}",
-               token_info.kind());
-  return token_info.real_id();
-}
-
 auto TokenizedBuffer::GetStringLiteralValue(TokenIndex token) const
     -> StringLiteralValueId {
   const auto& token_info = token_infos_.Get(token);
   MYLANG_CHECK(token_info.kind() == TokenKind::StringLiteral, "{0}",
                token_info.kind());
   return token_info.string_literal_id();
-}
-
-auto TokenizedBuffer::GetCharLiteralValue(TokenIndex token) const
-    -> CharLiteralValue {
-  const auto& token_info = token_infos_.Get(token);
-  MYLANG_CHECK(token_info.kind() == TokenKind::CharLiteral, "{0}",
-               token_info.kind());
-  return token_info.char_literal();
 }
 
 auto TokenizedBuffer::GetTypeLiteralSize(TokenIndex token) const -> IntId {
@@ -288,11 +259,6 @@ auto TokenizedBuffer::PrintToken(llvm::raw_ostream& output_stream,
           .Get(GetIntLiteral(token))
           .print(output_stream, /*isSigned=*/false);
       output_stream << "\"";
-      break;
-    case TokenKind::RealLiteral:
-      output_stream << ", value: \""
-                    << value_stores_->reals().Get(GetRealLiteral(token))
-                    << "\"";
       break;
     case TokenKind::StringLiteral:
       output_stream << ", value: \""

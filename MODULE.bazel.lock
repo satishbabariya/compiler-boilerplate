@@ -279,8 +279,8 @@
   "moduleExtensions": {
     "//bazel/cc_toolchains:clang_configuration.bzl%clang_toolchain_extension": {
       "general": {
-        "bzlTransitiveDigest": "44/bjnoCpU6JrWf798MGhACH/QjSv0OkcCi/jF+EGg0=",
-        "usagesDigest": "lTxkeAFhR0iBEa3dg5hWvtd2HFCr5zCJx/fl27A+IKA=",
+        "bzlTransitiveDigest": "Wh1mi/drvfKovwO/US8OTQ5COvbBRazJYGdgAxBP8A4=",
+        "usagesDigest": "POIoO/Be2JU7GYVtOx9tPcV/ZKywG+DNu2w4sWJUNUM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -295,8 +295,8 @@
     },
     "//bazel/llvm_project:llvm_project.bzl%llvm_project": {
       "general": {
-        "bzlTransitiveDigest": "xDeO6VeJOhQ/KmsAtVhSrY+/XoomqAxdF2SG/XbIkX4=",
-        "usagesDigest": "uwwVdRj/NhFVoOIaadPP393kgC/Uu3/nTX9ln69oWp4=",
+        "bzlTransitiveDigest": "VcdYbQbrtNaICoCMpr245pBzuLk4IEkpatr5vEza7aE=",
+        "usagesDigest": "bntPiq+jNN4aRN3vPuaiBAZwDrmOEj5vqtaQCYxuaMM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

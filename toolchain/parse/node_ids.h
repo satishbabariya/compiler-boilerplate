@@ -152,33 +152,11 @@ struct NodeIdOneOf : public NodeId {
       : NodeId(NoneIndex) {}
 };
 
-using AnyClassDeclId =
-    NodeIdOneOf<ClassDeclId, ClassDefinitionStartId,
-                // TODO: This may be wrong? But we have choice types produce a
-                // class, so they are a form of class decls. This avoids
-                // duplicating all of SemIR::ClassDecl.
-                ChoiceDefinitionStartId>;
-using AnyFunctionDeclId = NodeIdOneOf<FunctionDeclId, FunctionDefinitionStartId,
-                                      BuiltinFunctionDefinitionStartId>;
-using AnyFunctionDefinitionId =
-    NodeIdOneOf<FunctionDefinitionId, FunctionTerseDefinitionId,
-                BuiltinFunctionDefinitionId>;
-using AnyImplDeclId = NodeIdOneOf<ImplDeclId, ImplDefinitionStartId>;
-using AnyInterfaceDeclId =
-    NodeIdOneOf<InterfaceDeclId, InterfaceDefinitionStartId>;
-using AnyNamedConstraintDeclId =
-    NodeIdOneOf<NamedConstraintDeclId, NamedConstraintDefinitionStartId>;
-using AnyNamespaceId =
-    NodeIdOneOf<NamespaceId, ImportDeclId, LibraryDeclId, PackageDeclId>;
-using AnyPackagingDeclId =
-    NodeIdOneOf<ImportDeclId, LibraryDeclId, PackageDeclId>;
-using AnyPointerDeferenceExprId =
-    NodeIdOneOf<PrefixOperatorStarId, PointerMemberAccessExprId>;
-using AnyRuntimeBindingPatternName =
-    NodeIdOneOf<IdentifierNameNotBeforeParamsId, SelfValueNameId,
-                UnderscoreNameId>;
-using AnyPrimitiveFormIdId =
-    NodeIdOneOf<RefPrimitiveFormId, VarPrimitiveFormId, ValPrimitiveFormId>;
+// TODO: Add composite NodeIdOneOf aliases for your language's node kinds.
+using AnyFunctionDeclId =
+    NodeIdOneOf<FunctionDeclId, FunctionDefinitionStartId>;
+using AnyFunctionDefinitionId = NodeIdOneOf<FunctionDefinitionId>;
+using AnyPointerDeferenceExprId = NodeIdOneOf<PrefixOperatorStarId>;
 
 // NodeId with kind that is anything but T::Kind.
 template <typename T>
