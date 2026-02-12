@@ -2,12 +2,12 @@
 
 """Checks diagnostic use.
 
-Validates that each diagnostic declared with CARBON_DIAGNOSTIC_KIND is
-referenced by one (and only one) CARBON_DIAGNOSTIC.
+Validates that each diagnostic declared with MYLANG_DIAGNOSTIC_KIND is
+referenced by one (and only one) MYLANG_DIAGNOSTIC.
 """
 
 __copyright__ = """
-Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 Exceptions. See /LICENSE for license information.
 SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 """
@@ -43,14 +43,14 @@ def load_diagnostic_kind() -> Set[str]:
     """
     path = Path("toolchain/diagnostics/kind.def")
     content = path.read_text()
-    decls = set(re.findall(r"^\s+CARBON_DIAGNOSTIC_KIND\((.+)\)", content))
+    decls = set(re.findall(r"^\s+MYLANG_DIAGNOSTIC_KIND\((.+)\)", content))
     return decls.difference(IGNORED)
 
 
 def load_diagnostic_uses_in(
     path: Path,
 ) -> Dict[str, List[Loc]]:
-    """Returns the path's CARBON_DIAGNOSTIC uses."""
+    """Returns the path's MYLANG_DIAGNOSTIC uses."""
     content = path.read_text()
 
     # Keep a line cursor so that we don't keep re-scanning the file.
@@ -58,7 +58,7 @@ def load_diagnostic_uses_in(
     line_offset = 0
 
     found: Dict[str, List[Loc]] = collections.defaultdict(lambda: [])
-    for m in re.finditer(r"CARBON_DIAGNOSTIC\(\s*(\w+),", content):
+    for m in re.finditer(r"MYLANG_DIAGNOSTIC\(\s*(\w+),", content):
         diag = m.group(1)
         if diag in IGNORED:
             continue
@@ -69,7 +69,7 @@ def load_diagnostic_uses_in(
 
 
 def load_diagnostic_uses() -> Dict[str, List[Loc]]:
-    """Returns all CARBON_DIAGNOSTIC uses."""
+    """Returns all MYLANG_DIAGNOSTIC uses."""
     globs = itertools.chain(
         *[Path("toolchain").glob(f"**/*.{ext}") for ext in ("h", "cpp")]
     )

@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -13,7 +13,7 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
 TEST(ExePath, FailureFallback) {
@@ -54,4 +54,4 @@ TEST(ExePath, PathLookup) {
 }
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

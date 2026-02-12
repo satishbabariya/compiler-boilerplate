@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_RAW_HASHTABLE_BENCHMARK_HELPERS_H_
-#define CARBON_COMMON_RAW_HASHTABLE_BENCHMARK_HELPERS_H_
+#ifndef MYLANG_COMMON_RAW_HASHTABLE_BENCHMARK_HELPERS_H_
+#define MYLANG_COMMON_RAW_HASHTABLE_BENCHMARK_HELPERS_H_
 
 #include <benchmark/benchmark.h>
 #include <sys/types.h>
@@ -24,7 +24,7 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon::RawHashtable {
+namespace MyLang::RawHashtable {
 
 // We want to support benchmarking with 16M keys plus up to 256 "other" keys
 // (for misses). The large number of keys helps check for performance hiccups
@@ -168,11 +168,11 @@ inline auto HitArgs(benchmark::Benchmark* b) -> void {
 }
 
 // Provide some Dense{Map,Set}Info viable implementations for the key types
-// using Carbon's hashing framework. These let us benchmark the data structure
+// using MyLang's hashing framework. These let us benchmark the data structure
 // alone rather than the combination of data structure and hashing routine.
 //
 // We only provide these for benchmarking -- they are *not* necessarily suitable
-// for broader use. The Carbon hashing infrastructure has only been evaluated in
+// for broader use. The MyLang hashing infrastructure has only been evaluated in
 // the context of its specific hashtable design.
 template <typename T>
 struct CarbonHashDI;
@@ -287,14 +287,14 @@ auto ReportTableMetrics(const TableT& table, benchmark::State& state) -> void {
       metrics.storage_bytes;
 }
 
-}  // namespace Carbon::RawHashtable
+}  // namespace MyLang::RawHashtable
 
 namespace llvm {
 
 // Enable LLVM to hash our special stress testing integer type.
 template <int LowZeroBits>
-struct DenseMapInfo<Carbon::RawHashtable::LowZeroBitInt<LowZeroBits>> {
-  using IntT = Carbon::RawHashtable::LowZeroBitInt<LowZeroBits>;
+struct DenseMapInfo<MyLang::RawHashtable::LowZeroBitInt<LowZeroBits>> {
+  using IntT = MyLang::RawHashtable::LowZeroBitInt<LowZeroBits>;
   static auto getEmptyKey() -> IntT { return IntT(-1); }
   static auto getTombstoneKey() -> IntT { return IntT(-2); }
   static auto getHashValue(const IntT val) -> unsigned {
@@ -307,4 +307,4 @@ struct DenseMapInfo<Carbon::RawHashtable::LowZeroBitInt<LowZeroBits>> {
 
 }  // namespace llvm
 
-#endif  // CARBON_COMMON_RAW_HASHTABLE_BENCHMARK_HELPERS_H_
+#endif  // MYLANG_COMMON_RAW_HASHTABLE_BENCHMARK_HELPERS_H_

@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -8,7 +8,7 @@
 
 #include <tuple>
 
-namespace Carbon::StructReflection {
+namespace MyLang::StructReflection {
 namespace {
 
 struct ZeroFields {};
@@ -118,4 +118,4 @@ TEST(StructReflectionTest, ReferenceField) {
 }
 
 }  // namespace
-}  // namespace Carbon::StructReflection
+}  // namespace MyLang::StructReflection

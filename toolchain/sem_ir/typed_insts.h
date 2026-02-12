@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_TYPED_INSTS_H_
-#define CARBON_TOOLCHAIN_SEM_IR_TYPED_INSTS_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_TYPED_INSTS_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_TYPED_INSTS_H_
 
 #include "common/template_string.h"
 #include "toolchain/base/int.h"
@@ -24,9 +24,9 @@
 // - Up to two members describing the contents of the struct.
 //
 // TODO: Add your language's typed instruction representations here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 // A template for singleton types. Most uses will not add members, and so may
 // apply a `using` alias.
@@ -355,7 +355,7 @@ struct Converted {
 };
 
 // TODO: Add your language's typed instruction representations here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
 // These concepts are an implementation detail of the library, not public API.
 namespace Internal {
@@ -381,6 +381,6 @@ concept HasTypeIdMember = std::same_as<decltype(T::type_id), TypeId>;
 
 }  // namespace Internal
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_TYPED_INSTS_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_TYPED_INSTS_H_

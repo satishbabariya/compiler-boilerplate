@@ -1,13 +1,13 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_VERSION_H_
-#define CARBON_COMMON_VERSION_H_
+#ifndef MYLANG_COMMON_VERSION_H_
+#define MYLANG_COMMON_VERSION_H_
 
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon {
+namespace MyLang {
 
 struct Version {
   static const int Major;
@@ -22,6 +22,6 @@ struct Version {
   static const llvm::StringLiteral ToolchainInfo;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_VERSION_H_
+#endif  // MYLANG_COMMON_VERSION_H_

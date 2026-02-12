@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_ERROR_H_
-#define CARBON_COMMON_ERROR_H_
+#ifndef MYLANG_COMMON_ERROR_H_
+#define MYLANG_COMMON_ERROR_H_
 
 #include <concepts>
 #include <functional>
@@ -17,7 +17,7 @@
 #include "common/raw_string_ostream.h"
 #include "llvm/ADT/Twine.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Success values should be represented as the presence of a value in ErrorOr,
 // using `ErrorOr<Success>` and `return Success();` if no value needs to be
@@ -33,7 +33,7 @@ class [[nodiscard]] Error : public Printable<Error> {
  public:
   // Represents an error state.
   explicit Error(llvm::Twine message) : message_(message.str()) {
-    CARBON_CHECK(!message_.empty(), "Errors must have a message.");
+    MYLANG_CHECK(!message_.empty(), "Errors must have a message.");
   }
 
   // Move-only.
@@ -145,17 +145,17 @@ class [[nodiscard]] ErrorOr {
   // Returns the contained error.
   // REQUIRES: `ok()` is false.
   auto error() const& -> const ErrorT& {
-    CARBON_CHECK(!ok());
+    MYLANG_CHECK(!ok());
     return std::get<ErrorT>(val_);
   }
   auto error() && -> ErrorT {
-    CARBON_CHECK(!ok());
+    MYLANG_CHECK(!ok());
     return std::get<ErrorT>(std::move(val_));
   }
 
   // Checks that `ok()` is true.
   // REQUIRES: `ok()` is true.
-  auto Check() const -> void { CARBON_CHECK(ok(), "{0}", error()); }
+  auto Check() const -> void { MYLANG_CHECK(ok(), "{0}", error()); }
 
   // Returns the contained value.
   // REQUIRES: `ok()` is true.
@@ -231,36 +231,36 @@ class ErrorBuilder {
   std::unique_ptr<RawStringOstream> out_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
 // Macro hackery to get a unique variable name.
-#define CARBON_MAKE_UNIQUE_NAME_IMPL(a, b, c) a##b##c
-#define CARBON_MAKE_UNIQUE_NAME(a, b, c) CARBON_MAKE_UNIQUE_NAME_IMPL(a, b, c)
+#define MYLANG_MAKE_UNIQUE_NAME_IMPL(a, b, c) a##b##c
+#define MYLANG_MAKE_UNIQUE_NAME(a, b, c) MYLANG_MAKE_UNIQUE_NAME_IMPL(a, b, c)
 
 // Macro to prevent a top-level comma from being interpreted as a macro
 // argument separator.
-#define CARBON_PROTECT_COMMAS(...) __VA_ARGS__
+#define MYLANG_PROTECT_COMMAS(...) __VA_ARGS__
 
-#define CARBON_RETURN_IF_ERROR_IMPL(unique_name, expr)  \
+#define MYLANG_RETURN_IF_ERROR_IMPL(unique_name, expr)  \
   if (auto unique_name = (expr); !(unique_name).ok()) { \
     return std::move(unique_name).error();              \
   }
 
-#define CARBON_RETURN_IF_ERROR(expr)                                    \
-  CARBON_RETURN_IF_ERROR_IMPL(                                          \
-      CARBON_MAKE_UNIQUE_NAME(_llvm_error_line, __LINE__, __COUNTER__), \
-      CARBON_PROTECT_COMMAS(expr))
+#define MYLANG_RETURN_IF_ERROR(expr)                                    \
+  MYLANG_RETURN_IF_ERROR_IMPL(                                          \
+      MYLANG_MAKE_UNIQUE_NAME(_llvm_error_line, __LINE__, __COUNTER__), \
+      MYLANG_PROTECT_COMMAS(expr))
 
-#define CARBON_ASSIGN_OR_RETURN_IMPL(unique_name, var, expr) \
+#define MYLANG_ASSIGN_OR_RETURN_IMPL(unique_name, var, expr) \
   auto unique_name = (expr);                                 \
   if (!(unique_name).ok()) {                                 \
     return std::move(unique_name).error();                   \
   }                                                          \
   var = std::move(*(unique_name));
 
-#define CARBON_ASSIGN_OR_RETURN(var, expr)                                 \
-  CARBON_ASSIGN_OR_RETURN_IMPL(                                            \
-      CARBON_MAKE_UNIQUE_NAME(_llvm_expected_line, __LINE__, __COUNTER__), \
-      CARBON_PROTECT_COMMAS(var), CARBON_PROTECT_COMMAS(expr))
+#define MYLANG_ASSIGN_OR_RETURN(var, expr)                                 \
+  MYLANG_ASSIGN_OR_RETURN_IMPL(                                            \
+      MYLANG_MAKE_UNIQUE_NAME(_llvm_expected_line, __LINE__, __COUNTER__), \
+      MYLANG_PROTECT_COMMAS(var), MYLANG_PROTECT_COMMAS(expr))
 
-#endif  // CARBON_COMMON_ERROR_H_
+#endif  // MYLANG_COMMON_ERROR_H_

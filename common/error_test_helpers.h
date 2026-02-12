@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_ERROR_TEST_HELPERS_H_
-#define CARBON_COMMON_ERROR_TEST_HELPERS_H_
+#ifndef MYLANG_COMMON_ERROR_TEST_HELPERS_H_
+#define MYLANG_COMMON_ERROR_TEST_HELPERS_H_
 
 #include <gmock/gmock.h>
 
@@ -12,7 +12,7 @@
 #include "common/error.h"
 #include "common/ostream.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // Matches the message for an error state of `ErrorOr<T>`. For example:
 //   EXPECT_THAT(my_result, IsError(StrEq("error message")));
@@ -119,9 +119,9 @@ auto IsSuccess(InnerMatcher matcher) -> IsSuccessMatcher<InnerMatcher> {
   return IsSuccessMatcher<InnerMatcher>(matcher);
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-namespace Carbon {
+namespace MyLang {
 
 // Supports printing `ErrorOr<T>` to `std::ostream` in tests.
 template <typename T, typename ErrorT>
@@ -145,6 +145,6 @@ auto operator<<(std::ostream& out, const ErrorOr<T, ErrorT>& error_or)
   return out;
 }
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_ERROR_TEST_HELPERS_H_
+#endif  // MYLANG_COMMON_ERROR_TEST_HELPERS_H_

@@ -8,9 +8,8 @@ SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 ## Overview
 
-This is a compiler boilerplate project derived from the Carbon Language
-compiler. It provides a clean, modular foundation for building an LLVM-based
-compiler with Bazel.
+This is a compiler boilerplate project. It provides a clean, modular foundation
+for building an LLVM-based compiler with Bazel.
 
 ## Getting started
 
@@ -53,6 +52,5 @@ implementation. Start by:
 
 ## Code style
 
-This project follows the Google C++ Style Guide with Carbon-specific
-conventions. See `.clang-format` and `.clang-tidy` for automated formatting
+This project follows the Google C++ Style Guide. See See `.clang-format` and `.clang-tidy` for automated formatting
 and linting configuration.

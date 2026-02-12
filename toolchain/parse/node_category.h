@@ -1,21 +1,21 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_PARSE_NODE_CATEGORY_H_
-#define CARBON_TOOLCHAIN_PARSE_NODE_CATEGORY_H_
+#ifndef MYLANG_TOOLCHAIN_PARSE_NODE_CATEGORY_H_
+#define MYLANG_TOOLCHAIN_PARSE_NODE_CATEGORY_H_
 
 #include "common/enum_mask_base.h"
 #include "common/ostream.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 // An X-macro for node categories. Uses should look like:
 //
-//   #define CARBON_NODE_CATEGORY_FOR_XYZ(Name) ...
-//   CARBON_NODE_CATEGORY(CARBON_NODE_CATEGORY_FOR_XYZ)
-//   #undef CARBON_NODE_CATEGORY_FOR_XYZ
-#define CARBON_NODE_CATEGORY(X)                        \
+//   #define MYLANG_NODE_CATEGORY_FOR_XYZ(Name) ...
+//   MYLANG_NODE_CATEGORY(MYLANG_NODE_CATEGORY_FOR_XYZ)
+//   #undef MYLANG_NODE_CATEGORY_FOR_XYZ
+#define MYLANG_NODE_CATEGORY(X)                        \
   X(Decl)                                              \
   X(Expr)                                              \
   /* `impl <type> as` or just `impl as` */             \
@@ -33,14 +33,14 @@ namespace Carbon::Parse {
   X(Statement)
 
 // We expect this to grow, so are using a bigger size than needed.
-CARBON_DEFINE_RAW_ENUM_MASK(NodeCategory, uint32_t) {
-  CARBON_NODE_CATEGORY(CARBON_RAW_ENUM_MASK_ENUMERATOR)
+MYLANG_DEFINE_RAW_ENUM_MASK(NodeCategory, uint32_t) {
+  MYLANG_NODE_CATEGORY(MYLANG_RAW_ENUM_MASK_ENUMERATOR)
 };
 
 // Represents a set of keyword modifiers, using a separate bit per modifier.
-class NodeCategory : public CARBON_ENUM_MASK_BASE(NodeCategory) {
+class NodeCategory : public MYLANG_ENUM_MASK_BASE(NodeCategory) {
  public:
-  CARBON_NODE_CATEGORY(CARBON_ENUM_MASK_CONSTANT_DECL)
+  MYLANG_NODE_CATEGORY(MYLANG_ENUM_MASK_CONSTANT_DECL)
 
   using EnumMaskBase::EnumMaskBase;
   // Provide implicit conversion because the raw enum is used in templates.
@@ -49,11 +49,11 @@ class NodeCategory : public CARBON_ENUM_MASK_BASE(NodeCategory) {
   }
 };
 
-#define CARBON_NODE_CATEGORY_WITH_TYPE(X) \
-  CARBON_ENUM_MASK_CONSTANT_DEFINITION(NodeCategory, X)
-CARBON_NODE_CATEGORY(CARBON_NODE_CATEGORY_WITH_TYPE)
-#undef CARBON_NODE_CATEGORY_WITH_TYPE
+#define MYLANG_NODE_CATEGORY_WITH_TYPE(X) \
+  MYLANG_ENUM_MASK_CONSTANT_DEFINITION(NodeCategory, X)
+MYLANG_NODE_CATEGORY(MYLANG_NODE_CATEGORY_WITH_TYPE)
+#undef MYLANG_NODE_CATEGORY_WITH_TYPE
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse
 
-#endif  // CARBON_TOOLCHAIN_PARSE_NODE_CATEGORY_H_
+#endif  // MYLANG_TOOLCHAIN_PARSE_NODE_CATEGORY_H_

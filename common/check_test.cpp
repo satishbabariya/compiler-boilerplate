@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
 // Non-constexpr functions that always return true and false, to bypass constant
@@ -16,18 +16,18 @@ namespace {
 auto AlwaysTrue() -> bool { return true; }
 auto AlwaysFalse() -> bool { return false; }
 
-TEST(CheckTest, CheckTrue) { CARBON_CHECK(AlwaysTrue()); }
+TEST(CheckTest, CheckTrue) { MYLANG_CHECK(AlwaysTrue()); }
 
 TEST(CheckTest, CheckFalse) {
   ASSERT_DEATH(
-      { CARBON_CHECK(AlwaysFalse()); },
+      { MYLANG_CHECK(AlwaysFalse()); },
       R"(
 CHECK failure at common/check_test.cpp:\d+: AlwaysFalse\(\)
 )");
 }
 
 TEST(CheckTest, CheckFalseHasStackDump) {
-  ASSERT_DEATH({ CARBON_CHECK(AlwaysFalse()); }, "\nStack dump:\n");
+  ASSERT_DEATH({ MYLANG_CHECK(AlwaysFalse()); }, "\nStack dump:\n");
 }
 
 TEST(CheckTest, CheckTrueCallbackNotUsed) {
@@ -36,13 +36,13 @@ TEST(CheckTest, CheckTrueCallbackNotUsed) {
     called = true;
     return "called";
   };
-  CARBON_CHECK(AlwaysTrue(), "{0}", callback());
+  MYLANG_CHECK(AlwaysTrue(), "{0}", callback());
   EXPECT_FALSE(called);
 }
 
 TEST(CheckTest, CheckFalseMessage) {
   ASSERT_DEATH(
-      { CARBON_CHECK(AlwaysFalse(), "msg"); },
+      { MYLANG_CHECK(AlwaysFalse(), "msg"); },
       R"(
 CHECK failure at common/check_test.cpp:.+: AlwaysFalse\(\): msg
 )");
@@ -53,7 +53,7 @@ TEST(CheckTest, CheckFalseFormattedMessage) {
   std::string str = "str";
   int i = 1;
   ASSERT_DEATH(
-      { CARBON_CHECK(AlwaysFalse(), "{0} {1} {2} {3}", msg, str, i, 0); },
+      { MYLANG_CHECK(AlwaysFalse(), "{0} {1} {2} {3}", msg, str, i, 0); },
       R"(
 CHECK failure at common/check_test.cpp:.+: AlwaysFalse\(\): msg str 1 0
 )");
@@ -63,20 +63,20 @@ TEST(CheckTest, CheckOutputForms) {
   const char msg[] = "msg";
   std::string str = "str";
   int i = 1;
-  CARBON_CHECK(AlwaysTrue(), "{0} {1} {2} {3}", msg, str, i, 0);
+  MYLANG_CHECK(AlwaysTrue(), "{0} {1} {2} {3}", msg, str, i, 0);
 }
 
 TEST(CheckTest, Fatal) {
   ASSERT_DEATH(
-      { CARBON_FATAL("msg"); },
+      { MYLANG_FATAL("msg"); },
       "\nFATAL failure at common/check_test.cpp:.+: msg\n");
 }
 
 TEST(CheckTest, FatalHasStackDump) {
-  ASSERT_DEATH({ CARBON_FATAL("msg"); }, "\nStack dump:\n");
+  ASSERT_DEATH({ MYLANG_FATAL("msg"); }, "\nStack dump:\n");
 }
 
-auto FatalNoReturnRequired() -> int { CARBON_FATAL("msg"); }
+auto FatalNoReturnRequired() -> int { MYLANG_FATAL("msg"); }
 
 TEST(ErrorTest, FatalNoReturnRequired) {
   ASSERT_DEATH(
@@ -84,9 +84,9 @@ TEST(ErrorTest, FatalNoReturnRequired) {
       "\nFATAL failure at common/check_test.cpp:.+: msg\n");
 }
 
-// Detects whether `CARBON_CHECK(F())` compiles.
+// Detects whether `MYLANG_CHECK(F())` compiles.
 template <auto F>
-concept CheckCompilesWithCondition = requires { CARBON_CHECK(F()); };
+concept CheckCompilesWithCondition = requires { MYLANG_CHECK(F()); };
 
 TEST(CheckTest, CheckConstantCondition) {
   EXPECT_TRUE(CheckCompilesWithCondition<[] { return AlwaysTrue(); }>);
@@ -96,4 +96,4 @@ TEST(CheckTest, CheckConstantCondition) {
 }
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

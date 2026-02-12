@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_TIMINGS_H_
-#define CARBON_TOOLCHAIN_BASE_TIMINGS_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_TIMINGS_H_
+#define MYLANG_TOOLCHAIN_BASE_TIMINGS_H_
 
 #include <chrono>
 
@@ -11,7 +11,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "toolchain/base/yaml.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Helps track timings for a compile.
 class Timings {
@@ -74,6 +74,6 @@ class Timings {
   llvm::SmallVector<Entry> timings_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_BASE_TIMINGS_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_TIMINGS_H_

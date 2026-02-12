@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -9,7 +9,7 @@
 
 #include "llvm/ADT/Sequence.h"
 
-namespace Carbon::Diagnostics {
+namespace MyLang::Diagnostics {
 
 auto Loc::FormatLocation(llvm::raw_ostream& out) const -> void {
   if (filename.empty()) {
@@ -90,4 +90,4 @@ auto Loc::FormatSnippet(llvm::raw_ostream& out, int indent) const -> void {
   out << '\n';
 }
 
-}  // namespace Carbon::Diagnostics
+}  // namespace MyLang::Diagnostics

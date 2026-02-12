@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DRIVER_DRIVER_ENV_H_
-#define CARBON_TOOLCHAIN_DRIVER_DRIVER_ENV_H_
+#ifndef MYLANG_TOOLCHAIN_DRIVER_DRIVER_ENV_H_
+#define MYLANG_TOOLCHAIN_DRIVER_DRIVER_ENV_H_
 
 #include <cstdio>
 #include <utility>
@@ -13,7 +13,7 @@
 #include "toolchain/base/install_paths.h"
 #include "toolchain/diagnostics/emitter.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Driver environment information, encapsulated for easy passing to subcommands.
 struct DriverEnv {
@@ -57,10 +57,10 @@ struct DriverEnv {
   // A diagnostic emitter that has no locations.
   Diagnostics::NoLocEmitter emitter;
 
-  // For CARBON_VLOG.
+  // For MYLANG_VLOG.
   llvm::raw_pwrite_stream* vlog_stream = nullptr;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_DRIVER_DRIVER_ENV_H_
+#endif  // MYLANG_TOOLCHAIN_DRIVER_DRIVER_ENV_H_

@@ -1,8 +1,8 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-"""Provides rules for building Carbon files using the toolchain."""
+"""Provides rules for building MyLang files using the toolchain."""
 
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 
@@ -30,7 +30,7 @@ def _carbon_binary_impl(ctx):
         toolchain_data = ctx.files.internal_target_toolchain_data
         prebuilt_runtimes = ctx.files.internal_target_prebuilt_runtimes
 
-    # Pass any C++ flags from our dependencies onto Carbon.
+    # Pass any C++ flags from our dependencies onto MyLang.
     dep_flags = []
     dep_hdrs = []
     dep_link_flags = []
@@ -47,7 +47,7 @@ def _carbon_binary_impl(ctx):
             dep_flags += ["--clang-arg=-isystem{0}".format(path) for path in cc_info.compilation_context.system_includes.to_list()]
             dep_hdrs.append(cc_info.compilation_context.headers)
             for link_input in cc_info.linking_context.linker_inputs.to_list():
-                # TODO: `carbon link` doesn't support linker flags yet.
+                # TODO: `mylang link` doesn't support linker flags yet.
                 # dep_link_flags += link_input.user_link_flags
                 dep_link_inputs += link_input.additional_inputs
                 for lib in link_input.libraries:
@@ -70,7 +70,7 @@ def _carbon_binary_impl(ctx):
             # Build each source file. For now, we pass all sources to each compile
             # because we don't have visibility into dependencies and have no way to
             # specify multiple output files. Object code for each input is written
-            # into the output file in turn, so the final carbon source file
+            # into the output file in turn, so the final mylang source file
             # specified ends up determining the contents of the object file.
             #
             # TODO: This is a hack; replace with something better once the toolchain
@@ -91,7 +91,7 @@ def _carbon_binary_impl(ctx):
                 tools = depset(toolchain_data),
                 arguments = ["compile", "--output=" + out.path] +
                             [s.path for s in srcs_reordered] + extra_flags + ctx.attr.flags,
-                mnemonic = "CarbonCompile",
+                mnemonic = "MyLangCompile",
                 progress_message = "Compiling " + src.short_path,
             )
 
@@ -102,7 +102,7 @@ def _carbon_binary_impl(ctx):
         executable = toolchain_driver,
         tools = depset(toolchain_data + prebuilt_runtimes),
         arguments = ["--prebuilt-runtimes=" + _runtimes_path(prebuilt_runtimes), "link", "--output=" + bin.path] + ["--"] + dep_link_flags + [o.path for o in objs],
-        mnemonic = "CarbonLink",
+        mnemonic = "MyLangLink",
         progress_message = "Linking " + bin.short_path,
     )
     return [DefaultInfo(files = depset([bin]), executable = bin)]
@@ -154,13 +154,13 @@ _carbon_binary_internal = rule(
 )
 
 def carbon_binary(name, srcs, deps = [], flags = [], tags = []):
-    """Compiles a Carbon binary.
+    """Compiles a MyLang binary.
 
     Args:
       name: The name of the build target.
-      srcs: List of Carbon source files to compile.
+      srcs: List of MyLang source files to compile.
       deps: List of dependencies.
-      flags: Extra flags to pass to the Carbon compile command.
+      flags: Extra flags to pass to the MyLang compile command.
       tags: Tags to apply to the rule.
     """
     _carbon_binary_internal(
@@ -177,7 +177,7 @@ def carbon_binary(name, srcs, deps = [], flags = [], tags = []):
         # `select` which one we use.
         internal_exec_toolchain_driver = select({
             "//bazel/carbon_rules:use_target_config_carbon_rules_config": None,
-            "//conditions:default": "//toolchain/install:prefix/bin/carbon",
+            "//conditions:default": "//toolchain/install:prefix/bin/mylang",
         }),
         internal_exec_toolchain_data = select({
             "//bazel/carbon_rules:use_target_config_carbon_rules_config": None,
@@ -188,7 +188,7 @@ def carbon_binary(name, srcs, deps = [], flags = [], tags = []):
             "//conditions:default": "//toolchain/driver:prebuilt_runtimes",
         }),
         internal_target_toolchain_driver = select({
-            "//bazel/carbon_rules:use_target_config_carbon_rules_config": "//toolchain/install:prefix/bin/carbon",
+            "//bazel/carbon_rules:use_target_config_carbon_rules_config": "//toolchain/install:prefix/bin/mylang",
             "//conditions:default": None,
         }),
         internal_target_toolchain_data = select({

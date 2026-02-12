@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -11,7 +11,7 @@
 #include "common/set.h"
 #include "llvm/ADT/DenseSet.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
 using RawHashtable::CarbonHashDI;
@@ -60,7 +60,7 @@ struct SetWrapperImpl {
   auto BenchErase(KeyT k) -> bool { return s.erase(k) != 0; }
 };
 
-// Explicit (partial) specialization for the Carbon map type that uses its
+// Explicit (partial) specialization for the MyLang map type that uses its
 // different API design.
 template <typename KT, int MinSmallSize>
 struct SetWrapperImpl<Set<KT, MinSmallSize>> {
@@ -87,11 +87,11 @@ struct SetWrapperImpl<Set<KT, MinSmallSize>> {
   auto BenchErase(KeyT k) -> bool { return s.Erase(k); }
 };
 
-// Provide a way to override the Carbon Set specific benchmark runs with another
+// Provide a way to override the MyLang Set specific benchmark runs with another
 // hashtable implementation. When building, you can use one of these enum names
-// in a macro define such as `-DCARBON_SET_BENCH_OVERRIDE=Name` in order to
+// in a macro define such as `-DMYLANG_SET_BENCH_OVERRIDE=Name` in order to
 // trigger a specific override for the `Set` type benchmarks. This is used to
-// get before/after runs that compare the performance of Carbon's Set versus
+// get before/after runs that compare the performance of MyLang's Set versus
 // other implementations.
 enum class SetOverride : uint8_t {
   Abseil,
@@ -114,13 +114,13 @@ struct SetWrapperOverride<Set<KeyT, MinSmallSize>,
                           SetOverride::LLVMAndCarbonHash>
     : SetWrapperImpl<llvm::DenseSet<KeyT, CarbonHashDI<KeyT>>> {};
 
-#ifndef CARBON_SET_BENCH_OVERRIDE
+#ifndef MYLANG_SET_BENCH_OVERRIDE
 template <typename SetT>
 using SetWrapper = SetWrapperImpl<SetT>;
 #else
 template <typename SetT>
 using SetWrapper =
-    SetWrapperOverride<SetT, SetOverride::CARBON_SET_BENCH_OVERRIDE>;
+    SetWrapperOverride<SetT, SetOverride::MYLANG_SET_BENCH_OVERRIDE>;
 #endif
 
 // NOLINTBEGIN(bugprone-macro-parentheses): Parentheses are incorrect here.
@@ -175,7 +175,7 @@ static void BM_SetContainsHitPtr(benchmark::State& state) {
       benchmark::DoNotOptimize(i);
 
       bool result = s.BenchContains(lookup_keys[i]);
-      CARBON_DCHECK(result);
+      MYLANG_DCHECK(result);
       // We use the lookup success to step through keys, establishing a
       // dependency between each lookup. This doesn't fully allow us to measure
       // latency rather than throughput, as noted above.
@@ -203,7 +203,7 @@ static void BM_SetContainsMissPtr(benchmark::State& state) {
       benchmark::DoNotOptimize(i);
 
       bool result = s.BenchContains(lookup_keys[i]);
-      CARBON_DCHECK(!result);
+      MYLANG_DCHECK(!result);
       i += static_cast<ssize_t>(!result);
     }
   }
@@ -239,7 +239,7 @@ static void BM_SetLookupHitPtr(benchmark::State& state) {
       benchmark::DoNotOptimize(i);
 
       bool result = s.BenchLookup(lookup_keys[i]);
-      CARBON_DCHECK(result);
+      MYLANG_DCHECK(result);
       i += static_cast<ssize_t>(result);
     }
   }
@@ -282,7 +282,7 @@ static void BM_SetEraseInsertHitPtr(benchmark::State& state) {
       benchmark::ClobberMemory();
 
       bool inserted = s.BenchInsert(lookup_keys[i]);
-      CARBON_DCHECK(inserted);
+      MYLANG_DCHECK(inserted);
       i += static_cast<ssize_t>(inserted);
     }
   }
@@ -318,7 +318,7 @@ MAP_BENCHMARK_ONE_OP(BM_SetEraseInsertHitPtr, HitArgs);
 // the total cost of this usage pattern.
 //
 // Because this benchmark operates on whole sets, we also compute the number of
-// probed keys for Carbon's set as that is both a general reflection of the
+// probed keys for MyLang's set as that is both a general reflection of the
 // efficacy of the underlying hash function, and a direct factor that drives the
 // cost of these operations.
 template <typename SetT>
@@ -338,12 +338,12 @@ static void BM_SetInsertSeq(benchmark::State& state) {
     SetWrapperT s;
     for (auto k : keys) {
       bool inserted = s.BenchInsert(k);
-      CARBON_DCHECK(inserted, "Must be a successful insert!");
+      MYLANG_DCHECK(inserted, "Must be a successful insert!");
     }
 
     // Now insert a final random repeated key.
     bool inserted = s.BenchInsert(lookup_keys[i]);
-    CARBON_DCHECK(!inserted, "Must already be in the map!");
+    MYLANG_DCHECK(!inserted, "Must already be in the map!");
 
     // Rotate through the shuffled keys.
     i = (i + static_cast<ssize_t>(!inserted)) & (LookupKeysSize - 1);
@@ -355,14 +355,14 @@ static void BM_SetInsertSeq(benchmark::State& state) {
   state.counters["KeyRate"] = benchmark::Counter(
       keys.size(), benchmark::Counter::kIsIterationInvariantRate);
 
-  // Report some extra statistics about the Carbon type.
+  // Report some extra statistics about the MyLang type.
   if constexpr (IsCarbonSet<SetT>) {
     // Re-build a set outside of the timing loop to look at the statistics
     // rather than the timing.
     SetT s;
     for (auto k : keys) {
       bool inserted = s.Insert(k).is_inserted();
-      CARBON_DCHECK(inserted, "Must be a successful insert!");
+      MYLANG_DCHECK(inserted, "Must be a successful insert!");
     }
 
     ReportTableMetrics(s, state);
@@ -376,4 +376,4 @@ static void BM_SetInsertSeq(benchmark::State& state) {
 MAP_BENCHMARK_OP_SEQ(BM_SetInsertSeq);
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

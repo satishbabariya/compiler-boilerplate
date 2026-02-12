@@ -1,14 +1,14 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DIAGNOSTICS_FORMAT_PROVIDERS_H_
-#define CARBON_TOOLCHAIN_DIAGNOSTICS_FORMAT_PROVIDERS_H_
+#ifndef MYLANG_TOOLCHAIN_DIAGNOSTICS_FORMAT_PROVIDERS_H_
+#define MYLANG_TOOLCHAIN_DIAGNOSTICS_FORMAT_PROVIDERS_H_
 
 #include "common/ostream.h"
 #include "llvm/Support/FormatVariadicDetails.h"
 
-namespace Carbon::Diagnostics {
+namespace MyLang::Diagnostics {
 
 // Selects a formatv string based on the value.
 //
@@ -51,20 +51,20 @@ struct IntAsSelect {
   int value;
 };
 
-}  // namespace Carbon::Diagnostics
+}  // namespace MyLang::Diagnostics
 
 // See Diagnostics::BoolAsSelect.
 template <>
-struct llvm::format_provider<Carbon::Diagnostics::BoolAsSelect> {
-  static auto format(const Carbon::Diagnostics::BoolAsSelect& wrapper,
+struct llvm::format_provider<MyLang::Diagnostics::BoolAsSelect> {
+  static auto format(const MyLang::Diagnostics::BoolAsSelect& wrapper,
                      raw_ostream& out, StringRef style) -> void;
 };
 
 // See Diagnostics::IntAsSelect.
 template <>
-struct llvm::format_provider<Carbon::Diagnostics::IntAsSelect> {
-  static auto format(const Carbon::Diagnostics::IntAsSelect& wrapper,
+struct llvm::format_provider<MyLang::Diagnostics::IntAsSelect> {
+  static auto format(const MyLang::Diagnostics::IntAsSelect& wrapper,
                      raw_ostream& out, StringRef style) -> void;
 };
 
-#endif  // CARBON_TOOLCHAIN_DIAGNOSTICS_FORMAT_PROVIDERS_H_
+#endif  // MYLANG_TOOLCHAIN_DIAGNOSTICS_FORMAT_PROVIDERS_H_

@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -13,7 +13,7 @@
 #include "common/build_data.h"
 #include "llvm/Support/MathExtras.h"
 
-namespace Carbon::Filesystem {
+namespace MyLang::Filesystem {
 
 // Render an error number from `errno` to the provided stream using the richest
 // rendering available on the platform.
@@ -83,7 +83,7 @@ auto Internal::FileRefBase::ReadFileToString()
   // be any faster, but it will be much more friendly to callers with
   // constrained stack sizes and use less memory overall.
   std::byte buffer[PIPE_BUF];
-  CARBON_RETURN_IF_ERROR(SeekFromBeginning(0));
+  MYLANG_RETURN_IF_ERROR(SeekFromBeginning(0));
   for (;;) {
     auto read_result = ReadToBuffer(buffer);
     if (!read_result.ok()) {
@@ -102,7 +102,7 @@ auto Internal::FileRefBase::ReadFileToString()
 
 auto Internal::FileRefBase::WriteFileFromString(llvm::StringRef str)
     -> ErrorOr<Success, FdError> {
-  CARBON_RETURN_IF_ERROR(SeekFromBeginning(0));
+  MYLANG_RETURN_IF_ERROR(SeekFromBeginning(0));
   auto bytes = llvm::ArrayRef<std::byte>(
       reinterpret_cast<const std::byte*>(str.data()), str.size());
   while (!bytes.empty()) {
@@ -112,7 +112,7 @@ auto Internal::FileRefBase::WriteFileFromString(llvm::StringRef str)
     }
     bytes = *write_result;
   }
-  CARBON_RETURN_IF_ERROR(Truncate(str.size()));
+  MYLANG_RETURN_IF_ERROR(Truncate(str.size()));
   return Success();
 }
 
@@ -138,7 +138,7 @@ static auto SleepMacos(Duration sleep) -> void {
       int errnum = errno;
       RawStringOstream error_os;
       PrintErrorNumber(error_os, errnum);
-      CARBON_FATAL("Unexpected error while sleeping: {0}", error_os.TakeStr());
+      MYLANG_FATAL("Unexpected error while sleeping: {0}", error_os.TakeStr());
     }
 
     // Update to the remaining sleep time for the next attempt at sleeping.
@@ -166,7 +166,7 @@ static auto Sleep(Duration sleep) -> void {
   // interrupted by clock changes.
   timespec ts = {};
   int result = clock_gettime(CLOCK_MONOTONIC, &ts);
-  CARBON_CHECK(result == 0, "Error getting the time: {0}", strerror(errno));
+  MYLANG_CHECK(result == 0, "Error getting the time: {0}", strerror(errno));
 
   // Now convert the timespec to a duration that we can safely do arithmetic on.
   // Since the sleep interval is in nanoseconds it is tempting to directly do
@@ -194,7 +194,7 @@ static auto Sleep(Duration sleep) -> void {
     int errnum = errno;
     RawStringOstream error_os;
     PrintErrorNumber(error_os, errnum);
-    CARBON_FATAL("Unexpected error while sleeping: {0}", error_os.TakeStr());
+    MYLANG_FATAL("Unexpected error while sleeping: {0}", error_os.TakeStr());
   }
 #endif
 }
@@ -202,7 +202,7 @@ static auto Sleep(Duration sleep) -> void {
 auto Internal::FileRefBase::TryLock(FileLock::Kind kind, Duration deadline,
                                     Duration poll_interval)
     -> ErrorOr<FileLock, FdError> {
-  CARBON_CHECK(poll_interval <= deadline);
+  MYLANG_CHECK(poll_interval <= deadline);
   if (deadline != Duration(0) && poll_interval == Duration(0)) {
     // If the caller didn't provide a poll interval but did provide a deadline,
     // pick a poll interval to roughly be 1/1000th of the deadline but at least
@@ -212,11 +212,11 @@ auto Internal::FileRefBase::TryLock(FileLock::Kind kind, Duration deadline,
         std::max(Duration(std::chrono::microseconds(1)), deadline / 1000);
   }
   if (deadline != Duration(0)) {
-    CARBON_CHECK(
+    MYLANG_CHECK(
         deadline >= std::chrono::microseconds(10),
         "A deadline for a file lock shorter than 10 microseconds is not "
         "supported, callers can implement their own polling logic.");
-    CARBON_CHECK(poll_interval >= std::chrono::microseconds(1),
+    MYLANG_CHECK(poll_interval >= std::chrono::microseconds(1),
                  "Polling for a file lock faster than every microsecond is not "
                  "supported, callers can implement their own polling logic.");
   }
@@ -246,7 +246,7 @@ auto DirRef::AppendEntriesIf(
     llvm::SmallVectorImpl<std::filesystem::path>& entries,
     llvm::function_ref<auto(llvm::StringRef name)->bool> predicate)
     -> ErrorOr<Success, FdError> {
-  CARBON_ASSIGN_OR_RETURN(Reader reader, Read());
+  MYLANG_ASSIGN_OR_RETURN(Reader reader, Read());
   for (const Entry& entry : reader) {
     llvm::StringRef name = entry.name();
     if (name == "." || name == "..") {
@@ -265,7 +265,7 @@ auto DirRef::AppendEntriesIf(
     llvm::SmallVectorImpl<std::filesystem::path>& non_dir_entries,
     llvm::function_ref<auto(llvm::StringRef name)->bool> predicate)
     -> ErrorOr<Success, FdError> {
-  CARBON_ASSIGN_OR_RETURN(Reader reader, Read());
+  MYLANG_ASSIGN_OR_RETURN(Reader reader, Read());
   for (const Entry& entry : reader) {
     llvm::StringRef name = entry.name();
     if (name == "." || name == "..") {
@@ -318,7 +318,7 @@ auto DirRef::OpenDir(const std::filesystem::path& path,
   }
 
   if (creation_options != OpenExisting) {
-    CARBON_CHECK(creation_options != CreateAlways,
+    MYLANG_CHECK(creation_options != CreateAlways,
                  "Invalid `creation_options` value of `CreateAlways`: there is "
                  "no support for truncating directories, and so they cannot be "
                  "created in an analogous way to files if they already exist.");
@@ -406,7 +406,7 @@ auto DirRef::OpenDir(const std::filesystem::path& path,
 
 auto DirRef::ReadFileToString(const std::filesystem::path& path)
     -> ErrorOr<std::string, PathError> {
-  CARBON_ASSIGN_OR_RETURN(ReadFile f, OpenReadOnly(path));
+  MYLANG_ASSIGN_OR_RETURN(ReadFile f, OpenReadOnly(path));
   auto result = f.ReadFileToString();
   if (result.ok()) {
     return *std::move(result);
@@ -420,7 +420,7 @@ auto DirRef::WriteFileFromString(const std::filesystem::path& path,
                                  llvm::StringRef content,
                                  CreationOptions creation_options)
     -> ErrorOr<Success, PathError> {
-  CARBON_ASSIGN_OR_RETURN(WriteFile f, OpenWriteOnly(path, creation_options));
+  MYLANG_ASSIGN_OR_RETURN(WriteFile f, OpenWriteOnly(path, creation_options));
   auto write_result = f.WriteFileFromString(content);
   // Immediately close the file as even if there was a write error we don't want
   // to leave the file open.
@@ -483,14 +483,14 @@ auto DirRef::CreateDirectories(const std::filesystem::path& path,
     }
     missing_components.push_back(parent_path.filename());
   }
-  CARBON_CHECK(!missing_components.empty());
+  MYLANG_CHECK(!missing_components.empty());
 
   // If we haven't yet opened an intermediate directory, start by creating one
   // relative to this directory. We can't do this as part of the loop below as
   // `this` and the newly opened directory have different types.
   if (!work_dir) {
     std::filesystem::path component = missing_components.pop_back_val();
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         Dir component_dir,
         OpenDir(component, CreationOptions::OpenAlways, creation_mode));
     // Move this component into our temporary directory slot.
@@ -501,7 +501,7 @@ auto DirRef::CreateDirectories(const std::filesystem::path& path,
   // relative to the previous.
   while (!missing_components.empty()) {
     std::filesystem::path component = missing_components.pop_back_val();
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         Dir component_dir,
         work_dir->OpenDir(component, CreationOptions::OpenAlways,
                           creation_mode));
@@ -511,7 +511,7 @@ auto DirRef::CreateDirectories(const std::filesystem::path& path,
     work_dir = std::move(component_dir);
   }
 
-  CARBON_CHECK(work_dir,
+  MYLANG_CHECK(work_dir,
                "Should always have created at least one directory for a "
                "non-empty path!");
   return std::move(work_dir).value();
@@ -542,7 +542,7 @@ auto DirRef::Rmtree(const std::filesystem::path& path)
       dir_stack.pop_back();
       continue;
     }
-    CARBON_CHECK(dir_entry_start < static_cast<ssize_t>(dir_entries.size()));
+    MYLANG_CHECK(dir_entry_start < static_cast<ssize_t>(dir_entries.size()));
 
     // Take the last entry under the current directory and try removing it.
     const std::filesystem::path& entry_path = dir_entries.back();
@@ -553,7 +553,7 @@ auto DirRef::Rmtree(const std::filesystem::path& path)
       if (dir_entries.empty()) {
         // The last entry is the input path with an empty stack, so we've
         // finished at this point.
-        CARBON_CHECK(dir_stack.empty());
+        MYLANG_CHECK(dir_stack.empty());
         return Success();
       }
       continue;
@@ -565,7 +565,7 @@ auto DirRef::Rmtree(const std::filesystem::path& path)
 
     // Recurse into the subdirectory since it isn't empty, opening it, getting a
     // reader, and pushing it onto our stack.
-    CARBON_ASSIGN_OR_RETURN(Dir subdir, current.OpenDir(entry_path));
+    MYLANG_ASSIGN_OR_RETURN(Dir subdir, current.OpenDir(entry_path));
     auto read_result = std::move(subdir).TakeAndRead();
     if (!read_result.ok()) {
       return PathError(
@@ -634,7 +634,7 @@ auto DirRef::ReadlinkSlow(const std::filesystem::path& path)
   // Read directly into a string to avoid allocating two large buffers.
   std::string large_buffer;
   // Stat the symlink to get an initial guess at the size.
-  CARBON_ASSIGN_OR_RETURN(FileStatus status, Lstat(path));
+  MYLANG_ASSIGN_OR_RETURN(FileStatus status, Lstat(path));
   // We try to use the size from the `lstat` unless it is empty, in which case
   // we try to use our minimum buffer size which is `PATH_MAX` or a constant
   // value. We have a fallback to dynamically discover an adequate buffer size
@@ -711,14 +711,14 @@ auto MakeTmpDirWithPrefix(std::filesystem::path prefix)
     PrintErrorNumber(os, errno);
     return Error(os.TakeStr());
   }
-  CARBON_CHECK(result == tmpdir_path_buffer.data(),
+  MYLANG_CHECK(result == tmpdir_path_buffer.data(),
                "`mkdtemp` used a modified path");
   tmpdir_path = std::move(tmpdir_path_buffer);
 
   // Because `mkdtemp` doesn't return an open directory atomically, open the
   // created directory and perform safety checks similar to `OpenDir` when
   // creating a new directory.
-  CARBON_ASSIGN_OR_RETURN(
+  MYLANG_ASSIGN_OR_RETURN(
       Dir tmp, Cwd().OpenDir(tmpdir_path, OpenExisting, /*creation_mode=*/0,
                              OpenFlags::NoFollow));
   // Make sure we try to remove the directory from here on out.
@@ -726,7 +726,7 @@ auto MakeTmpDirWithPrefix(std::filesystem::path prefix)
 
   // It's a bit awkward to report `fstat` errors as `Error`s, but we
   // don't have much choice. The stat failing here would be very weird.
-  CARBON_ASSIGN_OR_RETURN(FileStatus stat, result_dir.Stat());
+  MYLANG_ASSIGN_OR_RETURN(FileStatus stat, result_dir.Stat());
 
   // The permissions must be exactly 0700 for a temporary directory, and the UID
   // should be ours.
@@ -740,4 +740,4 @@ auto MakeTmpDirWithPrefix(std::filesystem::path prefix)
   return result_dir;
 }
 
-}  // namespace Carbon::Filesystem
+}  // namespace MyLang::Filesystem

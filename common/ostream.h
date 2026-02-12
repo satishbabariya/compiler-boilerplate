@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_OSTREAM_H_
-#define CARBON_COMMON_OSTREAM_H_
+#ifndef MYLANG_COMMON_OSTREAM_H_
+#define MYLANG_COMMON_OSTREAM_H_
 
 // Libraries should include this header instead of raw_ostream.
 
@@ -15,7 +15,7 @@
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/Support/raw_ostream.h"  // IWYU pragma: export
 
-namespace Carbon {
+namespace MyLang {
 
 // CRTP base class for printable types. Children (DerivedT) must implement:
 // - auto Print(llvm::raw_ostream& out) const -> void
@@ -87,7 +87,7 @@ inline auto PrintToString(const T& val) -> std::string {
   return str;
 }
 
-}  // namespace Carbon
+}  // namespace MyLang
 
 namespace llvm {
 
@@ -118,4 +118,4 @@ auto operator<<(StreamT& standard_out, const ClassT& value) -> StreamT& {
 
 }  // namespace llvm
 
-#endif  // CARBON_COMMON_OSTREAM_H_
+#endif  // MYLANG_COMMON_OSTREAM_H_

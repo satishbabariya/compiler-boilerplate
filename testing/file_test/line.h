@@ -1,14 +1,14 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TESTING_FILE_TEST_LINE_H_
-#define CARBON_TESTING_FILE_TEST_LINE_H_
+#ifndef MYLANG_TESTING_FILE_TEST_LINE_H_
+#define MYLANG_TESTING_FILE_TEST_LINE_H_
 
 #include "common/ostream.h"
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // Interface for lines.
 class FileTestLineBase : public Printable<FileTestLineBase> {
@@ -55,6 +55,6 @@ class FileTestLine final : public FileTestLineBase {
   llvm::StringRef line_;
 };
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TESTING_FILE_TEST_LINE_H_
+#endif  // MYLANG_TESTING_FILE_TEST_LINE_H_

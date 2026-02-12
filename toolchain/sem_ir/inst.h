@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_INST_H_
-#define CARBON_TOOLCHAIN_SEM_IR_INST_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_INST_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_INST_H_
 
 #include <concepts>
 #include <cstdint>
@@ -22,7 +22,7 @@
 #include "toolchain/sem_ir/inst_kind.h"
 #include "toolchain/sem_ir/typed_insts.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 template <typename... TypedInsts>
 struct CategoryOf;
@@ -193,7 +193,7 @@ class Inst : public Printable<Inst> {
     // Converts to `IdT`, validating the `kind` matches.
     template <typename IdT>
     auto As() const -> IdT {
-      CARBON_DCHECK(kind_ == IdKind::For<IdT>);
+      MYLANG_DCHECK(kind_ == IdKind::For<IdT>);
       return IdT(value_);
     }
 
@@ -217,7 +217,7 @@ class Inst : public Printable<Inst> {
   // Makes an instruction for a singleton. This exists to support simple
   // construction of all singletons by File.
   static auto MakeSingleton(InstKind kind) -> Inst {
-    CARBON_CHECK(IsSingletonInstKind(kind));
+    MYLANG_CHECK(IsSingletonInstKind(kind));
     // Error uses a self-referential type so that it's not accidentally treated
     // as a normal type. Every other builtin is a type, including the
     // self-referential TypeType.
@@ -271,7 +271,7 @@ class Inst : public Printable<Inst> {
     requires Internal::InstLikeType<TypedInst>
   auto As() const -> TypedInst {
     using Info = Internal::InstLikeTypeInfo<TypedInst>;
-    CARBON_CHECK(Is<TypedInst>(), "Casting inst {0} to wrong kind {1}", *this,
+    MYLANG_CHECK(Is<TypedInst>(), "Casting inst {0} to wrong kind {1}", *this,
                  Info::DebugName());
     auto build_with_type_id_onwards = [&](auto... type_id_onwards) {
       if constexpr (Internal::HasKindMemberAsField<TypedInst>) {
@@ -549,7 +549,7 @@ class InstStore {
   // instruction type.
   template <typename InstT>
   auto GetAsKnownInstId(InstId inst_id) const -> KnownInstId<InstT> {
-    CARBON_CHECK(Is<InstT>(inst_id), "Casting inst {0} to wrong kind {1}",
+    MYLANG_CHECK(Is<InstT>(inst_id), "Casting inst {0} to wrong kind {1}",
                  Get(inst_id), Internal::InstLikeTypeInfo<InstT>::DebugName());
     return KnownInstId<InstT>::UnsafeMake(inst_id);
   }
@@ -680,7 +680,7 @@ class InstStore {
   // canonicalization.
   auto GetNonCanonicalLocId(InstId inst_id) const -> LocId {
     auto index = values_.GetRawIndex(inst_id);
-    CARBON_CHECK(static_cast<size_t>(index) < loc_ids_.size(), "{0} {1}", index,
+    MYLANG_CHECK(static_cast<size_t>(index) < loc_ids_.size(), "{0} {1}", index,
                  loc_ids_.size());
     return loc_ids_[index];
   }
@@ -702,11 +702,11 @@ class InstBlockStore
       // `InstBlockId::{Empty,Exports,Imports,GlobalInit}` global ids.
       : BaseType(allocator, check_ir_id, 4) {
     auto exports_id = AddPlaceholder();
-    CARBON_CHECK(exports_id == InstBlockId::Exports);
+    MYLANG_CHECK(exports_id == InstBlockId::Exports);
     auto imports_id = AddPlaceholder();
-    CARBON_CHECK(imports_id == InstBlockId::Imports);
+    MYLANG_CHECK(imports_id == InstBlockId::Imports);
     auto global_init_id = AddPlaceholder();
-    CARBON_CHECK(global_init_id == InstBlockId::GlobalInit);
+    MYLANG_CHECK(global_init_id == InstBlockId::GlobalInit);
   }
 
   // Adds an uninitialized block of the given size. The caller is expected to
@@ -724,8 +724,8 @@ class InstBlockStore
   // Sets the contents of a placeholder block to the given content.
   auto ReplacePlaceholder(InstBlockId block_id, llvm::ArrayRef<InstId> content)
       -> void {
-    CARBON_CHECK(block_id != InstBlockId::Empty);
-    CARBON_CHECK(Get(block_id).empty(),
+    MYLANG_CHECK(block_id != InstBlockId::Empty);
+    MYLANG_CHECK(Get(block_id).empty(),
                  "inst block content set more than once");
     values().Get(block_id) = AllocateCopy(content);
   }
@@ -744,6 +744,6 @@ inline auto CarbonHashValue(const Inst& value, uint64_t seed) -> HashCode {
   return static_cast<HashCode>(hasher);
 }
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_INST_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_INST_H_

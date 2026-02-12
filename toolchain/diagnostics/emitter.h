@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DIAGNOSTICS_EMITTER_H_
-#define CARBON_TOOLCHAIN_DIAGNOSTICS_EMITTER_H_
+#ifndef MYLANG_TOOLCHAIN_DIAGNOSTICS_EMITTER_H_
+#define MYLANG_TOOLCHAIN_DIAGNOSTICS_EMITTER_H_
 
 #include <cstdint>
 #include <string>
@@ -18,7 +18,7 @@
 #include "toolchain/diagnostics/diagnostic.h"
 #include "toolchain/diagnostics/kind.h"
 
-namespace Carbon::Diagnostics {
+namespace MyLang::Diagnostics {
 
 namespace Internal {
 
@@ -231,7 +231,7 @@ class Emitter {
 // TODO: Based on how this ends up used or if we get more distinct emitters, it
 // might be worth considering having diagnostics specify that they don't apply
 // to source-location carrying emitters. For example, this might look like a
-// `CARBON_NO_LOC_DIAGNOSTIC` macro, or some other factoring. But it might end
+// `MYLANG_NO_LOC_DIAGNOSTIC` macro, or some other factoring. But it might end
 // up being more noise than it is worth.
 class NoLocEmitter : public Emitter<void*> {
  public:
@@ -326,7 +326,7 @@ auto Emitter<LocT>::Builder::Note(
   if (!emitter_) {
     return *this;
   }
-  CARBON_CHECK(diagnostic_base.Level == Level::Note ||
+  MYLANG_CHECK(diagnostic_base.Level == Level::Note ||
                    diagnostic_base.Level == Level::LocationInfo,
                "{0}", static_cast<int>(diagnostic_base.Level));
   AddMessage(LocT(loc), diagnostic_base, {emitter_->MakeAny<Args>(args)...});
@@ -370,7 +370,7 @@ Emitter<LocT>::Builder::Builder(Emitter<LocT>* emitter, LocT loc,
       diagnostic_({.level = diagnostic_base.Level,
                    .is_on_scope = diagnostic_base.IsOnScope}) {
   AddMessage(LocT(loc), diagnostic_base, std::move(args));
-  CARBON_CHECK(diagnostic_base.Level != Level::Note);
+  MYLANG_CHECK(diagnostic_base.Level != Level::Note);
 }
 
 template <typename LocT>
@@ -419,7 +419,7 @@ auto Emitter<LocT>::Builder::FormatFn(const Message& message,
                                       std::index_sequence<N...> /*indices*/)
     -> std::string {
   static_assert(sizeof...(Args) == sizeof...(N), "Invalid template args");
-  CARBON_CHECK(message.format_args.size() == sizeof...(Args),
+  MYLANG_CHECK(message.format_args.size() == sizeof...(Args),
                "Argument count mismatch on {0}: {1} != {2}", message.kind,
                message.format_args.size(), sizeof...(Args));
   return llvm::formatv(
@@ -451,12 +451,12 @@ template <typename Arg>
 auto Emitter<LocT>::MakeAny(Arg arg) -> llvm::Any {
   llvm::Any converted = ConvertArg(arg);
   using Storage = Internal::DiagnosticTypeForArg<Arg>::StorageType;
-  CARBON_CHECK(llvm::any_cast<Storage>(&converted),
+  MYLANG_CHECK(llvm::any_cast<Storage>(&converted),
                "Failed to convert argument of type {0} to its storage type {1}",
                typeid(Arg).name(), typeid(Storage).name());
   return converted;
 }
 
-}  // namespace Carbon::Diagnostics
+}  // namespace MyLang::Diagnostics
 
-#endif  // CARBON_TOOLCHAIN_DIAGNOSTICS_EMITTER_H_
+#endif  // MYLANG_TOOLCHAIN_DIAGNOSTICS_EMITTER_H_

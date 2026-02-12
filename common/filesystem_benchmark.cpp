@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -12,7 +12,7 @@
 #include "llvm/ADT/Sequence.h"
 #include "llvm/ADT/StringExtras.h"
 
-namespace Carbon::Filesystem {
+namespace MyLang::Filesystem {
 namespace {
 
 // Alternative implementation strategies to allow comparing performance.
@@ -23,7 +23,7 @@ namespace {
 // implementations for different instantiations. The different instantiations
 // get these enumerators in their names in the output, so we keep them short.
 enum BenchmarkComparables {
-  Carbon,
+  MyLang,
   Std,
 };
 
@@ -44,7 +44,7 @@ static auto GetText(int length) -> std::string {
   while (static_cast<int>(content.size()) < length) {
     content += Text.substr(0, length - content.size());
   }
-  CARBON_CHECK(static_cast<int>(content.size()) == length);
+  MYLANG_CHECK(static_cast<int>(content.size()) == length);
   return content;
 }
 
@@ -75,7 +75,7 @@ struct BenchContext {
     for (int i : llvm::seq(NumFiles)) {
       file_paths[i] = llvm::formatv("file_{0}", i).str();
       auto result = tmpdir.WriteFileFromString(file_paths[i], Text);
-      CARBON_CHECK(result.ok(), "{0}", result.error());
+      MYLANG_CHECK(result.ok(), "{0}", result.error());
       missing_paths[i] = llvm::formatv("missing_{0}", i).str();
     }
     ShuffleFilePaths();
@@ -96,8 +96,8 @@ struct BenchContext {
   // subdirectories and files.
   auto CreateTree(std::filesystem::path base, int entries, int entries_per_dir)
       -> void {
-    CARBON_CHECK(entries >= 1);
-    CARBON_CHECK(entries_per_dir >= 1);
+    MYLANG_CHECK(entries >= 1);
+    MYLANG_CHECK(entries_per_dir >= 1);
     int num_subdirs = std::max<int>(entries_per_dir / 2, 1);
     struct DirStackEntry {
       Dir dir;
@@ -106,7 +106,7 @@ struct BenchContext {
     };
     llvm::SmallVector<DirStackEntry> dir_stack;
     auto d = tmpdir.OpenDir(base, CreationOptions::CreateNew);
-    CARBON_CHECK(d.ok(), "{0}", d.error());
+    MYLANG_CHECK(d.ok(), "{0}", d.error());
     dir_stack.push_back({std::move(*d), entries, 0});
 
     while (!dir_stack.empty()) {
@@ -116,7 +116,7 @@ struct BenchContext {
       // `entries_per_dir` directly. Spread the remaining entries across
       // `num_subdirs`.
       int entries_per_subdir = ((num_entries - entries_per_dir) / num_subdirs);
-      CARBON_CHECK(entries_per_subdir < num_entries);
+      MYLANG_CHECK(entries_per_subdir < num_entries);
 
       // While we'll still put entries in a subdirectory, and we still need more
       // subdirectories in this directory, create another subdirectory, push it
@@ -124,7 +124,7 @@ struct BenchContext {
       if (entries_per_subdir >= entries_per_dir && subdir_count < num_subdirs) {
         auto name = llvm::formatv("dir_{0}", subdir_count).str();
         auto subdir = dir.OpenDir(name, CreationOptions::CreateNew);
-        CARBON_CHECK(subdir.ok(), "{0}", subdir.error());
+        MYLANG_CHECK(subdir.ok(), "{0}", subdir.error());
         ++subdir_count;
 
         // Note we have to continue after `push_back` as this will invalidate
@@ -136,13 +136,13 @@ struct BenchContext {
       // Otherwise, we're finished with subdirectories and just need to create
       // direct files.
       int num_files = entries_per_dir - subdir_count;
-      CARBON_CHECK(num_files >= 0);
+      MYLANG_CHECK(num_files >= 0);
       for (int i = 0; i < num_files; ++i) {
         auto name = llvm::formatv("file_{0}", i).str();
         auto f = dir.OpenWriteOnly(name, CreationOptions::CreateNew);
-        CARBON_CHECK(f.ok(), "{0}", f.error());
+        MYLANG_CHECK(f.ok(), "{0}", f.error());
         auto close_result = std::move(*f).Close();
-        CARBON_CHECK(close_result.ok(), "{0}", close_result.error());
+        MYLANG_CHECK(close_result.ok(), "{0}", close_result.error());
       }
       dir_stack.pop_back();
     }
@@ -154,22 +154,22 @@ auto BM_Access(benchmark::State& state) -> void {
   BenchContext context;
   while (state.KeepRunningBatch(NumFiles)) {
     for (int i : llvm::seq(NumFiles)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto result = context.tmpdir.Access(context.file_paths[i]);
-        CARBON_CHECK(result.ok(), "{0}", result.error());
+        MYLANG_CHECK(result.ok(), "{0}", result.error());
       } else if constexpr (Comp == Std) {
         std::error_code ec;
         bool exists = std::filesystem::exists(
             context.tmpdir.path() / context.file_paths[i], ec);
-        CARBON_CHECK(!ec, "{0}", ec.message());
-        CARBON_CHECK(exists);
+        MYLANG_CHECK(!ec, "{0}", ec.message());
+        MYLANG_CHECK(exists);
       } else {
         static_assert(false, "Invalid benchmark comparable");
       }
     }
   }
 }
-BENCHMARK(BM_Access<Carbon>)->UseRealTime();
+BENCHMARK(BM_Access<MyLang>)->UseRealTime();
 BENCHMARK(BM_Access<Std>)->UseRealTime();
 
 template <BenchmarkComparables Comp>
@@ -177,22 +177,22 @@ auto BM_AccessMissing(benchmark::State& state) -> void {
   BenchContext context;
   while (state.KeepRunningBatch(NumFiles)) {
     for (int i : llvm::seq(NumFiles)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto result = context.tmpdir.Access(context.missing_paths[i]);
-        CARBON_CHECK(result.error().no_entity());
+        MYLANG_CHECK(result.error().no_entity());
       } else if constexpr (Comp == Std) {
         std::error_code ec;
         auto exists = std::filesystem::exists(
             context.tmpdir.path() / context.missing_paths[i], ec);
-        CARBON_CHECK(!ec, "{0}", ec.message());
-        CARBON_CHECK(!exists);
+        MYLANG_CHECK(!ec, "{0}", ec.message());
+        MYLANG_CHECK(!exists);
       } else {
         static_assert(false, "Invalid benchmark comparable");
       }
     }
   }
 }
-BENCHMARK(BM_AccessMissing<Carbon>)->UseRealTime();
+BENCHMARK(BM_AccessMissing<MyLang>)->UseRealTime();
 BENCHMARK(BM_AccessMissing<Std>)->UseRealTime();
 
 template <BenchmarkComparables Comp>
@@ -200,15 +200,15 @@ auto BM_Stat(benchmark::State& state) -> void {
   BenchContext context;
   while (state.KeepRunningBatch(NumFiles)) {
     for (int i : llvm::seq(NumFiles)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto status = context.tmpdir.Stat(context.file_paths[i]);
-        CARBON_CHECK(status.ok(), "{0}", status.error());
+        MYLANG_CHECK(status.ok(), "{0}", status.error());
         benchmark::DoNotOptimize(status->permissions());
       } else if constexpr (Comp == Std) {
         std::error_code ec;
         auto status = std::filesystem::status(
             context.tmpdir.path() / context.file_paths[i], ec);
-        CARBON_CHECK(!ec, "{0}", ec.message());
+        MYLANG_CHECK(!ec, "{0}", ec.message());
         benchmark::DoNotOptimize(status.permissions());
       } else {
         static_assert(false, "Invalid benchmark comparable");
@@ -216,7 +216,7 @@ auto BM_Stat(benchmark::State& state) -> void {
     }
   }
 }
-BENCHMARK(BM_Stat<Carbon>)->UseRealTime();
+BENCHMARK(BM_Stat<MyLang>)->UseRealTime();
 BENCHMARK(BM_Stat<Std>)->UseRealTime();
 
 template <BenchmarkComparables Comp>
@@ -224,21 +224,21 @@ auto BM_StatMissing(benchmark::State& state) -> void {
   BenchContext context;
   while (state.KeepRunningBatch(NumFiles)) {
     for (int i : llvm::seq(NumFiles)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto status = context.tmpdir.Stat(context.missing_paths[i]);
-        CARBON_CHECK(status.error().no_entity());
+        MYLANG_CHECK(status.error().no_entity());
       } else if constexpr (Comp == Std) {
         std::error_code ec;
         auto status = std::filesystem::status(
             context.tmpdir.path() / context.missing_paths[i], ec);
-        CARBON_CHECK(ec.value() == ENOENT, "{0}", ec.message());
+        MYLANG_CHECK(ec.value() == ENOENT, "{0}", ec.message());
       } else {
         static_assert(false, "Invalid benchmark comparable");
       }
     }
   }
 }
-BENCHMARK(BM_StatMissing<Carbon>)->UseRealTime();
+BENCHMARK(BM_StatMissing<MyLang>)->UseRealTime();
 BENCHMARK(BM_StatMissing<Std>)->UseRealTime();
 
 template <BenchmarkComparables Comp>
@@ -246,19 +246,19 @@ auto BM_OpenMissing(benchmark::State& state) -> void {
   BenchContext context;
   while (state.KeepRunningBatch(NumFiles)) {
     for (int i : llvm::seq(NumFiles)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto f = context.tmpdir.OpenReadOnly(context.missing_paths[i]);
-        CARBON_CHECK(f.error().no_entity());
+        MYLANG_CHECK(f.error().no_entity());
       } else if constexpr (Comp == Std) {
         std::ifstream f(context.tmpdir.path() / context.missing_paths[i]);
-        CARBON_CHECK(!f.is_open());
+        MYLANG_CHECK(!f.is_open());
       } else {
         static_assert(false, "Invalid benchmark comparable");
       }
     }
   }
 }
-BENCHMARK(BM_OpenMissing<Carbon>)->UseRealTime();
+BENCHMARK(BM_OpenMissing<MyLang>)->UseRealTime();
 BENCHMARK(BM_OpenMissing<Std>)->UseRealTime();
 
 template <BenchmarkComparables Comp>
@@ -266,21 +266,21 @@ auto BM_OpenClose(benchmark::State& state) -> void {
   BenchContext context;
   while (state.KeepRunningBatch(NumFiles)) {
     for (int i : llvm::seq(NumFiles)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto f = context.tmpdir.OpenReadOnly(context.file_paths[i]);
-        CARBON_CHECK(f.ok(), "{0}", f.error());
+        MYLANG_CHECK(f.ok(), "{0}", f.error());
         auto close_result = std::move(*f).Close();
-        CARBON_CHECK(close_result.ok(), "{0}", close_result.error());
+        MYLANG_CHECK(close_result.ok(), "{0}", close_result.error());
       } else if constexpr (Comp == Std) {
         std::ifstream f(context.tmpdir.path() / context.file_paths[i]);
-        CARBON_CHECK(f.is_open());
+        MYLANG_CHECK(f.is_open());
       } else {
         static_assert(false, "Invalid benchmark comparable");
       }
     }
   }
 }
-BENCHMARK(BM_OpenClose<Carbon>)->UseRealTime();
+BENCHMARK(BM_OpenClose<MyLang>)->UseRealTime();
 BENCHMARK(BM_OpenClose<Std>)->UseRealTime();
 
 template <BenchmarkComparables Comp>
@@ -288,35 +288,35 @@ auto BM_CreateRemove(benchmark::State& state) -> void {
   BenchContext context;
   while (state.KeepRunningBatch(NumFiles)) {
     for (int i : llvm::seq(NumFiles)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         // Create the file by opening it.
         auto f = context.tmpdir.OpenWriteOnly(context.missing_paths[i],
                                               CreationOptions::CreateNew);
-        CARBON_CHECK(f.ok(), "{0}", f.error());
+        MYLANG_CHECK(f.ok(), "{0}", f.error());
         // Close it right away.
         auto close_result = std::move(*f).Close();
-        CARBON_CHECK(close_result.ok(), "{0}", close_result.error());
+        MYLANG_CHECK(close_result.ok(), "{0}", close_result.error());
         // Remove it.
         auto remove_result = context.tmpdir.Unlink(context.missing_paths[i]);
-        CARBON_CHECK(remove_result.ok(), "{0}", remove_result.error());
+        MYLANG_CHECK(remove_result.ok(), "{0}", remove_result.error());
       } else if constexpr (Comp == Std) {
         auto path = context.tmpdir.path() / context.missing_paths[i];
         // Create the file by opening it.
         std::ofstream f(path);
-        CARBON_CHECK(f.is_open());
+        MYLANG_CHECK(f.is_open());
         // Close it right away.
         f.close();
         // Remove it.
         std::error_code ec;
         std::filesystem::remove(path, ec);
-        CARBON_CHECK(!ec, "{0}", ec.message());
+        MYLANG_CHECK(!ec, "{0}", ec.message());
       } else {
         static_assert(false, "Invalid benchmark comparable");
       }
     }
   }
 }
-BENCHMARK(BM_CreateRemove<Carbon>)->UseRealTime();
+BENCHMARK(BM_CreateRemove<MyLang>)->UseRealTime();
 BENCHMARK(BM_CreateRemove<Std>)->UseRealTime();
 
 template <BenchmarkComparables Comp>
@@ -327,7 +327,7 @@ auto BM_Read(benchmark::State& state) -> void {
   for (int i : llvm::seq(NumFiles)) {
     auto result =
         context.tmpdir.WriteFileFromString(context.file_paths[i], content);
-    CARBON_CHECK(result.ok(), "{0}", result.error());
+    MYLANG_CHECK(result.ok(), "{0}", result.error());
   }
   while (state.KeepRunningBatch(NumFiles)) {
     // Re-shuffle the order of the files for each batch to avoid exact cache
@@ -337,15 +337,15 @@ auto BM_Read(benchmark::State& state) -> void {
     state.ResumeTiming();
 
     for (int i : llvm::seq(NumFiles)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto read_result =
             context.tmpdir.ReadFileToString(context.file_paths[i]);
-        CARBON_CHECK(read_result.ok(), "{0}", read_result.error());
+        MYLANG_CHECK(read_result.ok(), "{0}", read_result.error());
         benchmark::DoNotOptimize(*read_result);
       } else if constexpr (Comp == Std) {
         std::ifstream f(context.tmpdir.path() / context.file_paths[i],
                         std::ios::binary);
-        CARBON_CHECK(f.is_open());
+        MYLANG_CHECK(f.is_open());
         // This may be a somewhat surprising implementation, but benchmarking
         // against several other ways of reading the file with `std::ifstream`
         // all have the same or worse performance.
@@ -358,7 +358,7 @@ auto BM_Read(benchmark::State& state) -> void {
     }
   }
 }
-BENCHMARK(BM_Read<Carbon>)->Range(4, 1024LL * 1024)->UseRealTime();
+BENCHMARK(BM_Read<MyLang>)->Range(4, 1024LL * 1024)->UseRealTime();
 BENCHMARK(BM_Read<Std>)->Range(4, 1024LL * 1024)->UseRealTime();
 
 template <BenchmarkComparables Comp>
@@ -374,14 +374,14 @@ auto BM_Write(benchmark::State& state) -> void {
     state.ResumeTiming();
 
     for (int i : llvm::seq(NumFiles)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto write_result =
             context.tmpdir.WriteFileFromString(context.file_paths[i], content);
-        CARBON_CHECK(write_result.ok(), "{0}", write_result.error());
+        MYLANG_CHECK(write_result.ok(), "{0}", write_result.error());
       } else if constexpr (Comp == Std) {
         std::ofstream f(context.tmpdir.path() / context.file_paths[i],
                         std::ios::binary | std::ios::trunc);
-        CARBON_CHECK(f.is_open());
+        MYLANG_CHECK(f.is_open());
         f.write(content.data(), content.length());
       } else {
         static_assert(false, "Invalid benchmark comparable");
@@ -389,7 +389,7 @@ auto BM_Write(benchmark::State& state) -> void {
     }
   }
 }
-BENCHMARK(BM_Write<Carbon>)->Range(4, 1024LL * 1024)->UseRealTime();
+BENCHMARK(BM_Write<MyLang>)->Range(4, 1024LL * 1024)->UseRealTime();
 BENCHMARK(BM_Write<Std>)->Range(4, 1024LL * 1024)->UseRealTime();
 
 template <BenchmarkComparables Comp>
@@ -412,20 +412,20 @@ auto BM_Rmtree(benchmark::State& state) -> void {
 
     for (int i : llvm::seq(batch_size)) {
       std::string tree = llvm::formatv("tree_{0}", i).str();
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto rmdir_result = context.tmpdir.Rmtree(tree);
-        CARBON_CHECK(rmdir_result.ok(), "{0}", rmdir_result.error());
+        MYLANG_CHECK(rmdir_result.ok(), "{0}", rmdir_result.error());
       } else if constexpr (Comp == Std) {
         std::error_code ec;
         std::filesystem::remove_all(context.tmpdir.path() / tree, ec);
-        CARBON_CHECK(!ec, "{0}", ec.message());
+        MYLANG_CHECK(!ec, "{0}", ec.message());
       } else {
         static_assert(false, "Invalid benchmark comparable");
       }
     }
   }
 }
-BENCHMARK(BM_Rmtree<Carbon>)
+BENCHMARK(BM_Rmtree<MyLang>)
     ->Ranges({{1, 256}, {1, 32}})
     ->Ranges({{2 * 1024, 256 * 1024}, {512, 1024}})
     ->Unit(benchmark::kMicrosecond)
@@ -441,8 +441,8 @@ auto BM_CreateDirectories(benchmark::State& state) -> void {
   BenchContext context;
   int depth = state.range(0);
   int existing_depth = state.range(1);
-  CARBON_CHECK(existing_depth <= depth);
-  CARBON_CHECK(depth > 0);
+  MYLANG_CHECK(existing_depth <= depth);
+  MYLANG_CHECK(depth > 0);
 
   // Use a batch size of 10 to get avoid completely swamping the measurements
   // with overhead from creating existing directories and cleaning up.
@@ -450,7 +450,7 @@ auto BM_CreateDirectories(benchmark::State& state) -> void {
 
   // Pre-build both the paths and the existing paths. Note that we use
   // relatively short paths here, which if anything makes the benefits of the
-  // Carbon library smaller.
+  // MyLang library smaller.
   llvm::SmallVector<std::string> paths;
   llvm::SmallVector<std::string> existing_paths;
   for (int i : llvm::seq(BatchSize)) {
@@ -472,15 +472,15 @@ auto BM_CreateDirectories(benchmark::State& state) -> void {
     for (int i : llvm::seq(BatchSize)) {
       if (existing_depth > 0) {
         auto result = context.tmpdir.CreateDirectories(existing_paths[i]);
-        CARBON_CHECK(result.ok(), "{0}", result.error());
+        MYLANG_CHECK(result.ok(), "{0}", result.error());
       }
     }
     state.ResumeTiming();
 
     for (int i : llvm::seq(BatchSize)) {
-      if constexpr (Comp == Carbon) {
+      if constexpr (Comp == MyLang) {
         auto result = context.tmpdir.CreateDirectories(paths[i]);
-        CARBON_CHECK(result.ok(), "Failed to create '{0}': {1}", paths[i],
+        MYLANG_CHECK(result.ok(), "Failed to create '{0}': {1}", paths[i],
                      result.error());
 
         // Create a file in the provided directory. This adds some baseline
@@ -488,14 +488,14 @@ auto BM_CreateDirectories(benchmark::State& state) -> void {
         // isn't some laziness that makes just creating a directory have an
         // unusually low cost.
         auto f = result->OpenWriteOnly("test", CreationOptions::CreateNew);
-        CARBON_CHECK(f.ok(), "{0}", f.error());
+        MYLANG_CHECK(f.ok(), "{0}", f.error());
         auto close_result = std::move(*f).Close();
-        CARBON_CHECK(close_result.ok(), "{0}", close_result.error());
+        MYLANG_CHECK(close_result.ok(), "{0}", close_result.error());
       } else if constexpr (Comp == Std) {
         std::filesystem::path path = context.tmpdir.path() / paths[i];
         std::error_code ec;
         std::filesystem::create_directories(path, ec);
-        CARBON_CHECK(!ec, "{0}", ec.message());
+        MYLANG_CHECK(!ec, "{0}", ec.message());
 
         // Create a file in the directory, similar to above. This has a (much)
         // bigger effect though because the C++ APIs don't open the created
@@ -503,7 +503,7 @@ auto BM_CreateDirectories(benchmark::State& state) -> void {
         // from the benchmark if we don't use it. This also lets us see the
         // benefit of not needing to re-walk the path to create the file.
         std::ofstream f(path / "test");
-        CARBON_CHECK(f.is_open());
+        MYLANG_CHECK(f.is_open());
         f.close();
       } else {
         static_assert(false, "Invalid benchmark comparable");
@@ -515,7 +515,7 @@ auto BM_CreateDirectories(benchmark::State& state) -> void {
       auto result = context.tmpdir.Rmtree(
           llvm::formatv("{0}_{1}", existing_depth > 0 ? "exists" : "dir", i)
               .str());
-      CARBON_CHECK(result.ok(), "{0}", result.error());
+      MYLANG_CHECK(result.ok(), "{0}", result.error());
     }
     state.ResumeTiming();
   }
@@ -533,7 +533,7 @@ static auto CreateDirectoriesBenchArgs(benchmark::Benchmark* b) {
     }
   }
 }
-BENCHMARK(BM_CreateDirectories<Carbon>)
+BENCHMARK(BM_CreateDirectories<MyLang>)
     ->Apply(CreateDirectoriesBenchArgs)
     ->UseRealTime();
 BENCHMARK(BM_CreateDirectories<Std>)
@@ -541,4 +541,4 @@ BENCHMARK(BM_CreateDirectories<Std>)
     ->UseRealTime();
 
 }  // namespace
-}  // namespace Carbon::Filesystem
+}  // namespace MyLang::Filesystem

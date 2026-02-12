@@ -1,11 +1,11 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_MOVE_ONLY_H_
-#define CARBON_COMMON_MOVE_ONLY_H_
+#ifndef MYLANG_COMMON_MOVE_ONLY_H_
+#define MYLANG_COMMON_MOVE_ONLY_H_
 
-namespace Carbon {
+namespace MyLang {
 
 // A base class that indicates a type is move-only. Typically this can be
 // achieved by declaring the move constructor and move assignment yourself; this
@@ -23,6 +23,6 @@ struct MoveOnly {
   auto operator=(MoveOnly&&) noexcept -> MoveOnly& = default;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_MOVE_ONLY_H_
+#endif  // MYLANG_COMMON_MOVE_ONLY_H_

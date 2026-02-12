@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,7 +10,7 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "toolchain/diagnostics/emitter.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
 static constexpr llvm::StringLiteral TestFileName = "test.carbon";
@@ -24,7 +24,7 @@ TEST(SourceBufferTest, MissingFile) {
 
 TEST(SourceBufferTest, SimpleFile) {
   llvm::vfs::InMemoryFileSystem fs;
-  CARBON_CHECK(fs.addFile(TestFileName, /*ModificationTime=*/0,
+  MYLANG_CHECK(fs.addFile(TestFileName, /*ModificationTime=*/0,
                           llvm::MemoryBuffer::getMemBuffer("Hello World")));
 
   auto buffer = SourceBuffer::MakeFromFile(fs, TestFileName,
@@ -38,7 +38,7 @@ TEST(SourceBufferTest, SimpleFile) {
 TEST(SourceBufferTest, NoNull) {
   llvm::vfs::InMemoryFileSystem fs;
   static constexpr char NoNull[3] = {'a', 'b', 'c'};
-  CARBON_CHECK(fs.addFile(
+  MYLANG_CHECK(fs.addFile(
       TestFileName, /*ModificationTime=*/0,
       llvm::MemoryBuffer::getMemBuffer(llvm::StringRef(NoNull, sizeof(NoNull)),
                                        /*BufferName=*/"",
@@ -54,7 +54,7 @@ TEST(SourceBufferTest, NoNull) {
 
 TEST(SourceBufferTest, EmptyFile) {
   llvm::vfs::InMemoryFileSystem fs;
-  CARBON_CHECK(fs.addFile(TestFileName, /*ModificationTime=*/0,
+  MYLANG_CHECK(fs.addFile(TestFileName, /*ModificationTime=*/0,
                           llvm::MemoryBuffer::getMemBuffer("")));
 
   auto buffer = SourceBuffer::MakeFromFile(fs, TestFileName,
@@ -66,4 +66,4 @@ TEST(SourceBufferTest, EmptyFile) {
 }
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

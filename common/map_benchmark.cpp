@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -12,7 +12,7 @@
 #include "common/raw_hashtable_benchmark_helpers.h"
 #include "llvm/ADT/DenseMap.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
 using RawHashtable::CarbonHashDI;
@@ -95,7 +95,7 @@ struct MapWrapperImpl {
   auto BenchErase(KeyT k) -> bool { return m.erase(k) != 0; }
 };
 
-// Explicit (partial) specialization for the Carbon map type that uses its
+// Explicit (partial) specialization for the MyLang map type that uses its
 // different API design.
 template <typename KT, typename VT, int MinSmallSize>
 struct MapWrapperImpl<Map<KT, VT, MinSmallSize>> {
@@ -128,11 +128,11 @@ struct MapWrapperImpl<Map<KT, VT, MinSmallSize>> {
   auto BenchErase(KeyT k) -> bool { return m.Erase(k); }
 };
 
-// Provide a way to override the Carbon Map specific benchmark runs with another
+// Provide a way to override the MyLang Map specific benchmark runs with another
 // hashtable implementation. When building, you can use one of these enum names
-// in a macro define such as `-DCARBON_MAP_BENCH_OVERRIDE=Name` in order to
+// in a macro define such as `-DMYLANG_MAP_BENCH_OVERRIDE=Name` in order to
 // trigger a specific override for the `Map` type benchmarks. This is used to
-// get before/after runs that compare the performance of Carbon's Map versus
+// get before/after runs that compare the performance of MyLang's Map versus
 // other implementations.
 enum class MapOverride : uint8_t {
   None,
@@ -141,8 +141,8 @@ enum class MapOverride : uint8_t {
   LLVM,
   LLVMAndCarbonHash,
 };
-#ifndef CARBON_MAP_BENCH_OVERRIDE
-#define CARBON_MAP_BENCH_OVERRIDE None
+#ifndef MYLANG_MAP_BENCH_OVERRIDE
+#define MYLANG_MAP_BENCH_OVERRIDE None
 #endif
 
 template <typename MapT, MapOverride Override>
@@ -167,12 +167,12 @@ struct MapWrapperOverride<Map<KeyT, ValueT, MinSmallSize>,
 
 template <typename MapT>
 using MapWrapper =
-    MapWrapperOverride<MapT, MapOverride::CARBON_MAP_BENCH_OVERRIDE>;
+    MapWrapperOverride<MapT, MapOverride::MYLANG_MAP_BENCH_OVERRIDE>;
 
 template <typename MapT>
 auto ReportMetrics(const MapWrapper<MapT>& m_wrapper, benchmark::State& state)
     -> void {
-  // Report some extra statistics about the Carbon type.
+  // Report some extra statistics about the MyLang type.
   if constexpr (IsCarbonMap<MapWrapper<MapT>>) {
     ReportTableMetrics(m_wrapper.m, state);
   }
@@ -236,7 +236,7 @@ static void BM_MapContainsHit(benchmark::State& state) {
       benchmark::DoNotOptimize(i);
 
       bool result = m.BenchContains(lookup_keys[i]);
-      CARBON_DCHECK(result);
+      MYLANG_DCHECK(result);
       // We use the lookup success to step through keys, establishing a
       // dependency between each lookup. This doesn't fully allow us to measure
       // latency rather than throughput, as noted above.
@@ -268,7 +268,7 @@ static void BM_MapContainsMiss(benchmark::State& state) {
       benchmark::DoNotOptimize(i);
 
       bool result = m.BenchContains(lookup_keys[i]);
-      CARBON_DCHECK(!result);
+      MYLANG_DCHECK(!result);
       i += static_cast<ssize_t>(!result);
     }
   }
@@ -322,7 +322,7 @@ static void BM_MapLookupHit(benchmark::State& state) {
       benchmark::DoNotOptimize(i);
 
       bool result = m.BenchLookup(lookup_keys[i]);
-      CARBON_DCHECK(result);
+      MYLANG_DCHECK(result);
       i += static_cast<ssize_t>(result);
     }
   }
@@ -333,7 +333,7 @@ MAP_BENCHMARK_ONE_OP(BM_MapLookupHit, HitArgs);
 
 // We also do some minimal benchmarking with integers that have a
 // large number of low zero bits shifted into them. These present particular
-// challenges to the hashing strategy Carbon's hash tables use and so they help
+// challenges to the hashing strategy MyLang's hash tables use and so they help
 // form stress tests and benchmark to make sure the hash function quality
 // remains reasonable even under adverse conditions. We can't go past a certain
 // limit here without our hash tables becoming impossibly slow due to complete
@@ -378,7 +378,7 @@ static void BM_MapUpdateHit(benchmark::State& state) {
       benchmark::DoNotOptimize(i);
 
       bool inserted = m.BenchUpdate(lookup_keys[i], MakeValue2<VT>());
-      CARBON_DCHECK(!inserted);
+      MYLANG_DCHECK(!inserted);
     }
   }
 
@@ -423,7 +423,7 @@ static void BM_MapEraseUpdateHit(benchmark::State& state) {
       benchmark::ClobberMemory();
 
       bool inserted = m.BenchUpdate(lookup_keys[i], MakeValue2<VT>());
-      CARBON_DCHECK(inserted);
+      MYLANG_DCHECK(inserted);
     }
   }
 }
@@ -457,7 +457,7 @@ MAP_BENCHMARK_ONE_OP(BM_MapEraseUpdateHit, HitArgs);
 // covered elsewhere, and the code path for growing a table to a larger size.
 //
 // Because this benchmark operates on whole maps, we also compute the number of
-// probed keys for Carbon's set as that is both a general reflection of the
+// probed keys for MyLang's set as that is both a general reflection of the
 // efficacy of the underlying hash function, and a direct factor that drives the
 // cost of these operations.
 template <typename MapT>
@@ -479,12 +479,12 @@ static void BM_MapInsertSeq(benchmark::State& state) {
     MapWrapperT m;
     for (auto k : keys) {
       bool inserted = m.BenchInsert(k, MakeValue<VT>());
-      CARBON_DCHECK(inserted, "Must be a successful insert!");
+      MYLANG_DCHECK(inserted, "Must be a successful insert!");
     }
 
     // Now insert a final random repeated key.
     bool inserted = m.BenchInsert(lookup_keys[i], MakeValue2<VT>());
-    CARBON_DCHECK(!inserted, "Must already be in the map!");
+    MYLANG_DCHECK(!inserted, "Must already be in the map!");
 
     // Rotate through the shuffled keys.
     i = (i + static_cast<ssize_t>(!inserted)) & (LookupKeysSize - 1);
@@ -496,14 +496,14 @@ static void BM_MapInsertSeq(benchmark::State& state) {
   state.counters["KeyRate"] = benchmark::Counter(
       keys.size(), benchmark::Counter::kIsIterationInvariantRate);
 
-  // Report some extra statistics about the Carbon type.
+  // Report some extra statistics about the MyLang type.
   if constexpr (IsCarbonMap<MapWrapperT>) {
     // Re-build a map outside of the timing loop to look at the statistics
     // rather than the timing.
     MapWrapperT m;
     for (auto k : keys) {
       bool inserted = m.BenchInsert(k, MakeValue<VT>());
-      CARBON_DCHECK(inserted, "Must be a successful insert!");
+      MYLANG_DCHECK(inserted, "Must be a successful insert!");
     }
 
     ReportMetrics(m, state);
@@ -517,4 +517,4 @@ static void BM_MapInsertSeq(benchmark::State& state) {
 MAP_BENCHMARK_ONE_OP(BM_MapInsertSeq, SizeArgs);
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

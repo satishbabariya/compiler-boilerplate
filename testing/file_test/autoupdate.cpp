@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -18,7 +18,7 @@
 #include "llvm/Support/FormatVariadic.h"
 #include "testing/base/file_helpers.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // Converts a matched line number to an int, trimming whitespace. Returns 0 if
 // there is no line number, to assist early placement.
@@ -30,7 +30,7 @@ static auto ParseLineNumber(absl::string_view matched_line_number) -> int {
   }
   // NOLINTNEXTLINE(google-runtime-int): API requirement.
   long long val;
-  CARBON_CHECK(!llvm::getAsSignedInteger(trimmed, 10, val), "{0}",
+  MYLANG_CHECK(!llvm::getAsSignedInteger(trimmed, 10, val), "{0}",
                matched_line_number);
   return val;
 }
@@ -212,7 +212,7 @@ auto FileTestAutoupdater::BuildCheckLines(llvm::StringRef output,
       absl::string_view filename;
       if (RE2::PartialMatch(line, *default_file_re_, &filename)) {
         auto it = file_to_number_map_.find(filename);
-        CARBON_CHECK(it != file_to_number_map_.end(),
+        MYLANG_CHECK(it != file_to_number_map_.end(),
                      "default_file_re had unexpected match in '{0}' (`{1}`)",
                      line, default_file_re_->pattern());
         default_file_number = it->second;
@@ -228,7 +228,7 @@ auto FileTestAutoupdater::BuildCheckLines(llvm::StringRef output,
 
 auto FileTestAutoupdater::AddRemappedNonCheckLine() -> void {
   new_lines_.push_back(non_check_line_);
-  CARBON_CHECK(output_line_remap_
+  MYLANG_CHECK(output_line_remap_
                    .insert({{non_check_line_->file_number(),
                              non_check_line_->line_number()},
                             ++output_line_number_})
@@ -236,7 +236,7 @@ auto FileTestAutoupdater::AddRemappedNonCheckLine() -> void {
 }
 
 auto FileTestAutoupdater::AddTips() -> void {
-  CARBON_CHECK(tips_.empty(), "Should only add tips once");
+  MYLANG_CHECK(tips_.empty(), "Should only add tips once");
 
   tips_.reserve(4);
   // This puts commands on a single line so that they can be easily copied.
@@ -297,11 +297,11 @@ auto FileTestAutoupdater::StartSplitFile() -> void {
   // Advance the file.
   ++output_file_number_;
   output_line_number_ = 0;
-  CARBON_CHECK(output_file_number_ == non_check_line_->file_number(),
+  MYLANG_CHECK(output_file_number_ == non_check_line_->file_number(),
                "Non-sequential file: {0}", non_check_line_->file_number());
 
   // Each following file has precisely one split line.
-  CARBON_CHECK(non_check_line_->line_number() < 1,
+  MYLANG_CHECK(non_check_line_->line_number() < 1,
                "Expected a split line, got {0}", *non_check_line_);
   // The split line is ignored when calculating line counts.
   new_lines_.push_back(non_check_line_);
@@ -318,7 +318,7 @@ auto FileTestAutoupdater::StartSplitFile() -> void {
 auto FileTestAutoupdater::Run(bool dry_run) -> bool {
   // Print everything until the autoupdate line.
   while (non_check_line_->line_number() != autoupdate_line_number_) {
-    CARBON_CHECK(non_check_line_ != non_check_lines_.end() &&
+    MYLANG_CHECK(non_check_line_ != non_check_lines_.end() &&
                      non_check_line_->file_number() == 0,
                  "Missed autoupdate?");
     AddRemappedNonCheckLine();
@@ -401,4 +401,4 @@ auto FileTestAutoupdater::Run(bool dry_run) -> bool {
   return true;
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

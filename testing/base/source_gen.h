@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TESTING_BASE_SOURCE_GEN_H_
-#define CARBON_TESTING_BASE_SOURCE_GEN_H_
+#ifndef MYLANG_TESTING_BASE_SOURCE_GEN_H_
+#define MYLANG_TESTING_BASE_SOURCE_GEN_H_
 
 #include <string>
 
@@ -14,7 +14,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // Provides source code generation facilities.
 //
@@ -24,7 +24,7 @@ namespace Carbon::Testing {
 //
 // - Generate interesting patterns and structures of code that have emerged as
 //   toolchain performance bottlenecks in practice in C++ codebases.
-// - Generate code that includes most Carbon language features (and whatever
+// - Generate code that includes most MyLang language features (and whatever
 //   reasonable C++ analogs could be used for comparative purposes):
 //   - Functions
 //   - Classes with class functions, methods, and fields
@@ -41,9 +41,9 @@ namespace Carbon::Testing {
 //   possible, it should permute the order and content without randomizing the
 //   total count, size, or complexity.
 //
-// Note that the default and primary generation target is interesting Carbon
+// Note that the default and primary generation target is interesting MyLang
 // source code. We have a best-effort to alternatively generate comparable C++
-// constructs to the Carbon ones for comparative benchmarking, but there is no
+// constructs to the MyLang ones for comparative benchmarking, but there is no
 // goal to cover all the interesting C++ patterns we might want to benchmark,
 // and we don't aim for perfectly synthesizing C++ analogs. We can always drop
 // fidelity for the C++ code path if needed for simplicity.
@@ -55,7 +55,7 @@ namespace Carbon::Testing {
 class SourceGen {
  public:
   enum class Language : uint8_t {
-    Carbon,
+    MyLang,
     Cpp,
   };
 
@@ -120,7 +120,7 @@ class SourceGen {
   // other compound types).
   struct TypeUseParams {
     // The weights in the histogram start with a sequence fixed types described
-    // with a Carbon and C++ string, and their associated weight.
+    // with a MyLang and C++ string, and their associated weight.
     struct FixedTypeWeight {
       llvm::StringRef carbon_spelling;
       llvm::StringRef cpp_spelling;
@@ -166,13 +166,13 @@ class SourceGen {
     TypeUseParams type_use_params = {};
   };
 
-  // Access a global instance of this type to generate Carbon code for
+  // Access a global instance of this type to generate MyLang code for
   // benchmarks, tests, or other places where sharing a common instance is
   // useful. Note that there is nothing thread safe about this instance or type.
   static auto Global() -> SourceGen&;
 
-  // Construct a source generator for the provided language, by default Carbon.
-  explicit SourceGen(Language language = Language::Carbon);
+  // Construct a source generator for the provided language, by default MyLang.
+  explicit SourceGen(Language language = Language::MyLang);
 
   // Generate an API file with dense classes containing function forward
   // declarations.
@@ -180,7 +180,7 @@ class SourceGen {
   // Accepts a number of `target_lines` for the resulting source code. This is a
   // rough approximation used to scale all the other constructs up and down
   // accordingly. For C++ source generation, we work to generate the same number
-  // of constructs as Carbon would for the given line count over keeping the
+  // of constructs as MyLang would for the given line count over keeping the
   // actual line count close to the target.
   //
   // TODO: Currently, the formatting and line breaks of generating code are
@@ -194,7 +194,7 @@ class SourceGen {
   // Get some number of randomly shuffled identifiers.
   //
   // The identifiers start with a character [A-Za-z], other characters may also
-  // include [0-9_]. Both Carbon and C++ keywords are excluded along with any
+  // include [0-9_]. Both MyLang and C++ keywords are excluded along with any
   // other non-identifier syntaxes that overlap to ensure all of these can be
   // used as identifiers.
   //
@@ -208,7 +208,7 @@ class SourceGen {
   // Optionally, callers can request a minimum and maximum length. By default,
   // the length distribution used across the identifiers will mirror the
   // observed distribution of identifiers in C++ source code and our expectation
-  // of them in Carbon source code. The maximum length in this default
+  // of them in MyLang source code. The maximum length in this default
   // distribution cannot be more than 64.
   //
   // Callers can request a uniform distribution across [min_length, max_length],
@@ -294,6 +294,6 @@ class SourceGen {
   Language language_;
 };
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TESTING_BASE_SOURCE_GEN_H_
+#endif  // MYLANG_TESTING_BASE_SOURCE_GEN_H_

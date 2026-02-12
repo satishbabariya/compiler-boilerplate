@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DIAGNOSTICS_DIAGNOSTIC_H_
-#define CARBON_TOOLCHAIN_DIAGNOSTICS_DIAGNOSTIC_H_
+#ifndef MYLANG_TOOLCHAIN_DIAGNOSTICS_DIAGNOSTIC_H_
+#define MYLANG_TOOLCHAIN_DIAGNOSTICS_DIAGNOSTIC_H_
 
 #include <cstdint>
 #include <functional>
@@ -15,7 +15,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "toolchain/diagnostics/kind.h"
 
-namespace Carbon::Diagnostics {
+namespace MyLang::Diagnostics {
 
 enum class Level : int8_t {
   // Information about the location of another diagnostic, showing how we
@@ -32,28 +32,28 @@ enum class Level : int8_t {
 };
 
 // Provides a definition of a diagnostic. For example:
-//   CARBON_DIAGNOSTIC(MyDiagnostic, Error, "invalid code!");
-//   CARBON_DIAGNOSTIC(MyDiagnostic, Warning, "found {0}, expected {1}",
+//   MYLANG_DIAGNOSTIC(MyDiagnostic, Error, "invalid code!");
+//   MYLANG_DIAGNOSTIC(MyDiagnostic, Warning, "found {0}, expected {1}",
 //                     std::string, std::string);
 //
 // Arguments are passed to llvm::formatv; see:
 // https://llvm.org/doxygen/FormatVariadic_8h_source.html
 //
 // See `Diagnostics::Emitter::Emit` for comments about argument lifetimes.
-#define CARBON_DIAGNOSTIC(DiagnosticName, LevelValue, Format, ...)         \
+#define MYLANG_DIAGNOSTIC(DiagnosticName, LevelValue, Format, ...)         \
   static constexpr auto DiagnosticName =                                   \
-      ::Carbon::Diagnostics::DiagnosticBase<__VA_ARGS__>(                  \
-          ::Carbon::Diagnostics::Kind::DiagnosticName,                     \
-          ::Carbon::Diagnostics::Level::LevelValue, /*is_on_scope=*/false, \
+      ::MyLang::Diagnostics::DiagnosticBase<__VA_ARGS__>(                  \
+          ::MyLang::Diagnostics::Kind::DiagnosticName,                     \
+          ::MyLang::Diagnostics::Level::LevelValue, /*is_on_scope=*/false, \
           Format)
 
-// Similar to `CARBON_DIAGNOSTIC`, but for diagnostics that are generated on a
+// Similar to `MYLANG_DIAGNOSTIC`, but for diagnostics that are generated on a
 // scope; see `Diagnostic::is_on_scope` for details.
-#define CARBON_DIAGNOSTIC_ON_SCOPE(DiagnosticName, LevelValue, Format, ...) \
+#define MYLANG_DIAGNOSTIC_ON_SCOPE(DiagnosticName, LevelValue, Format, ...) \
   static constexpr auto DiagnosticName =                                    \
-      ::Carbon::Diagnostics::DiagnosticBase<__VA_ARGS__>(                   \
-          ::Carbon::Diagnostics::Kind::DiagnosticName,                      \
-          ::Carbon::Diagnostics::Level::LevelValue, /*is_on_scope=*/true,   \
+      ::MyLang::Diagnostics::DiagnosticBase<__VA_ARGS__>(                   \
+          ::MyLang::Diagnostics::Kind::DiagnosticName,                      \
+          ::MyLang::Diagnostics::Level::LevelValue, /*is_on_scope=*/true,   \
           Format)
 
 // A location for a diagnostic in a file. The lifetime of a Loc
@@ -160,7 +160,7 @@ struct DiagnosticBase {
     static_assert((... && !(std::is_same_v<Args, llvm::StringRef> ||
                             std::is_same_v<Args, llvm::StringLiteral>)),
                   "String type disallowed in diagnostics. See "
-                  "https://github.com/carbon-language/carbon-lang/blob/trunk/"
+                  "https://github.com/TODO-update-with-your-project-url/"
                   "toolchain/docs/diagnostics.md#diagnostic-parameter-types");
   }
 
@@ -174,6 +174,6 @@ struct DiagnosticBase {
   llvm::StringLiteral Format;
 };
 
-}  // namespace Carbon::Diagnostics
+}  // namespace MyLang::Diagnostics
 
-#endif  // CARBON_TOOLCHAIN_DIAGNOSTICS_DIAGNOSTIC_H_
+#endif  // MYLANG_TOOLCHAIN_DIAGNOSTICS_DIAGNOSTIC_H_

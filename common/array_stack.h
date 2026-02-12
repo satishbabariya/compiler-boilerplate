@@ -1,15 +1,15 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_ARRAY_STACK_H_
-#define CARBON_COMMON_ARRAY_STACK_H_
+#ifndef MYLANG_COMMON_ARRAY_STACK_H_
+#define MYLANG_COMMON_ARRAY_STACK_H_
 
 #include "common/check.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/SmallVector.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Provides a stack of arrays. Only the array at the top of the stack can have
 // elements added.
@@ -43,12 +43,12 @@ class ArrayStack {
 
   // Returns the top array from the stack.
   auto PeekArray() const -> llvm::ArrayRef<ValueT> {
-    CARBON_CHECK(!array_offsets_.empty());
+    MYLANG_CHECK(!array_offsets_.empty());
     return llvm::ArrayRef(values_).slice(array_offsets_.back());
   }
 
   auto PeekArray() -> llvm::MutableArrayRef<ValueT> {
-    CARBON_CHECK(!array_offsets_.empty());
+    MYLANG_CHECK(!array_offsets_.empty());
     return llvm::MutableArrayRef(values_).slice(array_offsets_.back());
   }
 
@@ -67,21 +67,21 @@ class ArrayStack {
 
   // Appends a value to the top array on the stack.
   auto AppendToTop(const ValueT& value) -> void {
-    CARBON_CHECK(!array_offsets_.empty(),
+    MYLANG_CHECK(!array_offsets_.empty(),
                  "Must call PushArray before AppendToTop.");
     values_.push_back(value);
   }
 
   // Appends a value to the top array on the stack.
   auto AppendToTop(ValueT&& value) -> void {
-    CARBON_CHECK(!array_offsets_.empty(),
+    MYLANG_CHECK(!array_offsets_.empty(),
                  "Must call PushArray before AppendToTop.");
     values_.push_back(std::move(value));
   }
 
   // Adds multiple values to the top array on the stack.
   auto AppendToTop(llvm::ArrayRef<ValueT> values) -> void {
-    CARBON_CHECK(!array_offsets_.empty(),
+    MYLANG_CHECK(!array_offsets_.empty(),
                  "Must call PushArray before AppendToTop.");
     llvm::append_range(values_, values);
   }
@@ -100,6 +100,6 @@ class ArrayStack {
   llvm::SmallVector<ValueT> values_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_ARRAY_STACK_H_
+#endif  // MYLANG_COMMON_ARRAY_STACK_H_

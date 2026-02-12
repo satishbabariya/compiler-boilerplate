@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -8,33 +8,33 @@
 
 #include "common/raw_string_ostream.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
-#define CARBON_TEST_KIND(X) \
+#define MYLANG_TEST_KIND(X) \
   X(Beep)                   \
   X(Boop)                   \
   X(Burr)
 
-CARBON_DEFINE_RAW_ENUM_MASK(TestKind, uint8_t) {
-  CARBON_TEST_KIND(CARBON_RAW_ENUM_MASK_ENUMERATOR)
+MYLANG_DEFINE_RAW_ENUM_MASK(TestKind, uint8_t) {
+  MYLANG_TEST_KIND(MYLANG_RAW_ENUM_MASK_ENUMERATOR)
 };
 
-class TestKind : public CARBON_ENUM_MASK_BASE(TestKind) {
+class TestKind : public MYLANG_ENUM_MASK_BASE(TestKind) {
  public:
-  CARBON_TEST_KIND(CARBON_ENUM_MASK_CONSTANT_DECL)
+  MYLANG_TEST_KIND(MYLANG_ENUM_MASK_CONSTANT_DECL)
 
   using EnumMaskBase::AsInt;
   using EnumMaskBase::FromInt;
 };
 
-#define CARBON_TEST_KIND_WITH_TYPE(X) \
-  CARBON_ENUM_MASK_CONSTANT_DEFINITION(TestKind, X)
-CARBON_TEST_KIND(CARBON_TEST_KIND_WITH_TYPE)
-#undef CARBON_TEST_KIND_WITH_TYPE
+#define MYLANG_TEST_KIND_WITH_TYPE(X) \
+  MYLANG_ENUM_MASK_CONSTANT_DEFINITION(TestKind, X)
+MYLANG_TEST_KIND(MYLANG_TEST_KIND_WITH_TYPE)
+#undef MYLANG_TEST_KIND_WITH_TYPE
 
-CARBON_DEFINE_ENUM_MASK_NAMES(TestKind) {
-  CARBON_TEST_KIND(CARBON_ENUM_MASK_NAME_STRING)
+MYLANG_DEFINE_ENUM_MASK_NAMES(TestKind) {
+  MYLANG_TEST_KIND(MYLANG_ENUM_MASK_NAME_STRING)
 };
 
 static_assert(sizeof(TestKind) == sizeof(uint8_t),
@@ -139,4 +139,4 @@ TEST(EnumMaskBaseTest, IntConversion) {
 }
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

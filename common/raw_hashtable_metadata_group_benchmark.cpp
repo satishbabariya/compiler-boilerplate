@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -11,11 +11,11 @@
 #include "absl/random/random.h"
 #include "common/raw_hashtable_metadata_group.h"
 
-namespace Carbon::RawHashtable {
+namespace MyLang::RawHashtable {
 
 // If we have any SIMD support, create dedicated benchmark utilities for the
 // portable and SIMD implementation so we can directly benchmark both.
-#if CARBON_NEON_SIMD_SUPPORT || CARBON_X86_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT || MYLANG_X86_SIMD_SUPPORT
 // Override the core API with explicit use of the portable API.
 class BenchmarkPortableMetadataGroup : public MetadataGroup {
  public:
@@ -75,7 +75,7 @@ namespace {
 // of matching within a group.
 constexpr ssize_t BenchSize = 256;
 
-#if CARBON_NEON_SIMD_SUPPORT || CARBON_X86_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT || MYLANG_X86_SIMD_SUPPORT
 using PortableGroup = BenchmarkPortableMetadataGroup;
 using SimdGroup = BenchmarkSimdMetadataGroup;
 #endif
@@ -235,10 +235,10 @@ static void BM_LoadMatch(benchmark::State& s) {
     // Despite not being a DCHECK, this is fine for benchmarking. In an actual
     // hashtable, we expect to have a test for empty of the match prior to using
     // it to index an array, and that test is expected to be strongly predicted.
-    // That exactly matches how the `CARBON_CHECK` macro works, and so this
+    // That exactly matches how the `MYLANG_CHECK` macro works, and so this
     // serves as both a good correctness test and replication of hashtable usage
     // of a match.
-    CARBON_CHECK(matches);
+    MYLANG_CHECK(matches);
 
     // Now do the data-dependent increment by indexing our "all ones" array. The
     // index into `all_ones` is analogous to the index into a group of hashtable
@@ -249,7 +249,7 @@ static void BM_LoadMatch(benchmark::State& s) {
 BENCHMARK(BM_LoadMatch<BenchKind::Random>);
 BENCHMARK(BM_LoadMatch<BenchKind::Empty>);
 BENCHMARK(BM_LoadMatch<BenchKind::Deleted>);
-#if CARBON_NEON_SIMD_SUPPORT || CARBON_X86_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT || MYLANG_X86_SIMD_SUPPORT
 BENCHMARK(BM_LoadMatch<BenchKind::Random, PortableGroup>);
 BENCHMARK(BM_LoadMatch<BenchKind::Empty, PortableGroup>);
 BENCHMARK(BM_LoadMatch<BenchKind::Deleted, PortableGroup>);
@@ -298,7 +298,7 @@ static void BM_LoadMatchMissSteps(benchmark::State& s) {
     auto g = MetadataGroup::Load(bm.metadata.data(), i * GroupSize);
     auto matched_range = g.Match(bm.bytes[i]);
 
-    // We don't use a `CARBON_CHECK` here as the loop below will test the range
+    // We don't use a `MYLANG_CHECK` here as the loop below will test the range
     // to see if the loop should be skipped, replicating the test that we also
     // expect in hashtable usage.
 
@@ -326,10 +326,10 @@ BENCHMARK(BM_LoadMatchMissSteps<BenchKind::Random, 1>);
 BENCHMARK(BM_LoadMatchMissSteps<BenchKind::Random, 2>);
 BENCHMARK(BM_LoadMatchMissSteps<BenchKind::Random, 4>);
 BENCHMARK(BM_LoadMatchMissSteps<BenchKind::Random, 8>);
-#if CARBON_USE_X86_SIMD_CONTROL_GROUP
+#if MYLANG_USE_X86_SIMD_CONTROL_GROUP
 BENCHMARK(BM_LoadMatchMissSteps<BenchKind::Random, 12>);
 BENCHMARK(BM_LoadMatchMissSteps<BenchKind::Random, 16>);
 #endif
 
 }  // namespace
-}  // namespace Carbon::RawHashtable
+}  // namespace MyLang::RawHashtable

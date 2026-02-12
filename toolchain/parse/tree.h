@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_PARSE_TREE_H_
-#define CARBON_TOOLCHAIN_PARSE_TREE_H_
+#ifndef MYLANG_TOOLCHAIN_PARSE_TREE_H_
+#define MYLANG_TOOLCHAIN_PARSE_TREE_H_
 
 #include <iterator>
 
@@ -19,7 +19,7 @@
 #include "toolchain/parse/node_kind.h"
 #include "toolchain/parse/typed_nodes.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 struct DeferredDefinition;
 
@@ -113,13 +113,13 @@ class Tree : public Printable<Tree> {
   // Tests whether a particular node contains an error and may not match the
   // full expected structure of the grammar.
   auto node_has_error(NodeId n) const -> bool {
-    CARBON_DCHECK(n.has_value());
+    MYLANG_DCHECK(n.has_value());
     return node_impls_[n.index].has_error();
   }
 
   // Returns the kind of the given parse tree node.
   auto node_kind(NodeId n) const -> NodeKind {
-    CARBON_DCHECK(n.has_value());
+    MYLANG_DCHECK(n.has_value());
     return node_impls_[n.index].kind();
   }
 
@@ -135,7 +135,7 @@ class Tree : public Printable<Tree> {
   template <typename IdT>
   auto IsValid(IdT id) const -> bool {
     using T = typename NodeForId<IdT>::TypedNode;
-    CARBON_DCHECK(node_kind(id) == T::Kind);
+    MYLANG_DCHECK(node_kind(id) == T::Kind);
     return !node_has_error(id);
   }
 
@@ -143,7 +143,7 @@ class Tree : public Printable<Tree> {
   // the constraint on `T`.
   template <typename T>
   auto TryAs(NodeId n) const -> std::optional<T> {
-    CARBON_DCHECK(n.has_value());
+    MYLANG_DCHECK(n.has_value());
     if (ConvertTo<T>::AllowedFor(node_kind(n))) {
       return T::UnsafeMake(n);
     } else {
@@ -155,8 +155,8 @@ class Tree : public Printable<Tree> {
   // `node_kind(n)` matches the constraint on `T`.
   template <typename T>
   auto As(NodeId n) const -> T {
-    CARBON_DCHECK(n.has_value());
-    CARBON_DCHECK(ConvertTo<T>::AllowedFor(node_kind(n)),
+    MYLANG_DCHECK(n.has_value());
+    MYLANG_DCHECK(ConvertTo<T>::AllowedFor(node_kind(n)),
                   "cannot convert {0} to {1}", node_kind(n), typeid(T).name());
     return T::UnsafeMake(n);
   }
@@ -200,7 +200,7 @@ class Tree : public Printable<Tree> {
    public:
     explicit NodeImpl(NodeKind kind, bool has_error, Lex::TokenIndex token)
         : kind_(kind), has_error_(has_error), token_index_(token.index) {
-      CARBON_DCHECK(token.index >= 0, "Unexpected token for node: {0}", token);
+      MYLANG_DCHECK(token.index >= 0, "Unexpected token for node: {0}", token);
     }
 
     auto kind() const -> NodeKind { return kind_; }
@@ -347,6 +347,6 @@ struct Tree::ConvertTo<NodeIdOneOf<T...>> {
   }
 };
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse
 
-#endif  // CARBON_TOOLCHAIN_PARSE_TREE_H_
+#endif  // MYLANG_TOOLCHAIN_PARSE_TREE_H_

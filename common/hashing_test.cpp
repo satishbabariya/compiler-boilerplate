@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -19,7 +19,7 @@
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/TypeName.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
 using ::testing::Eq;
@@ -586,7 +586,7 @@ auto FindBitRangeCollisions(llvm::ArrayRef<HashedValue<T>> hashes)
   llvm::SmallVector<BitSequenceAndHashIndex> bits_and_indices;
   bits_and_indices.reserve(hashes.size());
   for (const auto& [hash, v] : hashes) {
-    CARBON_DCHECK(v == hashes[bits_and_indices.size()].v);
+    MYLANG_DCHECK(v == hashes[bits_and_indices.size()].v);
     auto hash_bits = (static_cast<uint64_t>(hash) & BitMask) >> BitShift;
     bits_and_indices.push_back(
         {.bits = static_cast<uint32_t>(hash_bits),
@@ -609,9 +609,9 @@ auto FindBitRangeCollisions(llvm::ArrayRef<HashedValue<T>> hashes)
   for (const auto& [hash_bits, hash_index] :
        llvm::ArrayRef(bits_and_indices).slice(1)) {
     // Check if we've found a new hash (and thus a new value), reset everything.
-    CARBON_CHECK(hashes[prev_index].v != hashes[hash_index].v);
+    MYLANG_CHECK(hashes[prev_index].v != hashes[hash_index].v);
     if (hash_bits != prev_hash_bits) {
-      CARBON_CHECK(hashes[prev_index].hash != hashes[hash_index].hash);
+      MYLANG_CHECK(hashes[prev_index].hash != hashes[hash_index].hash);
       prev_hash_bits = hash_bits;
       prev_index = hash_index;
       in_collision = false;
@@ -647,7 +647,7 @@ auto FindBitRangeCollisions(llvm::ArrayRef<HashedValue<T>> hashes)
   int median = collision_counts
       [collision_map[bits_and_indices[bits_and_indices.size() / 2].index]];
   int max = *llvm::max_element(collision_counts);
-  CARBON_CHECK(max ==
+  MYLANG_CHECK(max ==
                collision_counts[collision_map[bits_and_indices.back().index]]);
   return {.total = total, .median = median, .max = max};
 }
@@ -655,7 +655,7 @@ auto FindBitRangeCollisions(llvm::ArrayRef<HashedValue<T>> hashes)
 auto CheckNoDuplicateValues(llvm::ArrayRef<HashedString> hashes) -> void {
   for (int i = 0, size = hashes.size(); i < size - 1; ++i) {
     const auto& [_, value] = hashes[i];
-    CARBON_CHECK(value != hashes[i + 1].v, "Duplicate value: {0}", value);
+    MYLANG_CHECK(value != hashes[i + 1].v, "Duplicate value: {0}", value);
   }
 }
 
@@ -865,4 +865,4 @@ TYPED_TEST(SparseHashTest, Collisions) {
 }
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

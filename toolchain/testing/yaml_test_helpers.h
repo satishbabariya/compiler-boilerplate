@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
@@ -10,7 +10,7 @@
 //
 // Example usage:
 //
-//     namespace Yaml = Carbon::Testing::Yaml;
+//     namespace Yaml = MyLang::Testing::Yaml;
 //     using ::testing::ElementsAre;
 //     using ::testing::Pair;
 //     Yaml::Value yaml = Yaml::Value::FromText(R"yaml(
@@ -44,8 +44,8 @@
 // On match failure, Yaml::Values are printed as C++ code that can be used to
 // recreate the value, for easy copy-pasting into test expectations.
 
-#ifndef CARBON_TOOLCHAIN_TESTING_YAML_TEST_HELPERS_H_
-#define CARBON_TOOLCHAIN_TESTING_YAML_TEST_HELPERS_H_
+#ifndef MYLANG_TOOLCHAIN_TESTING_YAML_TEST_HELPERS_H_
+#define MYLANG_TOOLCHAIN_TESTING_YAML_TEST_HELPERS_H_
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -58,7 +58,7 @@
 #include "common/ostream.h"
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon::Testing::Yaml {
+namespace MyLang::Testing::Yaml {
 
 // Adds the specified indentation before each newline in the given string.
 inline auto IndentString(std::string_view str) -> std::string {
@@ -82,7 +82,7 @@ struct AliasValue : EmptyComparable {};
 // A thin wrapper around a variant of possible YAML value types. This type
 // intentionally provides no additional encapsulation or invariants beyond
 // those of the variant.
-struct Value : Carbon::Printable<Value>,
+struct Value : MyLang::Printable<Value>,
                std::variant<NullValue, ScalarValue, MappingValue, SequenceValue,
                             AliasValue> {
   using variant::variant;
@@ -165,6 +165,6 @@ MATCHER_P(Scalar, matcher,
   return false;
 }
 
-}  // namespace Carbon::Testing::Yaml
+}  // namespace MyLang::Testing::Yaml
 
-#endif  // CARBON_TOOLCHAIN_TESTING_YAML_TEST_HELPERS_H_
+#endif  // MYLANG_TOOLCHAIN_TESTING_YAML_TEST_HELPERS_H_

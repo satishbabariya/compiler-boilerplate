@@ -1,8 +1,8 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-# Setup stamping with Carbon's workspace status attached but disable it by
+# Setup stamping with MyLang's workspace status attached but disable it by
 # default.
 #
 # Note that while we have minimized the impact of stamping on build caching, it
@@ -32,9 +32,9 @@ common:clang-tidy --action_env=PATH --host_action_env=PATH
 common:clang-tidy --copt=-Wno-unknown-pragmas
 
 # --config=non-fatal-checks makes CHECK failures not terminate compilation.
-common:non-fatal-checks --per_file_copt=common/check_internal.cpp@-DCARBON_NON_FATAL_CHECKS
+common:non-fatal-checks --per_file_copt=common/check_internal.cpp@-DMYLANG_NON_FATAL_CHECKS
 
-# Provide an alias for controlling the `carbon_*` Bazel rules' configuration. We
+# Provide an alias for controlling the `mylang_*` Bazel rules' configuration. We
 # enable use of the target config here to make our build and tests more
 # efficient, see the documentation in //bazel/carbon_rules/BUILD for details.
 common --flag_alias=use_target_config_carbon_rules=//bazel/carbon_rules:use_target_config_carbon_rules
@@ -47,7 +47,7 @@ build --use_target_config_runtimes_builder
 # Default to using a disk cache to minimize re-building LLVM and Clang which we
 # try to avoid updating too frequently to minimize rebuild cost. The location
 # here can be overridden in the user configuration where needed.
-common --disk_cache=~/.cache/carbon-lang-build-cache
+common --disk_cache=~/.cache/mylang-build-cache
 # If you'd like a different disk cache size, override it by copying this
 # line to `user.bazelrc` in the repository root and modify the number there.
 common --experimental_disk_cache_gc_max_size=100G
@@ -60,7 +60,7 @@ common --action_env=CC --host_action_env=CC
 common --action_env=CMAKE_SYSROOT --host_action_env=CMAKE_SYSROOT
 
 # Disable warnings for all external compilations. These involve code that isn't
-# developed as part of Carbon and may be difficult or impossible to patch, so
+# developed as part of MyLang and may be difficult or impossible to patch, so
 # warnings aren't likely to be actionable.
 common --per_file_copt=external/.*\.(c|cc|cpp|cxx)$@-w
 common --host_per_file_copt=external/.*\.(c|cc|cpp|cxx)$@-w
@@ -115,7 +115,7 @@ common:linux --define=pfm=1
 # split.
 #
 # Note: if using GDB, see documentation to get that working:
-# https://docs.carbon-lang.dev/docs/project/contribution_tools.html#debugging-with-gdb-instead-of-lldb
+# https://TODO: Update with your project documentation link.
 #
 # TODO: Bazel has a bug where it doesn't manage dwo files in the cache correctly.
 # common:linux --fission=yes

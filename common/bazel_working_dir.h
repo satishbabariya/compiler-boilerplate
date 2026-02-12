@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_BAZEL_WORKING_DIR_H_
-#define CARBON_COMMON_BAZEL_WORKING_DIR_H_
+#ifndef MYLANG_COMMON_BAZEL_WORKING_DIR_H_
+#define MYLANG_COMMON_BAZEL_WORKING_DIR_H_
 
 #include <stdlib.h>
 
@@ -13,7 +13,7 @@
 #include "common/check.h"
 #include "common/filesystem.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Change working directory to behave as if it is where `bazel run` was invoked.
 //
@@ -34,18 +34,18 @@ inline auto SetWorkingDirForBazelRun(std::filesystem::path exe_path = {})
   if (!exe_path.empty()) {
     std::error_code err;
     exe_path = std::filesystem::absolute(exe_path, err);
-    CARBON_CHECK(!err, "Unable to make an absolute path for `{0}`: {1}",
+    MYLANG_CHECK(!err, "Unable to make an absolute path for `{0}`: {1}",
                  exe_path, err.message());
   }
 
   auto chdir_result = Filesystem::Cwd().Chdir(build_working_dir);
-  CARBON_CHECK(chdir_result.ok(),
+  MYLANG_CHECK(chdir_result.ok(),
                "Unable to change working directory to `{0}`: {1}",
                build_working_dir, chdir_result.error());
 
   return exe_path;
 }
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_BAZEL_WORKING_DIR_H_
+#endif  // MYLANG_COMMON_BAZEL_WORKING_DIR_H_

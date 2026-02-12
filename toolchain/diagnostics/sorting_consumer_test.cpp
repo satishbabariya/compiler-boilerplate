@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -11,15 +11,15 @@
 #include "toolchain/diagnostics/emitter.h"
 #include "toolchain/diagnostics/mocks.h"
 
-namespace Carbon::Diagnostics {
+namespace MyLang::Diagnostics {
 namespace {
 
-using ::Carbon::Testing::IsSingleDiagnostic;
+using ::MyLang::Testing::IsSingleDiagnostic;
 using ::testing::_;
 using ::testing::ElementsAreArray;
 
-CARBON_DIAGNOSTIC(TestDiagnostic, Error, "Diag{0}", int);
-CARBON_DIAGNOSTIC_ON_SCOPE(TestDiagnosticOnScope, Error, "DiagOnScope{0}", int);
+MYLANG_DIAGNOSTIC(TestDiagnostic, Error, "Diag{0}", int);
+MYLANG_DIAGNOSTIC_ON_SCOPE(TestDiagnosticOnScope, Error, "DiagOnScope{0}", int);
 
 // Sorting-related locations, consumed by `FakeEmitter::ConvertLoc`.
 struct TestLoc {
@@ -140,4 +140,4 @@ TEST(SortedEmitterTest, MixedScope) {
 }
 
 }  // namespace
-}  // namespace Carbon::Diagnostics
+}  // namespace MyLang::Diagnostics

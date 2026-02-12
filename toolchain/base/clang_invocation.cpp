@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -16,10 +16,10 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/FormatVariadic.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // The fake file name to use for the synthesized includes file.
-static constexpr const char IncludesFileName[] = "<carbon Cpp imports>";
+static constexpr const char IncludesFileName[] = "<mylang Cpp imports>";
 
 auto ClangDriverDiagnosticConsumer::HandleDiagnostic(
     clang::DiagnosticsEngine::Level diag_level, const clang::Diagnostic& info)
@@ -39,8 +39,8 @@ auto ClangDriverDiagnosticConsumer::HandleDiagnostic(
     case clang::DiagnosticsEngine::Warning:
     case clang::DiagnosticsEngine::Error:
     case clang::DiagnosticsEngine::Fatal: {
-      CARBON_DIAGNOSTIC(CppInteropDriverWarning, Warning, "{0}", std::string);
-      CARBON_DIAGNOSTIC(CppInteropDriverError, Error, "{0}", std::string);
+      MYLANG_DIAGNOSTIC(CppInteropDriverWarning, Warning, "{0}", std::string);
+      MYLANG_DIAGNOSTIC(CppInteropDriverError, Error, "{0}", std::string);
       emitter_->Emit(diag_level == clang::DiagnosticsEngine::Warning
                          ? CppInteropDriverWarning
                          : CppInteropDriverError,
@@ -169,4 +169,4 @@ auto AppendDefaultClangArgs(const InstallPaths& install_paths,
   }
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

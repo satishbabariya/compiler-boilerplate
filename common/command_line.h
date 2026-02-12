@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_COMMAND_LINE_H_
-#define CARBON_COMMON_COMMAND_LINE_H_
+#ifndef MYLANG_COMMON_COMMAND_LINE_H_
+#define MYLANG_COMMON_COMMAND_LINE_H_
 
 #include <memory>
 #include <utility>
@@ -211,7 +211,7 @@
 // - Finish adding support for setting and printing version information.
 // - Add short option counting support (`-vvv` -> `--verbose=3`).
 //
-namespace Carbon::CommandLine {
+namespace MyLang::CommandLine {
 
 // Forward declare some implementation detail classes and classes that are
 // friended.
@@ -742,7 +742,7 @@ struct Command {
 
 template <typename T>
 auto ArgBuilder::MetaAction(T action) -> void {
-  CARBON_CHECK(!arg_->meta_action, "Cannot set a meta action twice!");
+  MYLANG_CHECK(!arg_->meta_action, "Cannot set a meta action twice!");
   arg_->meta_action = std::move(action);
 }
 
@@ -822,8 +822,8 @@ auto OneOfArgBuilder::OneOfImpl(const OneOfValueT<U> (&input_values)[N],
 
   // Fold over all the input values to see if there is a default.
   if ((input_values[Indices].is_default || ...)) {
-    CARBON_CHECK(!arg()->is_append, "Can't append default.");
-    CARBON_CHECK((input_values[Indices].is_default + ... + 0) == 1,
+    MYLANG_CHECK(!arg()->is_append, "Can't append default.");
+    MYLANG_CHECK((input_values[Indices].is_default + ... + 0) == 1,
                  "Cannot default more than one value.");
 
     arg()->has_default = true;
@@ -852,6 +852,6 @@ auto OneOfArgBuilder::OneOfImpl(const OneOfValueT<U> (&input_values)[N],
   }
 }
 
-}  // namespace Carbon::CommandLine
+}  // namespace MyLang::CommandLine
 
-#endif  // CARBON_COMMON_COMMAND_LINE_H_
+#endif  // MYLANG_COMMON_COMMAND_LINE_H_

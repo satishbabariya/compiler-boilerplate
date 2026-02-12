@@ -1,52 +1,52 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_ENUM_MASK_BASE_H_
-#define CARBON_COMMON_ENUM_MASK_BASE_H_
+#ifndef MYLANG_COMMON_ENUM_MASK_BASE_H_
+#define MYLANG_COMMON_ENUM_MASK_BASE_H_
 
 #include <bit>
 
 #include "common/enum_base.h"
 #include "llvm/ADT/StringExtras.h"
 
-namespace Carbon::Internal {
+namespace MyLang::Internal {
 
 // CRTP-style base class similar to `EnumBase`, but supporting mask enums.
 // Enumerator values are consecutive bit shifts (1 << 0, 1 << 1, 1 << 2, 1 << 3,
 // ...).
 //
-// Users must be in the `Carbon` namespace and should look like the following.
+// Users must be in the `MyLang` namespace and should look like the following.
 //
 // In `my_kind.h`:
 //   ```
-//   #define CARBON_MY_KIND(X) \
+//   #define MYLANG_MY_KIND(X) \
 //       X(Enumerator1)        \
 //       X(Enumerator2)        \
 //       X(Enumerator3)        \
 //       ...
 //
-//   CARBON_DEFINE_RAW_ENUM_MASK(MyKind, uint32_t) {
-//     CARBON_MY_KIND(CARBON_RAW_ENUM_MASK_ENUMERATOR)
+//   MYLANG_DEFINE_RAW_ENUM_MASK(MyKind, uint32_t) {
+//     MYLANG_MY_KIND(MYLANG_RAW_ENUM_MASK_ENUMERATOR)
 //   };
 //
-//   class MyKind : public CARBON_ENUM_MASK_BASE(MyKind) {
+//   class MyKind : public MYLANG_ENUM_MASK_BASE(MyKind) {
 //    public:
-//     CARBON_MY_KIND(CARBON_ENUM_MASK_CONSTANT_DECL)
+//     MYLANG_MY_KIND(MYLANG_ENUM_MASK_CONSTANT_DECL)
 //
 //     // Plus, anything else you wish to include.
 //   };
 //
-//   #define CARBON_MY_KIND_WITH_TYPE(X) \
-//     CARBON_ENUM_MASK_CONSTANT_DEFINITION(MyKind, X)
-//   CARBON_MY_KIND(CARBON_MY_KIND_WITH_TYPE)
-//   #undef CARBON_MY_KIND_WITH_TYPE
+//   #define MYLANG_MY_KIND_WITH_TYPE(X) \
+//     MYLANG_ENUM_MASK_CONSTANT_DEFINITION(MyKind, X)
+//   MYLANG_MY_KIND(MYLANG_MY_KIND_WITH_TYPE)
+//   #undef MYLANG_MY_KIND_WITH_TYPE
 //   ```
 //
 // In `my_kind.cpp`:
 //   ```
-//   CARBON_DEFINE_ENUM_MASK_NAMES(MyKind) {
-//     CARBON_MY_KIND(CARBON_ENUM_MASK_NAME_STRING)
+//   MYLANG_DEFINE_ENUM_MASK_NAMES(MyKind) {
+//     MYLANG_MY_KIND(MYLANG_ENUM_MASK_NAME_STRING)
 //   };
 //   ```
 template <typename DerivedT, typename EnumT, const llvm::StringLiteral Names[]>
@@ -110,12 +110,12 @@ template <typename DerivedT, typename EnumT, const llvm::StringLiteral Names[]>
 constexpr const DerivedT& EnumMaskBase<DerivedT, EnumT, Names>::None =
     DerivedT::FromInt(0);
 
-}  // namespace Carbon::Internal
+}  // namespace MyLang::Internal
 
 // Use this before defining a class that derives from `EnumMaskBase` to begin
 // the definition of the raw `enum class`. It should be followed by the body of
 // that raw enum class.
-#define CARBON_DEFINE_RAW_ENUM_MASK(EnumMaskName, UnderlyingType)              \
+#define MYLANG_DEFINE_RAW_ENUM_MASK(EnumMaskName, UnderlyingType)              \
   namespace Internal {                                                         \
   struct EnumMaskName##Data {                                                  \
     static const llvm::StringLiteral Names[];                                  \
@@ -127,25 +127,25 @@ constexpr const DerivedT& EnumMaskBase<DerivedT, EnumT, Names>::None =
   }                                                                            \
   enum class Internal::EnumMaskName##Data::RawEnum : UnderlyingType
 
-// In the `CARBON_DEFINE_RAW_ENUM_MASK` block, use this to generate each
+// In the `MYLANG_DEFINE_RAW_ENUM_MASK` block, use this to generate each
 // enumerator.
-#define CARBON_RAW_ENUM_MASK_ENUMERATOR(Name) \
+#define MYLANG_RAW_ENUM_MASK_ENUMERATOR(Name) \
   Name = 1 << (__COUNTER__ - BitShiftCounter),
 
-// Use this to compute the `Internal::EnumMaskBase` specialization for a Carbon
+// Use this to compute the `Internal::EnumMaskBase` specialization for a MyLang
 // enum mask. It both computes the name of the raw enum and ensures all the
 // namespaces are correct.
-#define CARBON_ENUM_MASK_BASE(EnumMaskName)                               \
-  ::Carbon::Internal::EnumMaskBase<EnumMaskName,                          \
+#define MYLANG_ENUM_MASK_BASE(EnumMaskName)                               \
+  ::MyLang::Internal::EnumMaskBase<EnumMaskName,                          \
                                    Internal::EnumMaskName##Data::RawEnum, \
                                    Internal::EnumMaskName##Data::Names>
 
 // Constants and names are declared equivalently as to `EnumBase`.
-#define CARBON_ENUM_MASK_CONSTANT_DECL(Name) CARBON_ENUM_CONSTANT_DECL(Name)
-#define CARBON_ENUM_MASK_CONSTANT_DEFINITION(EnumMaskName, Name) \
-  CARBON_ENUM_CONSTANT_DEFINITION(EnumMaskName, Name)
-#define CARBON_DEFINE_ENUM_MASK_NAMES(EnumMaskName) \
-  CARBON_DEFINE_ENUM_CLASS_NAMES(EnumMaskName)
-#define CARBON_ENUM_MASK_NAME_STRING(Name) CARBON_ENUM_CLASS_NAME_STRING(Name)
+#define MYLANG_ENUM_MASK_CONSTANT_DECL(Name) MYLANG_ENUM_CONSTANT_DECL(Name)
+#define MYLANG_ENUM_MASK_CONSTANT_DEFINITION(EnumMaskName, Name) \
+  MYLANG_ENUM_CONSTANT_DEFINITION(EnumMaskName, Name)
+#define MYLANG_DEFINE_ENUM_MASK_NAMES(EnumMaskName) \
+  MYLANG_DEFINE_ENUM_CLASS_NAMES(EnumMaskName)
+#define MYLANG_ENUM_MASK_NAME_STRING(Name) MYLANG_ENUM_CLASS_NAME_STRING(Name)
 
-#endif  // CARBON_COMMON_ENUM_MASK_BASE_H_
+#endif  // MYLANG_COMMON_ENUM_MASK_BASE_H_

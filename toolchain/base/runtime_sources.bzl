@@ -1,4 +1,4 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -44,7 +44,7 @@ RUNTIMES_FILEGROUPS = {
 }
 
 _TEMPLATE = """
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
@@ -53,12 +53,12 @@ _TEMPLATE = """
 //
 // See toolchain/driver/runtime_sources.bzl for more details.
 
-#ifndef CARBON_TOOLCHAIN_BASE_RUNTIME_SOURCES_H_
-#define CARBON_TOOLCHAIN_BASE_RUNTIME_SOURCES_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_RUNTIME_SOURCES_H_
+#define MYLANG_TOOLCHAIN_BASE_RUNTIME_SOURCES_H_
 
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon::RuntimeSources {{
+namespace MyLang::RuntimeSources {{
 
 inline constexpr llvm::StringLiteral CrtBegin = {crtbegin_src};
 inline constexpr llvm::StringLiteral CrtEnd = {crtend_src};
@@ -103,9 +103,9 @@ constexpr inline llvm::StringLiteral LibunwindSrcs[] = {{
 {libunwind}
 }};
 
-}}  // namespace Carbon::RuntimeSources
+}}  // namespace MyLang::RuntimeSources
 
-#endif  // CARBON_TOOLCHAIN_BASE_RUNTIME_SOURCES_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_RUNTIME_SOURCES_H_
 """
 
 def _builtins_path(file):

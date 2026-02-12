@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_IDS_H_
-#define CARBON_TOOLCHAIN_SEM_IR_IDS_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_IDS_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_IDS_H_
 
 #include <limits>
 
@@ -15,7 +15,7 @@
 #include "toolchain/diagnostics/emitter.h"
 #include "toolchain/parse/node_ids.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 // TODO: This is in use, but not here.
 class File;
@@ -195,17 +195,17 @@ struct ConstantId : public IdBase<ConstantId> {
 
   // Returns whether this represents a constant. Requires has_value.
   constexpr auto is_constant() const -> bool {
-    CARBON_DCHECK(has_value());
+    MYLANG_DCHECK(has_value());
     return *this != ConstantId::NotConstant;
   }
   // Returns whether this represents a symbolic constant. Requires has_value.
   constexpr auto is_symbolic() const -> bool {
-    CARBON_DCHECK(has_value());
+    MYLANG_DCHECK(has_value());
     return index <= FirstSymbolicId;
   }
   // Returns whether this represents a concrete constant. Requires has_value.
   constexpr auto is_concrete() const -> bool {
-    CARBON_DCHECK(has_value());
+    MYLANG_DCHECK(has_value());
     return index >= 0;
   }
 
@@ -241,14 +241,14 @@ struct ConstantId : public IdBase<ConstantId> {
   // Requires `is_concrete()`. Use `ConstantValueStore::GetInstId` to get the
   // instruction ID of a `ConstantId`.
   constexpr auto concrete_inst_id() const -> InstId {
-    CARBON_DCHECK(is_concrete());
+    MYLANG_DCHECK(is_concrete());
     return InstId(index);
   }
 
   // Returns the symbolic constant index that describes this symbolic constant
   // value. Requires `is_symbolic()`.
   constexpr auto symbolic_id() const -> SymbolicId {
-    CARBON_DCHECK(is_symbolic());
+    MYLANG_DCHECK(is_symbolic());
     return SymbolicId(FirstSymbolicId - index);
   }
 
@@ -425,19 +425,19 @@ struct GenericInstIndex : public IndexBase<GenericInstIndex> {
   explicit constexpr GenericInstIndex(Region region, int32_t index)
       : IndexBase(region == Declaration ? index
                                         : FirstDefinitionIndex - index) {
-    CARBON_CHECK(index >= 0);
+    MYLANG_CHECK(index >= 0);
   }
 
   // Returns the index of the instruction within the region.
   auto index() const -> int32_t {
-    CARBON_CHECK(has_value());
+    MYLANG_CHECK(has_value());
     return IndexBase::index >= 0 ? IndexBase::index
                                  : FirstDefinitionIndex - IndexBase::index;
   }
 
   // Returns the region within which this instruction was first used.
   auto region() const -> Region {
-    CARBON_CHECK(has_value());
+    MYLANG_CHECK(has_value());
     return IndexBase::index >= 0 ? Declaration : Definition;
   }
 
@@ -504,7 +504,7 @@ struct BoolValue : public IdBase<BoolValue> {
 
   // Returns the `bool` corresponding to this `BoolValue`.
   constexpr auto ToBool() -> bool {
-    CARBON_CHECK(*this == False || *this == True, "Invalid bool value {0}",
+    MYLANG_CHECK(*this == False || *this == True, "Invalid bool value {0}",
                  index);
     return *this != False;
   }
@@ -559,7 +559,7 @@ struct FloatKind : public IdBase<FloatKind> {
   // An explicitly absent kind. Used when the kind has not been determined.
   static const FloatKind None;
 
-  // Supported IEEE-754 interchange formats. These correspond to Carbon `fN`
+  // Supported IEEE-754 interchange formats. These correspond to MyLang `fN`
   // type literal syntax.
   static const FloatKind Binary16;
   static const FloatKind Binary32;
@@ -569,7 +569,7 @@ struct FloatKind : public IdBase<FloatKind> {
 
   // Other formats supported by LLVM. Support for these may be
   // target-dependent.
-  // TODO: Add a mechanism to use these types from Carbon code.
+  // TODO: Add a mechanism to use these types from MyLang code.
   static const FloatKind BFloat16;
   static const FloatKind X87Float80;
   static const FloatKind PPCFloat128;
@@ -595,10 +595,10 @@ inline constexpr FloatKind FloatKind::PPCFloat128 = FloatKind(6);
 
 // An X-macro for special names. Uses should look like:
 //
-//   #define CARBON_SPECIAL_NAME_ID_FOR_XYZ(Name) ...
-//   CARBON_SPECIAL_NAME_ID(CARBON_SPECIAL_NAME_ID_FOR_XYZ)
-//   #undef CARBON_SPECIAL_NAME_ID_FOR_XYZ
-#define CARBON_SPECIAL_NAME_ID(X)                                \
+//   #define MYLANG_SPECIAL_NAME_ID_FOR_XYZ(Name) ...
+//   MYLANG_SPECIAL_NAME_ID(MYLANG_SPECIAL_NAME_ID_FOR_XYZ)
+//   #undef MYLANG_SPECIAL_NAME_ID_FOR_XYZ
+#define MYLANG_SPECIAL_NAME_ID(X)                                \
   /* The name of `base`. */                                      \
   X(Base)                                                        \
   /* The name of the discriminant field (if any) in a choice. */ \
@@ -638,16 +638,16 @@ struct NameId : public IdBase<NameId> {
 
   // An enum of special names.
   enum class SpecialNameId : uint8_t {
-#define CARBON_SPECIAL_NAME_ID_FOR_ENUM(Name) Name,
-    CARBON_SPECIAL_NAME_ID(CARBON_SPECIAL_NAME_ID_FOR_ENUM)
-#undef CARBON_SPECIAL_NAME_ID_FOR_ENUM
+#define MYLANG_SPECIAL_NAME_ID_FOR_ENUM(Name) Name,
+    MYLANG_SPECIAL_NAME_ID(MYLANG_SPECIAL_NAME_ID_FOR_ENUM)
+#undef MYLANG_SPECIAL_NAME_ID_FOR_ENUM
   };
 
   // For each SpecialNameId, provide a matching `NameId` instance for
   // convenience.
-#define CARBON_SPECIAL_NAME_ID_FOR_DECL(Name) static const NameId Name;
-  CARBON_SPECIAL_NAME_ID(CARBON_SPECIAL_NAME_ID_FOR_DECL)
-#undef CARBON_SPECIAL_NAME_ID_FOR_DECL
+#define MYLANG_SPECIAL_NAME_ID_FOR_DECL(Name) static const NameId Name;
+  MYLANG_SPECIAL_NAME_ID(MYLANG_SPECIAL_NAME_ID_FOR_DECL)
+#undef MYLANG_SPECIAL_NAME_ID_FOR_DECL
 
   // The number of non-index (<0) that exist, and will need storage in name
   // lookup.
@@ -680,17 +680,17 @@ struct NameId : public IdBase<NameId> {
 };
 
 // Define the special `static const NameId` values.
-#define CARBON_SPECIAL_NAME_ID_FOR_DEF(Name) \
+#define MYLANG_SPECIAL_NAME_ID_FOR_DEF(Name) \
   inline constexpr NameId NameId::Name =     \
       NameId(NoneIndex - 1 - static_cast<int>(NameId::SpecialNameId::Name));
-CARBON_SPECIAL_NAME_ID(CARBON_SPECIAL_NAME_ID_FOR_DEF)
-#undef CARBON_SPECIAL_NAME_ID_FOR_DEF
+MYLANG_SPECIAL_NAME_ID(MYLANG_SPECIAL_NAME_ID_FOR_DEF)
+#undef MYLANG_SPECIAL_NAME_ID_FOR_DEF
 
 // Count non-index values, including `None` and special names.
-#define CARBON_SPECIAL_NAME_ID_FOR_COUNT(...) +1
+#define MYLANG_SPECIAL_NAME_ID_FOR_COUNT(...) +1
 inline constexpr int NameId::NonIndexValueCount =
-    1 CARBON_SPECIAL_NAME_ID(CARBON_SPECIAL_NAME_ID_FOR_COUNT);
-#undef CARBON_SPECIAL_NAME_ID_FOR_COUNT
+    1 MYLANG_SPECIAL_NAME_ID(MYLANG_SPECIAL_NAME_ID_FOR_COUNT);
+#undef MYLANG_SPECIAL_NAME_ID_FOR_COUNT
 
 // The ID of a `NameScope`.
 struct NameScopeId : public IdBase<NameScopeId> {
@@ -771,7 +771,7 @@ class InstBlockIdOrError {
   //
   // Only valid to call if `has_error_value()` is false.
   auto inst_block_id() const -> InstBlockId {
-    CARBON_CHECK(!has_error_value());
+    MYLANG_CHECK(!has_error_value());
     return inst_block_id_;
   }
 
@@ -930,7 +930,7 @@ struct LibraryNameId : public IdBase<LibraryNameId> {
 
   // Converts a LibraryNameId back to a string literal.
   auto AsStringLiteralValueId() const -> StringLiteralValueId {
-    CARBON_CHECK(index >= NoneIndex, "{0} must be handled directly", *this);
+    MYLANG_CHECK(index >= NoneIndex, "{0} must be handled directly", *this);
     return StringLiteralValueId(index);
   }
 
@@ -951,7 +951,7 @@ struct ImportIRInstId : public IdBase<ImportIRInstId> {
       -(std::numeric_limits<int32_t>::min() + 2 * Parse::NodeId::Max + 1);
 
   constexpr explicit ImportIRInstId(int32_t index) : IdBase(index) {
-    CARBON_DCHECK(index < Max, "Index out of range: {0}", index);
+    MYLANG_DCHECK(index < Max, "Index out of range: {0}", index);
   }
 };
 
@@ -1026,7 +1026,7 @@ struct LocId : public IdBase<LocId> {
   auto AsDesugared() const -> LocId {
     // This should only be called for NodeId or ImportIRInstId (i.e. canonical
     // locations), but we only set the flag for NodeId.
-    CARBON_CHECK(kind() != Kind::InstId, "Use InstStore::GetDesugaredLocId");
+    MYLANG_CHECK(kind() != Kind::InstId, "Use InstStore::GetDesugaredLocId");
     if (index <= FirstNodeId && index > FirstDesugaredNodeId) {
       return LocId(index - Parse::NodeId::Max);
     }
@@ -1061,13 +1061,13 @@ struct LocId : public IdBase<LocId> {
     if (!has_value()) {
       return ImportIRInstId::None;
     }
-    CARBON_CHECK(kind() == Kind::ImportIRInstId, "{0}", index);
+    MYLANG_CHECK(kind() == Kind::ImportIRInstId, "{0}", index);
     return ImportIRInstId(FirstImportIRInstId - index);
   }
 
   // Returns the equivalent `InstId` when `kind()` matches or is `None`.
   auto inst_id() const -> InstId {
-    CARBON_CHECK(kind() == Kind::None || kind() == Kind::InstId, "{0}", index);
+    MYLANG_CHECK(kind() == Kind::None || kind() == Kind::InstId, "{0}", index);
     return InstId(index);
   }
 
@@ -1076,7 +1076,7 @@ struct LocId : public IdBase<LocId> {
     if (!has_value()) {
       return Parse::NodeId::None;
     }
-    CARBON_CHECK(kind() == Kind::NodeId, "{0}", index);
+    MYLANG_CHECK(kind() == Kind::NodeId, "{0}", index);
     if (index <= FirstDesugaredNodeId) {
       return Parse::NodeId(FirstDesugaredNodeId - index);
     } else {
@@ -1117,6 +1117,6 @@ struct AnyRawId : public AnyIdBase {
   constexpr explicit AnyRawId(int32_t id) : AnyIdBase(id) {}
 };
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_IDS_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_IDS_H_

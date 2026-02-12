@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -8,30 +8,30 @@
 
 #include "common/raw_string_ostream.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
-// These are directly in the Carbon namespace because the defines require it.
-CARBON_DEFINE_RAW_ENUM_CLASS(TestKind, uint8_t) {
-#define CARBON_ENUM_BASE_TEST_KIND(Name) CARBON_RAW_ENUM_ENUMERATOR(Name)
+// These are directly in the MyLang namespace because the defines require it.
+MYLANG_DEFINE_RAW_ENUM_CLASS(TestKind, uint8_t) {
+#define MYLANG_ENUM_BASE_TEST_KIND(Name) MYLANG_RAW_ENUM_ENUMERATOR(Name)
 #include "common/enum_base_test.def"
 };
 
-class TestKind : public CARBON_ENUM_BASE(TestKind) {
+class TestKind : public MYLANG_ENUM_BASE(TestKind) {
  public:
-#define CARBON_ENUM_BASE_TEST_KIND(Name) CARBON_ENUM_CONSTANT_DECL(Name)
+#define MYLANG_ENUM_BASE_TEST_KIND(Name) MYLANG_ENUM_CONSTANT_DECL(Name)
 #include "common/enum_base_test.def"
 
   using EnumBase::AsInt;
   using EnumBase::FromInt;
 };
 
-#define CARBON_ENUM_BASE_TEST_KIND(Name) \
-  CARBON_ENUM_CONSTANT_DEFINITION(TestKind, Name)
+#define MYLANG_ENUM_BASE_TEST_KIND(Name) \
+  MYLANG_ENUM_CONSTANT_DEFINITION(TestKind, Name)
 #include "common/enum_base_test.def"
 
-CARBON_DEFINE_ENUM_CLASS_NAMES(TestKind) {
-#define CARBON_ENUM_BASE_TEST_KIND(Name) CARBON_ENUM_CLASS_NAME_STRING(Name)
+MYLANG_DEFINE_ENUM_CLASS_NAMES(TestKind) {
+#define MYLANG_ENUM_BASE_TEST_KIND(Name) MYLANG_ENUM_CLASS_NAME_STRING(Name)
 #include "common/enum_base_test.def"
 };
 
@@ -101,4 +101,4 @@ TEST(EnumBaseTest, IntConversion) {
 }
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

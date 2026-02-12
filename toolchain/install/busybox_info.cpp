@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,13 +10,13 @@
 #include "common/filesystem.h"
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // The mode is set to the initial filename used for `argv[0]`.
 static auto GetMode(const std::filesystem::path& argv0)
     -> std::optional<std::string> {
   std::string filename = argv0.filename();
-  if (filename != "carbon" && filename != "carbon-busybox") {
+  if (filename != "mylang" && filename != "mylang-busybox") {
     return filename;
   }
   return std::nullopt;
@@ -38,15 +38,15 @@ auto GetBusyboxInfo(const char* argv0) -> ErrorOr<BusyboxInfo> {
 
   // Now search through any symlinks to locate the installed busybox binary.
   while (true) {
-    if (info.bin_path.filename() == "carbon-busybox") {
+    if (info.bin_path.filename() == "mylang-busybox") {
       // Check for bazel structure. For example, this makes work:
-      //   /bin/sh -c "exec -a carbon ./bazel-bin/toolchain/carbon"
-      //   /bin/sh -c "exec -a llvm-symbolizer ./bazel-bin/toolchain/carbon"
+      //   /bin/sh -c "exec -a mylang ./bazel-bin/toolchain/mylang"
+      //   /bin/sh -c "exec -a llvm-symbolizer ./bazel-bin/toolchain/mylang"
       //
       // This will never occur in a "bin" subdirectory, so doesn't need to be
       // handled in the other return path.
       std::string busybox_path = info.bin_path.parent_path().string() +
-                                 "/prefix/lib/carbon/carbon-busybox";
+                                 "/prefix/lib/mylang/mylang-busybox";
       if (auto access = Filesystem::Cwd().Access(busybox_path);
           access.ok() && *access) {
         info.bin_path = busybox_path;
@@ -61,8 +61,8 @@ auto GetBusyboxInfo(const char* argv0) -> ErrorOr<BusyboxInfo> {
     // output tree.
     //
     // We break this into two cases we need to handle:
-    // - Carbon's CLI will be: `<prefix>/bin/carbon`
-    // - Other tools will be: `<prefix>/lib/carbon/<group>/bin/<tool>`
+    // - MyLang's CLI will be: `<prefix>/bin/mylang`
+    // - Other tools will be: `<prefix>/lib/mylang/<group>/bin/<tool>`
     //
     // We also check that the current path is within a `bin` directory to
     // provide best-effort checking for accidentally walking up from symlinks
@@ -73,10 +73,10 @@ auto GetBusyboxInfo(const char* argv0) -> ErrorOr<BusyboxInfo> {
       parent_path = parent_path.parent_path();
     }
     if (parent_path.filename() == "bin") {
-      auto lib_path = info.bin_path.filename() == "carbon"
-                          ? parent_path / ".." / "lib" / "carbon"
+      auto lib_path = info.bin_path.filename() == "mylang"
+                          ? parent_path / ".." / "lib" / "mylang"
                           : parent_path / ".." / "..";
-      auto busybox_path = lib_path / "carbon-busybox";
+      auto busybox_path = lib_path / "mylang-busybox";
       if (auto access = Filesystem::Cwd().Access(busybox_path);
           access.ok() && *access) {
         info.bin_path = busybox_path;
@@ -89,7 +89,7 @@ auto GetBusyboxInfo(const char* argv0) -> ErrorOr<BusyboxInfo> {
     auto readlink = Filesystem::Cwd().Readlink(info.bin_path);
     if (!readlink.ok()) {
       return ErrorBuilder()
-             << "expected carbon-busybox symlink at `" << info.bin_path << "`";
+             << "expected mylang-busybox symlink at `" << info.bin_path << "`";
     }
 
     // Do a path join, to handle relative symlinks.
@@ -97,4 +97,4 @@ auto GetBusyboxInfo(const char* argv0) -> ErrorOr<BusyboxInfo> {
   }
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

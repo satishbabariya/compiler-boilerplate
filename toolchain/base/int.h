@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_INT_H_
-#define CARBON_TOOLCHAIN_BASE_INT_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_INT_H_
+#define MYLANG_TOOLCHAIN_BASE_INT_H_
 
 #include "common/check.h"
 #include "llvm/ADT/APInt.h"
@@ -14,7 +14,7 @@
 #include "toolchain/base/value_store.h"
 #include "toolchain/base/yaml.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Forward declare a testing peer so we can friend it.
 namespace Testing {
@@ -100,7 +100,7 @@ class IntId : public Printable<IntId> {
   // Converts an ID to the embedded value. Requires that `is_embedded_value()`
   // is true.
   constexpr auto AsValue() const -> int {
-    CARBON_DCHECK(is_embedded_value());
+    MYLANG_DCHECK(is_embedded_value());
     return id_;
   }
 
@@ -108,7 +108,7 @@ class IntId : public Printable<IntId> {
   //
   // Note `None` is represented as an index ID, and can be converted here.
   constexpr auto AsIndex() const -> int {
-    CARBON_DCHECK(is_index());
+    MYLANG_DCHECK(is_index());
     return ZeroIndexId - id_;
   }
 
@@ -116,7 +116,7 @@ class IntId : public Printable<IntId> {
   constexpr auto AsTokenPayload() const -> uint32_t {
     uint32_t payload = id_;
     // Ensure this ID round trips as the token payload.
-    CARBON_DCHECK(*this == MakeFromTokenPayload(payload));
+    MYLANG_DCHECK(*this == MakeFromTokenPayload(payload));
     return payload;
   }
 
@@ -129,7 +129,7 @@ class IntId : public Printable<IntId> {
     } else if (is_index()) {
       out << "index: " << AsIndex();
     } else {
-      CARBON_CHECK(!has_value());
+      MYLANG_CHECK(!has_value());
       out << "<none>";
     }
     out << ")";
@@ -317,7 +317,7 @@ class IntStore {
   // more details.
   auto GetAtWidth(IntId id, IntId bit_width_id) const -> llvm::APInt {
     const llvm::APInt bit_width = Get(bit_width_id);
-    CARBON_CHECK(
+    MYLANG_CHECK(
         bit_width.isStrictlyPositive() && bit_width.isSignedIntN(MinAPWidth),
         "Invalid bit width value: {0}", bit_width);
     return GetAtWidth(id, bit_width.getSExtValue());
@@ -373,7 +373,7 @@ class IntStore {
   static constexpr int MinAPWidth = 64;
 
   static auto MakeIndexOrNone(int index) -> IntId {
-    CARBON_DCHECK(index >= 0 && index <= IntId::NoneIndex);
+    MYLANG_DCHECK(index >= 0 && index <= IntId::NoneIndex);
     return IntId(IntId::ZeroIndexId - index);
   }
 
@@ -431,6 +431,6 @@ class IntStore {
 inline constexpr IntStore::APIntId IntStore::APIntId::None(
     IntId::None.AsIndex());
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_BASE_INT_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_INT_H_

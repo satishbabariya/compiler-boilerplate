@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -18,14 +18,14 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "tools/cpp/runfiles/runfiles.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // The location within our Bazel output tree of the install root.
 static constexpr llvm::StringLiteral BazelRoot =
-    "carbon/toolchain/install/prefix/lib/carbon/";
+    "mylang/toolchain/install/prefix/lib/mylang/";
 
 // Path within an install root for our marker of a valid install.
-static constexpr llvm::StringLiteral MarkerPath = "carbon_install.txt";
+static constexpr llvm::StringLiteral MarkerPath = "mylang_install.txt";
 
 auto InstallPaths::MakeExeRelative(llvm::StringRef exe_path) -> InstallPaths {
   InstallPaths paths;
@@ -50,7 +50,7 @@ auto InstallPaths::MakeForBazelRunfiles(llvm::StringRef exe_path)
   std::string runtimes_error;
   std::unique_ptr<Runfiles> runfiles(
       Runfiles::Create(exe_path.str(), &runtimes_error));
-  CARBON_CHECK(runfiles != nullptr, "Failed to find runtimes tree: {0}",
+  MYLANG_CHECK(runfiles != nullptr, "Failed to find runtimes tree: {0}",
                runtimes_error);
 
   std::string relative_marker_path = (BazelRoot.str() + MarkerPath).str();
@@ -240,4 +240,4 @@ auto InstallPaths::digest_path() const -> std::filesystem::path {
   return root_ / "install_digest.txt";
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

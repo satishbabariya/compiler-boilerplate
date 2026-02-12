@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -11,13 +11,13 @@
 
 #include "common/raw_string_ostream.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 namespace {
 
 using ::testing::IsEmpty;
 using ::testing::StrEq;
 
-// Helper class with a vlog_stream_ member for CARBON_VLOG.
+// Helper class with a vlog_stream_ member for MYLANG_VLOG.
 class VLogger {
  public:
   explicit VLogger(bool enable) {
@@ -26,8 +26,8 @@ class VLogger {
     }
   }
 
-  auto VLog() -> void { CARBON_VLOG("Test\n"); }
-  auto VLogFormatArgs() -> void { CARBON_VLOG("Test {0} {1} {2}\n", 1, 2, 3); }
+  auto VLog() -> void { MYLANG_VLOG("Test\n"); }
+  auto VLogFormatArgs() -> void { MYLANG_VLOG("Test {0} {1} {2}\n", 1, 2, 3); }
 
   auto TakeStr() -> std::string { return buffer_.TakeStr(); }
 
@@ -53,11 +53,11 @@ TEST(VLogTest, Disabled) {
 
 TEST(VLogTest, To) {
   RawStringOstream buffer;
-  CARBON_VLOG_TO(&buffer, "Test");
+  MYLANG_VLOG_TO(&buffer, "Test");
   EXPECT_THAT(buffer.TakeStr(), "Test");
 }
 
-TEST(VLogTest, ToNull) { CARBON_VLOG_TO(nullptr, "Unused"); }
+TEST(VLogTest, ToNull) { MYLANG_VLOG_TO(nullptr, "Unused"); }
 
 }  // namespace
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

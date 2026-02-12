@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-namespace Carbon::RawHashtable {
+namespace MyLang::RawHashtable {
 
 // A local shuffle implementation built on Abseil to improve performance in
 // debug builds.
@@ -41,7 +41,7 @@ static auto MakeChars() -> llvm::SmallVector<char> {
   llvm::append_range(characters, llvm::seq_inclusive('a', 'z'));
   llvm::append_range(characters, llvm::seq_inclusive('A', 'Z'));
   llvm::append_range(characters, llvm::seq_inclusive('0', '9'));
-  CARBON_CHECK(characters.size() == NumChars,
+  MYLANG_CHECK(characters.size() == NumChars,
                "Expected exactly {0} characters, got {1} instead!", NumChars,
                characters.size());
   return characters;
@@ -66,7 +66,7 @@ static auto MakeFourCharStrs(llvm::ArrayRef<char> characters, absl::BitGen& gen)
         i >>= NumCharsShift;
         str[2] = characters[i & NumCharsMask];
         i >>= NumCharsShift;
-        CARBON_CHECK((i & ~NumCharsMask) == 0);
+        MYLANG_CHECK((i & ~NumCharsMask) == 0);
         str[3] = characters[i];
         return str;
       }));
@@ -100,7 +100,7 @@ static auto MakeRawStrKeys(ssize_t length, ssize_t key_count,
                            llvm::ArrayRef<char> random_chars, absl::BitGen& gen)
     -> llvm::SmallVector<const char*> {
   llvm::SmallVector<const char*> raw_keys;
-  CARBON_CHECK(length >= 4);
+  MYLANG_CHECK(length >= 4);
   ssize_t prefix_length = length - 4;
 
   // Select a random start for indexing our four character strings.
@@ -149,7 +149,7 @@ static absl::NoDestructor<llvm::SmallVector<llvm::StringRef>> raw_str_keys{[] {
       4, 4, 4, 4, 5, 5, 5, 5, 7, 7, 10, 10, 15, 25, 40, 80,
   };
   static_assert((MaxNumKeys % length_buckets.size()) == 0);
-  CARBON_CHECK(llvm::is_sorted(length_buckets));
+  MYLANG_CHECK(llvm::is_sorted(length_buckets));
 
   // For each distinct length bucket, we build a vector of raw keys.
   std::forward_list<llvm::SmallVector<const char*>> raw_keys_storage;
@@ -193,7 +193,7 @@ static absl::NoDestructor<llvm::SmallVector<llvm::StringRef>> raw_str_keys{[] {
   }
   // Check that in fact we popped every raw key into our main keys.
   for (const auto& raw_keys : raw_keys_storage) {
-    CARBON_CHECK(raw_keys.empty());
+    MYLANG_CHECK(raw_keys.empty());
   }
   return keys;
 }()};
@@ -270,7 +270,7 @@ auto GetShuffledLookupKeys(ssize_t table_keys_size, ssize_t lookup_keys_size)
     absl::BitGen gen;
     Shuffle<T>(lookup_keys, gen);
   }
-  CARBON_CHECK(static_cast<ssize_t>(lookup_keys.size()) == lookup_keys_size);
+  MYLANG_CHECK(static_cast<ssize_t>(lookup_keys.size()) == lookup_keys_size);
 
   return lookup_keys;
 }
@@ -280,13 +280,13 @@ auto GetShuffledLookupKeys(ssize_t table_keys_size, ssize_t lookup_keys_size)
 template <typename T>
 auto GetKeysAndMissKeys(ssize_t table_keys_size)
     -> std::pair<llvm::ArrayRef<T>, llvm::ArrayRef<T>> {
-  CARBON_CHECK(table_keys_size <= MaxNumKeys);
+  MYLANG_CHECK(table_keys_size <= MaxNumKeys);
   // The raw keys aren't shuffled and round-robin through the sizes. Take the
   // tail of this sequence and shuffle it to form a random set of miss keys with
   // a consistent total size.
   static absl::NoDestructor<llvm::SmallVector<T>> miss_keys{[] {
     llvm::SmallVector<T> keys(GetRawKeys<T>().take_back(NumOtherKeys));
-    CARBON_CHECK(keys.size() == NumOtherKeys);
+    MYLANG_CHECK(keys.size() == NumOtherKeys);
     absl::BitGen gen;
     Shuffle<T>(keys, gen);
     return keys;
@@ -314,8 +314,8 @@ template auto GetKeysAndMissKeys<LowZeroBitInt<32>>(ssize_t size)
 template <typename T>
 auto GetKeysAndHitKeys(ssize_t table_keys_size, ssize_t lookup_keys_size)
     -> std::pair<llvm::ArrayRef<T>, llvm::ArrayRef<T>> {
-  CARBON_CHECK(table_keys_size <= MaxNumKeys);
-  CARBON_CHECK(lookup_keys_size <= MaxNumKeys);
+  MYLANG_CHECK(table_keys_size <= MaxNumKeys);
+  MYLANG_CHECK(lookup_keys_size <= MaxNumKeys);
   return {GetRawKeys<T>().slice(0, table_keys_size),
           GetShuffledLookupKeys<T>(table_keys_size, lookup_keys_size)};
 }
@@ -365,7 +365,7 @@ auto DumpHashStatistics(llvm::ArrayRef<T> keys) -> void {
                                                     GroupShift);
   for (auto [i, k] : llvm::enumerate(keys)) {
     ssize_t hash_index = get_hash_index(k);
-    CARBON_CHECK(hash_index < (expected_size >> GroupShift), "{0}", hash_index);
+    MYLANG_CHECK(hash_index < (expected_size >> GroupShift), "{0}", hash_index);
     grouped_key_indices[hash_index].push_back(i);
   }
   ssize_t max_group_index =
@@ -407,4 +407,4 @@ template auto DumpHashStatistics(llvm::ArrayRef<LowZeroBitInt<32>> keys)
 template auto DumpHashStatistics(llvm::ArrayRef<int*> keys) -> void;
 template auto DumpHashStatistics(llvm::ArrayRef<llvm::StringRef> keys) -> void;
 
-}  // namespace Carbon::RawHashtable
+}  // namespace MyLang::RawHashtable

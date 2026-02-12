@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -12,7 +12,7 @@
 
 #include "common/ostream.h"
 
-namespace Carbon::Testing::Internal {
+namespace MyLang::Testing::Internal {
 
 // While these are marked as "internal" APIs, they seem to work and be pretty
 // widely used for their exact documented behavior.
@@ -32,4 +32,4 @@ auto EndStdStreamCapture(std::string& out, std::string& err) -> void {
   out = GetCapturedStdout();
 }
 
-}  // namespace Carbon::Testing::Internal
+}  // namespace MyLang::Testing::Internal

@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_LLVM_TOOLS_H_
-#define CARBON_TOOLCHAIN_BASE_LLVM_TOOLS_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_LLVM_TOOLS_H_
+#define MYLANG_TOOLCHAIN_BASE_LLVM_TOOLS_H_
 
 #include <cstdint>
 
@@ -13,11 +13,11 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/LLVMDriver.h"
 
-namespace Carbon {
+namespace MyLang {
 
-CARBON_DEFINE_RAW_ENUM_CLASS(LLVMTool, uint8_t) {
-#define CARBON_LLVM_TOOL(Identifier, Name, BinName, MainFn) \
-  CARBON_RAW_ENUM_ENUMERATOR(Identifier)
+MYLANG_DEFINE_RAW_ENUM_CLASS(LLVMTool, uint8_t) {
+#define MYLANG_LLVM_TOOL(Identifier, Name, BinName, MainFn) \
+  MYLANG_RAW_ENUM_ENUMERATOR(Identifier)
 #include "toolchain/base/llvm_tools.def"
 };
 
@@ -29,10 +29,10 @@ CARBON_DEFINE_RAW_ENUM_CLASS(LLVMTool, uint8_t) {
 //
 // The instances of this class are generated from `llvm_tools.bzl`, see that
 // file for more details.
-class LLVMTool : public CARBON_ENUM_BASE(LLVMTool) {
+class LLVMTool : public MYLANG_ENUM_BASE(LLVMTool) {
  public:
-#define CARBON_LLVM_TOOL(Identifier, Name, BinName, MainFn) \
-  CARBON_ENUM_CONSTANT_DECL(Identifier)
+#define MYLANG_LLVM_TOOL(Identifier, Name, BinName, MainFn) \
+  MYLANG_ENUM_CONSTANT_DECL(Identifier)
 #include "toolchain/base/llvm_tools.def"
 
   static const llvm::ArrayRef<LLVMTool> Tools;
@@ -59,17 +59,17 @@ class LLVMTool : public CARBON_ENUM_BASE(LLVMTool) {
   static const CommandLine::CommandInfo SubcommandInfos[];
 };
 
-#define CARBON_LLVM_TOOL(Identifier, Name, BinName, MainFn) \
-  CARBON_ENUM_CONSTANT_DEFINITION(LLVMTool, Identifier)
+#define MYLANG_LLVM_TOOL(Identifier, Name, BinName, MainFn) \
+  MYLANG_ENUM_CONSTANT_DEFINITION(LLVMTool, Identifier)
 #include "toolchain/base/llvm_tools.def"
 
 inline constexpr LLVMTool LLVMTool::ToolsStorage[] = {
-#define CARBON_LLVM_TOOL(Identifier, Name, BinName, MainFn) \
+#define MYLANG_LLVM_TOOL(Identifier, Name, BinName, MainFn) \
   LLVMTool::Identifier,
 #include "toolchain/base/llvm_tools.def"
 };
 inline constexpr llvm::ArrayRef<LLVMTool> LLVMTool::Tools = ToolsStorage;
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_BASE_LLVM_TOOLS_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_LLVM_TOOLS_H_

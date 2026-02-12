@@ -1,15 +1,15 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_PRETTY_STACK_TRACE_FUNCTION_H_
-#define CARBON_COMMON_PRETTY_STACK_TRACE_FUNCTION_H_
+#ifndef MYLANG_COMMON_PRETTY_STACK_TRACE_FUNCTION_H_
+#define MYLANG_COMMON_PRETTY_STACK_TRACE_FUNCTION_H_
 
 #include <functional>
 
 #include "llvm/Support/PrettyStackTrace.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Calls `fn` as part of LLVM's pretty stack trace support. Implementations
 // should typically have a terminating `\n`.
@@ -26,6 +26,6 @@ class PrettyStackTraceFunction : public llvm::PrettyStackTraceEntry {
   const std::function<auto(llvm::raw_ostream&)->void> fn_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_PRETTY_STACK_TRACE_FUNCTION_H_
+#endif  // MYLANG_COMMON_PRETTY_STACK_TRACE_FUNCTION_H_

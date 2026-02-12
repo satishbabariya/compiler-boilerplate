@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
@@ -8,58 +8,58 @@
 // at the end of this file.
 //
 // This macro should be defined before including this header:
-// - CARBON_SEM_IR_INST_KIND(Name)
+// - MYLANG_SEM_IR_INST_KIND(Name)
 //   Invoked for each kind of semantic instruction.
 
-#ifndef CARBON_SEM_IR_INST_KIND
+#ifndef MYLANG_SEM_IR_INST_KIND
 #error "Must define the x-macro to use this file."
-#define CARBON_SEM_IR_INST_KIND(Name)
+#define MYLANG_SEM_IR_INST_KIND(Name)
 #endif
 
 // Core
-CARBON_SEM_IR_INST_KIND(ErrorInst)
-CARBON_SEM_IR_INST_KIND(Assign)
+MYLANG_SEM_IR_INST_KIND(ErrorInst)
+MYLANG_SEM_IR_INST_KIND(Assign)
 
 // Control flow
-CARBON_SEM_IR_INST_KIND(Branch)
-CARBON_SEM_IR_INST_KIND(BranchIf)
-CARBON_SEM_IR_INST_KIND(BranchWithArg)
-CARBON_SEM_IR_INST_KIND(Call)
-CARBON_SEM_IR_INST_KIND(Return)
-CARBON_SEM_IR_INST_KIND(ReturnExpr)
+MYLANG_SEM_IR_INST_KIND(Branch)
+MYLANG_SEM_IR_INST_KIND(BranchIf)
+MYLANG_SEM_IR_INST_KIND(BranchWithArg)
+MYLANG_SEM_IR_INST_KIND(Call)
+MYLANG_SEM_IR_INST_KIND(Return)
+MYLANG_SEM_IR_INST_KIND(ReturnExpr)
 
 // Types
-CARBON_SEM_IR_INST_KIND(BoolType)
-CARBON_SEM_IR_INST_KIND(IntType)
-CARBON_SEM_IR_INST_KIND(FunctionType)
-CARBON_SEM_IR_INST_KIND(PointerType)
-CARBON_SEM_IR_INST_KIND(TypeType)
+MYLANG_SEM_IR_INST_KIND(BoolType)
+MYLANG_SEM_IR_INST_KIND(IntType)
+MYLANG_SEM_IR_INST_KIND(FunctionType)
+MYLANG_SEM_IR_INST_KIND(PointerType)
+MYLANG_SEM_IR_INST_KIND(TypeType)
 
 // Values
-CARBON_SEM_IR_INST_KIND(BoolLiteral)
-CARBON_SEM_IR_INST_KIND(IntValue)
-CARBON_SEM_IR_INST_KIND(IntLiteralType)
+MYLANG_SEM_IR_INST_KIND(BoolLiteral)
+MYLANG_SEM_IR_INST_KIND(IntValue)
+MYLANG_SEM_IR_INST_KIND(IntLiteralType)
 
 // Variables and bindings
-CARBON_SEM_IR_INST_KIND(VarStorage)
-CARBON_SEM_IR_INST_KIND(NameRef)
-CARBON_SEM_IR_INST_KIND(Namespace)
-CARBON_SEM_IR_INST_KIND(NamespaceType)
-CARBON_SEM_IR_INST_KIND(NameBindingDecl)
-CARBON_SEM_IR_INST_KIND(ValueBinding)
-CARBON_SEM_IR_INST_KIND(ValueBindingPattern)
-CARBON_SEM_IR_INST_KIND(ValueParam)
-CARBON_SEM_IR_INST_KIND(ValueParamPattern)
+MYLANG_SEM_IR_INST_KIND(VarStorage)
+MYLANG_SEM_IR_INST_KIND(NameRef)
+MYLANG_SEM_IR_INST_KIND(Namespace)
+MYLANG_SEM_IR_INST_KIND(NamespaceType)
+MYLANG_SEM_IR_INST_KIND(NameBindingDecl)
+MYLANG_SEM_IR_INST_KIND(ValueBinding)
+MYLANG_SEM_IR_INST_KIND(ValueBindingPattern)
+MYLANG_SEM_IR_INST_KIND(ValueParam)
+MYLANG_SEM_IR_INST_KIND(ValueParamPattern)
 
 // Functions
-CARBON_SEM_IR_INST_KIND(FunctionDecl)
+MYLANG_SEM_IR_INST_KIND(FunctionDecl)
 
 // Other essential
-CARBON_SEM_IR_INST_KIND(BlockArg)
-CARBON_SEM_IR_INST_KIND(SpliceBlock)
-CARBON_SEM_IR_INST_KIND(ImportDecl)
-CARBON_SEM_IR_INST_KIND(Converted)
+MYLANG_SEM_IR_INST_KIND(BlockArg)
+MYLANG_SEM_IR_INST_KIND(SpliceBlock)
+MYLANG_SEM_IR_INST_KIND(ImportDecl)
+MYLANG_SEM_IR_INST_KIND(Converted)
 
 // TODO: Add your language's semantic IR instructions here.
 
-#undef CARBON_SEM_IR_INST_KIND
+#undef MYLANG_SEM_IR_INST_KIND

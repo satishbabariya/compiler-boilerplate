@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_FILE_H_
-#define CARBON_TOOLCHAIN_SEM_IR_FILE_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_FILE_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_FILE_H_
 
 #include "common/error.h"
 #include "llvm/ADT/SmallVector.h"
@@ -20,9 +20,9 @@
 #include "toolchain/sem_ir/type.h"
 
 // TODO: Implement your language's semantic IR file representation here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 // Stores constant values for instructions. Maps InstId -> ConstantId.
 class ConstantValueStore : public Yaml::Printable<ConstantValueStore> {
@@ -109,7 +109,7 @@ class ConstantStore {
   explicit ConstantStore(File* /*file*/) {}
 
   // TODO: Implement constant deduplication and storage.
-  // See the Carbon Language compiler for reference implementation patterns.
+  // See MyLang compiler for reference implementation patterns.
 
   auto CollectMemUsage(MemUsage& mem_usage, llvm::StringRef label) const
       -> void {
@@ -340,6 +340,6 @@ class File : public Printable<File> {
   TypeStore types_ = TypeStore(this);
 };
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_FILE_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_FILE_H_

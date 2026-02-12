@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -15,12 +15,12 @@
 #include "llvm/ADT/SmallString.h"
 #include "llvm/Support/YAMLParser.h"
 
-namespace Carbon::Testing::Yaml {
+namespace MyLang::Testing::Yaml {
 
 // This is for tests, so we should be okay with the recursion here.
 // NOLINTNEXTLINE(misc-no-recursion)
 static auto Parse(llvm::yaml::Node* node) -> Value {
-  CARBON_CHECK(node != nullptr);
+  MYLANG_CHECK(node != nullptr);
 
   // getType returns an unsigned int which should map to the enum.
   switch (static_cast<llvm::yaml::Node::NodeKind>(node->getType())) {
@@ -132,4 +132,4 @@ auto Value::Print(llvm::raw_ostream& os) const -> void {
   std::visit(Printer{.out = os}, *this);
 }
 
-}  // namespace Carbon::Testing::Yaml
+}  // namespace MyLang::Testing::Yaml

@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -15,13 +15,13 @@
 #include "llvm/Support/FileSystem.h"
 #include "testing/base/source_gen.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 namespace {
 
 constexpr CommandLine::CommandInfo Info = {
     .name = "source_gen",
     .help = R"""(
-A source generator for Carbon.
+A source generator for MyLang.
 )""",
 };
 
@@ -47,7 +47,7 @@ constexpr CommandLine::ArgInfo LanguageArgInfo = {
     .help = R"""(
 The language of source code to generate. The C++ source generation is best
 effort to try to provide as much comparable benchmarking as possible, but the
-primary language focus is generating Carbon.
+primary language focus is generating MyLang.
 )""",
 };
 
@@ -66,7 +66,7 @@ auto Run(llvm::ArrayRef<llvm::StringRef> args) -> bool {
         b.AddOneOfOption(LanguageArgInfo, [&](auto& arg_b) {
           arg_b.SetOneOf(
               {
-                  arg_b.OneOfValue("carbon", SourceGen::Language::Carbon)
+                  arg_b.OneOfValue("carbon", SourceGen::Language::MyLang)
                       .Default(true),
                   arg_b.OneOfValue("cpp", SourceGen::Language::Cpp),
               },
@@ -104,15 +104,15 @@ auto Run(llvm::ArrayRef<llvm::StringRef> args) -> bool {
 }
 
 }  // namespace
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
 auto main(int argc, char** argv) -> int {
   // Do LLVM's initialization first, this will also transform UTF-16 to UTF-8.
-  Carbon::InitLLVM init_llvm(argc, argv);
+  MyLang::InitLLVM init_llvm(argc, argv);
 
-  Carbon::SetWorkingDirForBazelRun();
+  MyLang::SetWorkingDirForBazelRun();
 
   llvm::SmallVector<llvm::StringRef> args(argv + 1, argv + argc);
-  bool success = Carbon::Testing::Run(args);
+  bool success = MyLang::Testing::Run(args);
   return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }

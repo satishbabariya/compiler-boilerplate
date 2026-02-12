@@ -1,15 +1,15 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_LATCH_H_
-#define CARBON_COMMON_LATCH_H_
+#ifndef MYLANG_COMMON_LATCH_H_
+#define MYLANG_COMMON_LATCH_H_
 
 #include <atomic>
 
 #include "llvm/ADT/FunctionExtras.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // A synchronization primitive similar to `std::latch` to coordinate starting
 // some action once all of a set of other actions complete.
@@ -130,6 +130,6 @@ class Latch::Handle {
   Latch* latch_ = nullptr;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_LATCH_H_
+#endif  // MYLANG_COMMON_LATCH_H_

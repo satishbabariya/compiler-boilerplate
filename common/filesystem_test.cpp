@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -14,7 +14,7 @@
 
 #include "common/error_test_helpers.h"
 
-namespace Carbon::Filesystem {
+namespace MyLang::Filesystem {
 namespace {
 
 using ::testing::_;
@@ -28,13 +28,13 @@ class FilesystemTest : public ::testing::Test {
  public:
   explicit FilesystemTest() {
     auto result = MakeTmpDir();
-    CARBON_CHECK(result.ok(), "{0}", result.error());
+    MYLANG_CHECK(result.ok(), "{0}", result.error());
     dir_ = std::move(*result);
   }
 
   ~FilesystemTest() override {
     auto result = std::move(dir_).Remove();
-    CARBON_CHECK(result.ok(), "{0}", result.error());
+    MYLANG_CHECK(result.ok(), "{0}", result.error());
   }
 
   auto path() const -> const std::filesystem::path& { return dir_.path(); }
@@ -615,4 +615,4 @@ TEST_F(FilesystemTest, MtimeAndUpdateTimes) {
 }
 
 }  // namespace
-}  // namespace Carbon::Filesystem
+}  // namespace MyLang::Filesystem

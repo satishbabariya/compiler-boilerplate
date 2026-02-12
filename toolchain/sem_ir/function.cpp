@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -7,9 +7,9 @@
 #include "toolchain/sem_ir/file.h"
 
 // TODO: Implement your language's function-related operations here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 auto GetCallee(const File& sem_ir, InstId callee_id,
                SpecificId /*caller_specific_id*/) -> Callee {
@@ -53,4 +53,4 @@ auto Function::GetDeclaredReturnType(const File& file,
   return file.types().GetTypeIdForTypeInstId(return_type_inst_id);
 }
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR

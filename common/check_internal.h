@@ -1,14 +1,14 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_CHECK_INTERNAL_H_
-#define CARBON_COMMON_CHECK_INTERNAL_H_
+#ifndef MYLANG_COMMON_CHECK_INTERNAL_H_
+#define MYLANG_COMMON_CHECK_INTERNAL_H_
 
 #include "common/template_string.h"
 #include "llvm/Support/FormatVariadic.h"
 
-namespace Carbon::Internal {
+namespace MyLang::Internal {
 
 // Evaluates a condition in a CHECK. This diagnoses if the condition evaluates
 // to the constant `true` or `false`.
@@ -23,7 +23,7 @@ CheckCondition(bool condition)
                                "error")))
     __attribute__((diagnose_if(!condition,
                                "CHECK condition is always false; replace with "
-                               "CARBON_FATAL if this is intended",
+                               "MYLANG_FATAL if this is intended",
                                "error"))) {
   return condition;
 }
@@ -100,14 +100,14 @@ template <TemplateString Kind, TemplateString File, int Line,
   }
 }
 
-}  // namespace Carbon::Internal
+}  // namespace MyLang::Internal
 
 // Evaluates the condition of a CHECK as a boolean value.
 //
 // This performs a contextual conversion to bool, diagnoses if the condition is
 // always true or always false, and returns its value.
-#define CARBON_INTERNAL_CHECK_CONDITION(cond) \
-  (Carbon::Internal::CheckCondition(true && (cond)))
+#define MYLANG_INTERNAL_CHECK_CONDITION(cond) \
+  (MyLang::Internal::CheckCondition(true && (cond)))
 
 // Implements check messages without any formatted values.
 //
@@ -115,8 +115,8 @@ template <TemplateString Kind, TemplateString File, int Line,
 // parameters of the check failure printing function above, including an empty
 // string for the format string. Because there are multiple template arguments,
 // the entire call is wrapped in parentheses.
-#define CARBON_INTERNAL_CHECK_IMPL(kind, file, line, condition_str) \
-  (Carbon::Internal::CheckFail<kind, file, line, condition_str, "">())
+#define MYLANG_INTERNAL_CHECK_IMPL(kind, file, line, condition_str) \
+  (MyLang::Internal::CheckFail<kind, file, line, condition_str, "">())
 
 // Implements check messages with a format string and potentially formatted
 // values.
@@ -124,9 +124,9 @@ template <TemplateString Kind, TemplateString File, int Line,
 // Each of the main components is passed as a template arguments, and then any
 // formatted values are passed as arguments. Because there are multiple template
 // arguments, the entire call is wrapped in parentheses.
-#define CARBON_INTERNAL_CHECK_IMPL_FORMAT(kind, file, line, condition_str,   \
+#define MYLANG_INTERNAL_CHECK_IMPL_FORMAT(kind, file, line, condition_str,   \
                                           format_str, ...)                   \
-  (Carbon::Internal::CheckFail<kind, file, line, condition_str, format_str>( \
+  (MyLang::Internal::CheckFail<kind, file, line, condition_str, format_str>( \
       __VA_ARGS__))
 
 // Implements the failure of a check.
@@ -134,18 +134,18 @@ template <TemplateString Kind, TemplateString File, int Line,
 // Collects all the metadata about the failure to be printed, such as source
 // location and stringified condition, and passes those, any format string and
 // formatted arguments to the correct implementation macro above.
-#define CARBON_INTERNAL_CHECK(condition, ...)      \
-  CARBON_INTERNAL_CHECK_IMPL##__VA_OPT__(_FORMAT)( \
+#define MYLANG_INTERNAL_CHECK(condition, ...)      \
+  MYLANG_INTERNAL_CHECK_IMPL##__VA_OPT__(_FORMAT)( \
       "CHECK", __FILE__, __LINE__, #condition __VA_OPT__(, ) __VA_ARGS__)
 
 // Implements the fatal macro.
 //
 // Similar to the check failure macro, but tags the message as a fatal one and
 // leaves the stringified condition empty.
-#define CARBON_INTERNAL_FATAL(...)                                  \
-  (CARBON_INTERNAL_CHECK_IMPL##__VA_OPT__(_FORMAT)(                 \
+#define MYLANG_INTERNAL_FATAL(...)                                  \
+  (MYLANG_INTERNAL_CHECK_IMPL##__VA_OPT__(_FORMAT)(                 \
        "FATAL", __FILE__, __LINE__, "" __VA_OPT__(, ) __VA_ARGS__), \
-   CARBON_INTERNAL_FATAL_NORETURN_SUFFIX())
+   MYLANG_INTERNAL_FATAL_NORETURN_SUFFIX())
 
 #ifdef NDEBUG
 // For `DCHECK` in optimized builds we have a dead check that we want to
@@ -153,19 +153,19 @@ template <TemplateString Kind, TemplateString File, int Line,
 // avoid forming interesting format strings here so that we don't have to
 // repeatedly instantiate the `Check` function above. This format string would
 // be an error if actually used.
-#define CARBON_INTERNAL_DEAD_DCHECK(condition, ...) \
-  CARBON_INTERNAL_DEAD_DCHECK_IMPL##__VA_OPT__(_FORMAT)(__VA_ARGS__)
+#define MYLANG_INTERNAL_DEAD_DCHECK(condition, ...) \
+  MYLANG_INTERNAL_DEAD_DCHECK_IMPL##__VA_OPT__(_FORMAT)(__VA_ARGS__)
 
-#define CARBON_INTERNAL_DEAD_DCHECK_IMPL() \
-  Carbon::Internal::CheckFail<"", "", 0, "", "">()
+#define MYLANG_INTERNAL_DEAD_DCHECK_IMPL() \
+  MyLang::Internal::CheckFail<"", "", 0, "", "">()
 
-#define CARBON_INTERNAL_DEAD_DCHECK_IMPL_FORMAT(format_str, ...) \
-  Carbon::Internal::CheckFail<"", "", 0, "", "">(__VA_ARGS__)
+#define MYLANG_INTERNAL_DEAD_DCHECK_IMPL_FORMAT(format_str, ...) \
+  MyLang::Internal::CheckFail<"", "", 0, "", "">(__VA_ARGS__)
 
 // The CheckFail function itself is noreturn in NDEBUG.
-#define CARBON_INTERNAL_FATAL_NORETURN_SUFFIX() void()
+#define MYLANG_INTERNAL_FATAL_NORETURN_SUFFIX() void()
 #else
-#define CARBON_INTERNAL_FATAL_NORETURN_SUFFIX() std::abort()
+#define MYLANG_INTERNAL_FATAL_NORETURN_SUFFIX() std::abort()
 #endif
 
-#endif  // CARBON_COMMON_CHECK_INTERNAL_H_
+#endif  // MYLANG_COMMON_CHECK_INTERNAL_H_

@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-namespace Carbon {
+namespace MyLang {
 
 // A simplistic string-to-integer routine that is consteval for compile-time
 // extracting specific components of the version from the string form. We use
@@ -48,4 +48,4 @@ constexpr int Version::Major = MajorVersion("$VERSION");
 constexpr int Version::Minor = MinorVersion("$VERSION");
 constexpr int Version::Patch = PatchVersion("$VERSION");
 
-}  // namespace Carbon
+}  // namespace MyLang

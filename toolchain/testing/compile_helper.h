@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_TESTING_COMPILE_HELPER_H_
-#define CARBON_TOOLCHAIN_TESTING_COMPILE_HELPER_H_
+#ifndef MYLANG_TOOLCHAIN_TESTING_COMPILE_HELPER_H_
+#define MYLANG_TOOLCHAIN_TESTING_COMPILE_HELPER_H_
 
 #include <forward_list>
 
@@ -14,7 +14,7 @@
 #include "toolchain/parse/tree_and_subtrees.h"
 #include "toolchain/source/source_buffer.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // A test helper for compile-related functionality.
 class CompileHelper {
@@ -60,6 +60,6 @@ class CompileHelper {
   std::forward_list<Parse::TreeAndSubtrees> tree_and_subtrees_storage_;
 };
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TOOLCHAIN_TESTING_COMPILE_HELPER_H_
+#endif  // MYLANG_TOOLCHAIN_TESTING_COMPILE_HELPER_H_

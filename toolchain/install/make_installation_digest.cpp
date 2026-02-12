@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -19,7 +19,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/SHA256.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
 // A class implementing our digest program.
@@ -28,10 +28,10 @@ namespace {
 // an exit code for `main`. It has a very simple command line interface:
 // - An optional flag `--verbose` that must be the first argument if provided.
 // - A required positional argument of a manifest file of all the files in a
-//   Carbon installation that should be added to the digest.
+//   MyLang installation that should be added to the digest.
 // - A required positional argument of an output file for the digest.
 //
-// The program reads the manifest of all the files in the Carbon installation,
+// The program reads the manifest of all the files in the MyLang installation,
 // and adds each of those files to a running cryptographic digest. Once
 // complete, it writes this cryptographic digest to the provided output digest
 // file.
@@ -71,7 +71,7 @@ auto DigestProgram::Run(int argc, char** argv) -> ErrorOr<int> {
   std::filesystem::path manifest_path = argv[num_args - 1];
   std::filesystem::path digest_path = argv[num_args];
 
-  CARBON_ASSIGN_OR_RETURN(std::string manifest,
+  MYLANG_ASSIGN_OR_RETURN(std::string manifest,
                           Filesystem::Cwd().ReadFileToString(manifest_path));
   llvm::SmallVector<llvm::StringRef> manifest_lines;
   llvm::StringRef(manifest).split(manifest_lines, '\n');
@@ -97,7 +97,7 @@ auto DigestProgram::Run(int argc, char** argv) -> ErrorOr<int> {
       }
     }
 
-    CARBON_VLOG("Digesting file: {0}\n", install_path);
+    MYLANG_VLOG("Digesting file: {0}\n", install_path);
     // Add the install path itself to the digest to track the layout of the
     // installation data.
     sha256.update(install_path.native());
@@ -105,16 +105,16 @@ auto DigestProgram::Run(int argc, char** argv) -> ErrorOr<int> {
     // Open the file and compute its digest to add as well. We use a memoizing
     // helper here to avoid re-examining the same file even if there are
     // multiple paths to reach that file.
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         Filesystem::ReadFile file,
         Filesystem::Cwd().OpenReadOnly(full_path, Filesystem::OpenExisting));
     sha256.update(ComputeFileDigest(file));
   }
 
   auto digest = sha256.final();
-  CARBON_VLOG("Digest: {0}\n", llvm::toHex(digest));
+  MYLANG_VLOG("Digest: {0}\n", llvm::toHex(digest));
 
-  CARBON_RETURN_IF_ERROR(Filesystem::Cwd().WriteFileFromString(
+  MYLANG_RETURN_IF_ERROR(Filesystem::Cwd().WriteFileFromString(
       digest_path, llvm::toHex(digest, /*LowerCase=*/true) + "\n"));
 
   return EXIT_SUCCESS;
@@ -135,10 +135,10 @@ auto DigestProgram::ComputeFileDigest(Filesystem::ReadFileRef file)
 }
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang
 
 auto main(int argc, char** argv) -> int {
-  Carbon::DigestProgram program;
+  MyLang::DigestProgram program;
   auto result = program.Run(argc, argv);
   if (result.ok()) {
     return *result;

@@ -1,15 +1,15 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_ID_KIND_H_
-#define CARBON_TOOLCHAIN_SEM_IR_ID_KIND_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_ID_KIND_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_ID_KIND_H_
 
 #include "common/type_enum.h"
 #include "toolchain/base/int.h"
 #include "toolchain/sem_ir/ids.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 // An enum of all the ID types used as instruction operands.
 //
@@ -70,6 +70,6 @@ using IdKind = TypeEnum<
     VtableId>;
 // clang-format on
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_ID_KIND_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_ID_KIND_H_

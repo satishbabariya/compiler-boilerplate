@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -6,12 +6,12 @@
 
 #include <cstddef>
 
-namespace Carbon {
+namespace MyLang {
 
 auto Hasher::HashSizedBytesLarge(llvm::ArrayRef<std::byte> bytes) -> void {
   const std::byte* data_ptr = bytes.data();
   const ssize_t size = bytes.size();
-  CARBON_DCHECK(size > 32);
+  MYLANG_DCHECK(size > 32);
 
   // If we have 64 bytes or more, we're going to handle two 32-byte chunks at a
   // time using a simplified version of the main algorithm. This is based
@@ -78,4 +78,4 @@ auto Hasher::HashSizedBytesLarge(llvm::ArrayRef<std::byte> bytes) -> void {
   HashDense(size);
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

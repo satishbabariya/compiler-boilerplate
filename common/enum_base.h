@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_ENUM_BASE_H_
-#define CARBON_COMMON_ENUM_BASE_H_
+#ifndef MYLANG_COMMON_ENUM_BASE_H_
+#define MYLANG_COMMON_ENUM_BASE_H_
 
 #include <compare>
 #include <type_traits>
@@ -11,9 +11,9 @@
 #include "common/ostream.h"
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon::Internal {
+namespace MyLang::Internal {
 
-// CRTP-style base class used to define the common pattern of Carbon enum-like
+// CRTP-style base class used to define the common pattern of MyLang enum-like
 // classes. The result is a class with named constants similar to enumerators,
 // but that are normal classes, can contain other methods, and support a `name`
 // method and printing the enums. These even work in switch statements and
@@ -22,18 +22,18 @@ namespace Carbon::Internal {
 // It is specifically designed to compose with X-MACRO style `.def` files that
 // stamp out all the enumerators.
 //
-// Users must be in the `Carbon` namespace and should look like the following.
+// Users must be in the `MyLang` namespace and should look like the following.
 //
 // In `my_kind.h`:
 //   ```
-//   CARBON_DEFINE_RAW_ENUM_CLASS(MyKind, uint8_t) {
-//   #define CARBON_MY_KIND(Name) CARBON_RAW_ENUM_ENUMERATOR(Name)
+//   MYLANG_DEFINE_RAW_ENUM_CLASS(MyKind, uint8_t) {
+//   #define MYLANG_MY_KIND(Name) MYLANG_RAW_ENUM_ENUMERATOR(Name)
 //   #include ".../my_kind.def"
 //   };
 //
-//   class MyKind : public CARBON_ENUM_BASE(MyKind) {
+//   class MyKind : public MYLANG_ENUM_BASE(MyKind) {
 //    public:
-//   #define CARBON_MY_KIND(Name) CARBON_ENUM_CONSTANT_DECL(Name)
+//   #define MYLANG_MY_KIND(Name) MYLANG_ENUM_CONSTANT_DECL(Name)
 //   #include ".../my_kind.def"
 //
 //     // OPTIONAL: To support converting to and from the underlying type of
@@ -48,24 +48,24 @@ namespace Carbon::Internal {
 //     // Plus, anything else you wish to include.
 //   };
 //
-//   #define CARBON_MY_KIND(Name) CARBON_ENUM_CONSTANT_DEFINITION(MyKind, Name)
+//   #define MYLANG_MY_KIND(Name) MYLANG_ENUM_CONSTANT_DEFINITION(MyKind, Name)
 //   #include ".../my_kind.def"
 //   ```
 //
 // In `my_kind.cpp`:
 //   ```
-//   CARBON_DEFINE_ENUM_CLASS_NAMES(MyKind) {
-//   #define CARBON_MY_KIND(Name) CARBON_ENUM_CLASS_NAME_STRING(Name)
+//   MYLANG_DEFINE_ENUM_CLASS_NAMES(MyKind) {
+//   #define MYLANG_MY_KIND(Name) MYLANG_ENUM_CLASS_NAME_STRING(Name)
 //   #include ".../my_kind.def"
 //   };
 //   ```
 //
 // The result of the above:
 // - An enum class (`RawEnumType`) defined in an `Internal` namespace with one
-//   enumerator per call to CARBON_MY_KIND(Name) in `.../my_kind.def`, with name
+//   enumerator per call to MYLANG_MY_KIND(Name) in `.../my_kind.def`, with name
 //   `Name`. This won't generally be used directly, but may be needed for niche
 //   use cases such as a template argument.
-// - A type `MyKind` that extends `Carbon::Internal::EnumBase`.
+// - A type `MyKind` that extends `MyLang::Internal::EnumBase`.
 //   - `MyKind` includes all the public members of `EnumBase`, like `name` and
 //     `Print`. For example, you might call `name()` to construct an error
 //     message:
@@ -78,7 +78,7 @@ namespace Carbon::Internal {
 //     `FromInt`. They will be part of the public API of `EnumBase` if they
 //     were included in a `using` declaration.
 //   - `MyKind` includes a member `static const MyKind Name;` per call to
-//     `CARBON_MY_KIND(Name)` in `.../my_kind.def`. It will have the
+//     `MYLANG_MY_KIND(Name)` in `.../my_kind.def`. It will have the
 //     corresponding value from `RawEnumType`. This is the primary way to create
 //     an instance of `MyKind`. For example, it might be used like:
 //     ```
@@ -177,12 +177,12 @@ class EnumBase : public Printable<DerivedT> {
   RawEnumType value_;
 };
 
-}  // namespace Carbon::Internal
+}  // namespace MyLang::Internal
 
 // Use this before defining a class that derives from `EnumBase` to begin the
 // definition of the raw `enum class`. It should be followed by the body of that
 // raw enum class.
-#define CARBON_DEFINE_RAW_ENUM_CLASS(EnumClassName, UnderlyingType) \
+#define MYLANG_DEFINE_RAW_ENUM_CLASS(EnumClassName, UnderlyingType) \
   namespace Internal {                                              \
   struct EnumClassName##Data {                                      \
     static const llvm::StringLiteral Names[];                       \
@@ -191,25 +191,25 @@ class EnumBase : public Printable<DerivedT> {
   }                                                                 \
   enum class Internal::EnumClassName##Data::RawEnum : UnderlyingType
 
-// In the `CARBON_DEFINE_RAW_ENUM_CLASS` block, use this to generate each
+// In the `MYLANG_DEFINE_RAW_ENUM_CLASS` block, use this to generate each
 // enumerator.
-#define CARBON_RAW_ENUM_ENUMERATOR(Name) Name,
+#define MYLANG_RAW_ENUM_ENUMERATOR(Name) Name,
 
-// Use this to compute the `Internal::EnumBase` specialization for a Carbon enum
+// Use this to compute the `Internal::EnumBase` specialization for a MyLang enum
 // class. It both computes the name of the raw enum and ensures all the
 // namespaces are correct.
-#define CARBON_ENUM_BASE(EnumClassName)                                \
-  ::Carbon::Internal::EnumBase<EnumClassName,                          \
+#define MYLANG_ENUM_BASE(EnumClassName)                                \
+  ::MyLang::Internal::EnumBase<EnumClassName,                          \
                                Internal::EnumClassName##Data::RawEnum, \
                                Internal::EnumClassName##Data::Names>
 
-// Use this within the Carbon enum class body to generate named constant
+// Use this within the MyLang enum class body to generate named constant
 // declarations for each value.
-#define CARBON_ENUM_CONSTANT_DECL(Name) static const EnumType Name;
+#define MYLANG_ENUM_CONSTANT_DECL(Name) static const EnumType Name;
 
-// Use this immediately after the Carbon enum class body to define each named
+// Use this immediately after the MyLang enum class body to define each named
 // constant.
-#define CARBON_ENUM_CONSTANT_DEFINITION(EnumClassName, Name) \
+#define MYLANG_ENUM_CONSTANT_DEFINITION(EnumClassName, Name) \
   inline constexpr EnumClassName EnumClassName::Name =       \
       EnumClassName::Make(RawEnumType::Name);
 
@@ -219,11 +219,11 @@ class EnumBase : public Printable<DerivedT> {
 //
 // `clang-format` has a bug with spacing around `->` returns in macros. See
 // https://bugs.llvm.org/show_bug.cgi?id=48320 for details.
-#define CARBON_DEFINE_ENUM_CLASS_NAMES(EnumClassName) \
+#define MYLANG_DEFINE_ENUM_CLASS_NAMES(EnumClassName) \
   constexpr llvm::StringLiteral Internal::EnumClassName##Data::Names[] =
 
 // Use this within the names array initializer to generate a string for each
 // name.
-#define CARBON_ENUM_CLASS_NAME_STRING(Name) #Name,
+#define MYLANG_ENUM_CLASS_NAME_STRING(Name) #Name,
 
-#endif  // CARBON_COMMON_ENUM_BASE_H_
+#endif  // MYLANG_COMMON_ENUM_BASE_H_

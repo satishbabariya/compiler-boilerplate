@@ -1,21 +1,21 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_PARSE_TREE_AND_SUBTREES_H_
-#define CARBON_TOOLCHAIN_PARSE_TREE_AND_SUBTREES_H_
+#ifndef MYLANG_TOOLCHAIN_PARSE_TREE_AND_SUBTREES_H_
+#define MYLANG_TOOLCHAIN_PARSE_TREE_AND_SUBTREES_H_
 
 #include "llvm/ADT/SmallVector.h"
 #include "toolchain/base/fixed_size_value_store.h"
 #include "toolchain/lex/token_index.h"
 #include "toolchain/parse/tree.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 // Forward-declared here for `GetTreeAndSubtreesStore`.
 struct CheckIRId;
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 // Calculates and stores subtree data for a parse tree. Supports APIs that
 // require subtree knowledge.
@@ -258,7 +258,7 @@ auto TreeAndSubtrees::ExtractNodeFromChildren(
     // On error try again, this time capturing a trace.
     ErrorBuilder trace;
     TryExtractNodeFromChildren<T>(node_id, children, &trace);
-    CARBON_FATAL("Malformed parse node:\n{0}",
+    MYLANG_FATAL("Malformed parse node:\n{0}",
                  static_cast<Error>(trace).message());
   }
   return *result;
@@ -300,6 +300,6 @@ auto TreeAndSubtrees::Extract(IdT id) const
   return ExtractNodeFromChildren<T>(id, children(id));
 }
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse
 
-#endif  // CARBON_TOOLCHAIN_PARSE_TREE_AND_SUBTREES_H_
+#endif  // MYLANG_TOOLCHAIN_PARSE_TREE_AND_SUBTREES_H_

@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -19,7 +19,7 @@
 #include "testing/file_test/file_test_base.h"
 #include "testing/file_test/test_file.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // While these are marked as "internal" APIs, they seem to work and be pretty
 // widely used for their exact documented behavior.
@@ -116,7 +116,7 @@ auto RunTestFile(const FileTestBase& test_base, bool dump_output,
     test_file.test_args = test_base.GetDefaultArgs();
   }
   test_file.test_args.append(test_file.extra_args);
-  CARBON_RETURN_IF_ERROR(DoArgReplacements(
+  MYLANG_RETURN_IF_ERROR(DoArgReplacements(
       test_file.test_args, test_base.GetArgReplacements(), all_splits));
 
   // stdin needs to exist on-disk for compatibility. We'll use a pointer for it.
@@ -137,7 +137,7 @@ auto RunTestFile(const FileTestBase& test_base, bool dump_output,
       input_stream = tmpfile();
       fwrite(split->content.c_str(), sizeof(char), split->content.size(),
              input_stream);
-      CARBON_CHECK(!fseek(input_stream, 0, SEEK_SET));
+      MYLANG_CHECK(!fseek(input_stream, 0, SEEK_SET));
     } else if (!fs->addFile(split->filename, /*ModificationTime=*/0,
                             llvm::MemoryBuffer::getMemBuffer(
                                 split->content, split->filename,
@@ -213,4 +213,4 @@ auto RunTestFile(const FileTestBase& test_base, bool dump_output,
   return Success();
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

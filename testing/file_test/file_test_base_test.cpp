@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -17,7 +17,7 @@
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/FormatVariadic.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 namespace {
 
 class FileTestBaseTest : public FileTestBase {
@@ -312,12 +312,12 @@ auto FileTestBaseTest::Run(
                        .input_stream = input_stream,
                        .output_stream = output_stream,
                        .error_stream = error_stream};
-  CARBON_ASSIGN_OR_RETURN(params.files, GetFilesFromArgs(test_args, *fs));
+  MYLANG_ASSIGN_OR_RETURN(params.files, GetFilesFromArgs(test_args, *fs));
   return test_fn(params);
 }
 
 }  // namespace
 
-CARBON_FILE_TEST_FACTORY(FileTestBaseTest)
+MYLANG_FILE_TEST_FACTORY(FileTestBaseTest)
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

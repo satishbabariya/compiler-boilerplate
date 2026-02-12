@@ -1,14 +1,14 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_RAW_STRING_OSTREAM_H_
-#define CARBON_COMMON_RAW_STRING_OSTREAM_H_
+#ifndef MYLANG_COMMON_RAW_STRING_OSTREAM_H_
+#define MYLANG_COMMON_RAW_STRING_OSTREAM_H_
 
 #include "common/check.h"
 #include "common/ostream.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Implements streaming output with an underlying string. The string must always
 // be taken prior to destruction.
@@ -21,7 +21,7 @@ class RawStringOstream : public llvm::raw_pwrite_stream {
   explicit RawStringOstream() : llvm::raw_pwrite_stream(/*Unbuffered=*/true) {}
 
   ~RawStringOstream() override {
-    CARBON_CHECK(str_.empty(), "Expected to be emptied by TakeStr, have: {0}",
+    MYLANG_CHECK(str_.empty(), "Expected to be emptied by TakeStr, have: {0}",
                  str_);
   }
 
@@ -59,6 +59,6 @@ class RawStringOstream : public llvm::raw_pwrite_stream {
   std::string str_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_RAW_STRING_OSTREAM_H_
+#endif  // MYLANG_COMMON_RAW_STRING_OSTREAM_H_

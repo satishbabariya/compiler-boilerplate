@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_RAW_HASHTABLE_H_
-#define CARBON_COMMON_RAW_HASHTABLE_H_
+#ifndef MYLANG_COMMON_RAW_HASHTABLE_H_
+#define MYLANG_COMMON_RAW_HASHTABLE_H_
 
 #include <algorithm>
 #include <concepts>
@@ -126,7 +126,7 @@
 //   the group-based metadata scanning into an iterator model. Instead, there is
 //   just a for-each method that is passed a lambda to observe all entries. The
 //   order of this observation is also not guaranteed.
-namespace Carbon::RawHashtable {
+namespace MyLang::RawHashtable {
 
 // Which prefetch strategies to enable can be controlled via macros to enable
 // doing experiments.
@@ -138,11 +138,11 @@ namespace Carbon::RawHashtable {
 //
 // Override these by defining them as part of the build explicitly to either `0`
 // or `1`. If left undefined, the defaults will be supplied.
-#ifndef CARBON_ENABLE_PREFETCH_METADATA
-#define CARBON_ENABLE_PREFETCH_METADATA 0
+#ifndef MYLANG_ENABLE_PREFETCH_METADATA
+#define MYLANG_ENABLE_PREFETCH_METADATA 0
 #endif
-#ifndef CARBON_ENABLE_PREFETCH_ENTRY_GROUP
-#define CARBON_ENABLE_PREFETCH_ENTRY_GROUP 1
+#ifndef MYLANG_ENABLE_PREFETCH_ENTRY_GROUP
+#define MYLANG_ENABLE_PREFETCH_ENTRY_GROUP 1
 #endif
 
 // If allocating storage, allocate a minimum of one cacheline of group metadata
@@ -406,13 +406,13 @@ class ViewImpl {
   // given size. This is trivial, but we use this routine to enforce invariants
   // on the sizes.
   static constexpr auto EntriesOffset(ssize_t alloc_size) -> ssize_t {
-    CARBON_DCHECK(llvm::isPowerOf2_64(alloc_size),
+    MYLANG_DCHECK(llvm::isPowerOf2_64(alloc_size),
                   "Size must be a power of two for a hashed buffer!");
     // The size is always a power of two. We prevent any too-small sizes so it
     // being a power of two provides the needed alignment. As a result, the
     // offset is exactly the size. We validate this here to catch alignment bugs
     // early.
-    CARBON_DCHECK(static_cast<uint64_t>(alloc_size) ==
+    MYLANG_DCHECK(static_cast<uint64_t>(alloc_size) ==
                   llvm::alignTo<alignof(EntryT)>(alloc_size));
     return alloc_size;
   }
@@ -434,7 +434,7 @@ class ViewImpl {
   // memory access latency we can with the hashing of a key or other
   // latency-bound operation prior to probing.
   auto PrefetchMetadata() const -> void {
-    if constexpr (CARBON_ENABLE_PREFETCH_METADATA) {
+    if constexpr (MYLANG_ENABLE_PREFETCH_METADATA) {
       // Prefetch with a "low" temporal locality as we're primarily expecting a
       // brief use of the metadata and then to return to application code.
       __builtin_prefetch(metadata(), /*read*/ 0, /*low-locality*/ 1);
@@ -446,7 +446,7 @@ class ViewImpl {
   // down. We don't want to synthesize writes unless we *know* we're going to
   // write.
   static auto PrefetchEntryGroup(const EntryT* entry_group) -> void {
-    if constexpr (CARBON_ENABLE_PREFETCH_ENTRY_GROUP) {
+    if constexpr (MYLANG_ENABLE_PREFETCH_ENTRY_GROUP) {
       // Prefetch with a "low" temporal locality as we're primarily expecting a
       // brief use of the entries and then to return to application code.
       __builtin_prefetch(entry_group, /*read*/ 0, /*low-locality*/ 1);
@@ -479,7 +479,7 @@ class BaseImpl {
 
   BaseImpl(int small_alloc_size, Storage* small_storage)
       : small_alloc_size_(small_alloc_size) {
-    CARBON_CHECK(small_alloc_size >= 0);
+    MYLANG_CHECK(small_alloc_size >= 0);
     Construct(small_storage);
   }
   // Only used for copying and moving, and leaves storage uninitialized.
@@ -566,7 +566,7 @@ class BaseImpl {
     return static_cast<unsigned>(small_alloc_size_);
   }
   auto is_small() const -> bool {
-    CARBON_DCHECK(alloc_size() >= small_alloc_size());
+    MYLANG_DCHECK(alloc_size() >= small_alloc_size());
     return alloc_size() == small_alloc_size();
   }
 
@@ -666,7 +666,7 @@ inline auto ComputeSeed() -> uint64_t {
 }
 
 inline auto ComputeProbeMaskFromSize(ssize_t size) -> size_t {
-  CARBON_DCHECK(llvm::isPowerOf2_64(size),
+  MYLANG_DCHECK(llvm::isPowerOf2_64(size),
                 "Size must be a power of two for a hashed buffer!");
   // Since `size` is a power of two, we can make sure the probes are less
   // than `size` by making the mask `size - 1`. We also mask off the low
@@ -708,14 +708,14 @@ class ProbeSequence {
 #ifndef NDEBUG
     // Verify against the quadratic formula we expect to be following by scaling
     // everything down by `GroupSize`.
-    CARBON_DCHECK(
+    MYLANG_DCHECK(
         (p_ / GroupSize) ==
             ((start_ / GroupSize +
               (step_ / GroupSize + (step_ / GroupSize) * (step_ / GroupSize)) /
                   2) %
              (size_ / GroupSize)),
         "Index in probe sequence does not match the expected formula.");
-    CARBON_DCHECK(step_ < size_,
+    MYLANG_DCHECK(step_ < size_,
                   "We necessarily visit all groups, so we can't have more "
                   "probe steps than groups.");
 #endif
@@ -742,7 +742,7 @@ auto ViewImpl<InputKeyT, InputValueT, InputKeyContextT>::LookupEntry(
   PrefetchMetadata();
 
   ssize_t local_size = alloc_size_;
-  CARBON_DCHECK(local_size > 0);
+  MYLANG_DCHECK(local_size > 0);
 
   uint8_t* local_metadata = metadata();
   HashCode hash = key_context.HashKey(lookup_key, ComputeSeed());
@@ -873,7 +873,7 @@ auto ViewImpl<InputKeyT, InputValueT, InputKeyContextT>::ComputeMetricsImpl(
 
       auto probe_g = MetadataGroup::Load(local_metadata, s.index());
       auto probe_matched_range = probe_g.Match(tag);
-      CARBON_CHECK(!probe_matched_range.empty());
+      MYLANG_CHECK(!probe_matched_range.empty());
       for (ssize_t match_index : probe_matched_range) {
         if (match_index >= byte_index) {
           // Note we only count the compares that will *fail* as part of
@@ -906,7 +906,7 @@ template <typename LookupKeyT>
 auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::InsertImpl(
     LookupKeyT lookup_key, KeyContextT key_context)
     -> std::pair<EntryT*, bool> {
-  CARBON_DCHECK(alloc_size() > 0);
+  MYLANG_DCHECK(alloc_size() > 0);
   PrefetchStorage();
 
   uint8_t* local_metadata = metadata();
@@ -986,12 +986,12 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::InsertImpl(
     }
 
     --growth_budget_;
-    CARBON_DCHECK(growth_budget() >= 0,
+    MYLANG_DCHECK(growth_budget() >= 0,
                   "Growth budget shouldn't have gone negative!");
     return return_insert_at_index(group_index + empty_match.index());
   }
 
-  CARBON_FATAL(
+  MYLANG_FATAL(
       "We should never finish probing without finding the entry or an empty "
       "slot.");
 }
@@ -1000,7 +1000,7 @@ template <typename InputKeyT, typename InputValueT, typename InputKeyContextT>
 [[clang::noinline]] auto
 BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::GrowToAllocSizeImpl(
     ssize_t target_alloc_size, KeyContextT key_context) -> void {
-  CARBON_CHECK(llvm::isPowerOf2_64(target_alloc_size));
+  MYLANG_CHECK(llvm::isPowerOf2_64(target_alloc_size));
   if (target_alloc_size <= alloc_size()) {
     return;
   }
@@ -1013,7 +1013,7 @@ BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::GrowToAllocSizeImpl(
 
   // Create locals for the old state of the table.
   ssize_t old_size = alloc_size();
-  CARBON_DCHECK(old_size > 0);
+  MYLANG_DCHECK(old_size > 0);
   bool old_small = is_small();
   Storage* old_storage = storage();
   uint8_t* old_metadata = metadata();
@@ -1070,7 +1070,7 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::GrowForInsertCountImpl(
   ssize_t budget_needed = used_budget + count;
   ssize_t space_needed = budget_needed + (budget_needed / 7);
   ssize_t target_alloc_size = llvm::NextPowerOf2(space_needed);
-  CARBON_CHECK(GrowthThresholdForAllocSize(target_alloc_size) >
+  MYLANG_CHECK(GrowthThresholdForAllocSize(target_alloc_size) >
                (budget_needed));
   GrowToAllocSizeImpl(target_alloc_size, key_context);
 }
@@ -1216,7 +1216,7 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::CopySlotsFrom(
     const BaseImpl& arg) -> void
   requires(EntryT::IsCopyable)
 {
-  CARBON_DCHECK(alloc_size() == arg.alloc_size());
+  MYLANG_DCHECK(alloc_size() == arg.alloc_size());
   ssize_t local_size = alloc_size();
 
   // Preserve which slot every entry is in, including tombstones in the
@@ -1255,14 +1255,14 @@ template <typename InputKeyT, typename InputValueT, typename InputKeyContextT>
 auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::MoveFrom(
     BaseImpl&& arg, Storage* small_storage) -> void {
   ssize_t local_size = alloc_size();
-  CARBON_DCHECK(local_size == arg.alloc_size());
+  MYLANG_DCHECK(local_size == arg.alloc_size());
   // If `arg` is moved-from, skip the rest as the local size is all we need.
   if (local_size == 0) {
     return;
   }
 
   if (arg.is_small()) {
-    CARBON_DCHECK(local_size == small_alloc_size_);
+    MYLANG_DCHECK(local_size == small_alloc_size_);
     this->storage() = small_storage;
 
     // For small tables, we have to move the entries as we can't move the tables
@@ -1327,11 +1327,11 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::InsertIntoEmpty(
 template <typename InputKeyT, typename InputValueT, typename InputKeyContextT>
 auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::ComputeNextAllocSize(
     ssize_t old_alloc_size) -> ssize_t {
-  CARBON_DCHECK(llvm::isPowerOf2_64(old_alloc_size),
+  MYLANG_DCHECK(llvm::isPowerOf2_64(old_alloc_size),
                 "Expected a power of two!");
   ssize_t new_alloc_size;
   bool overflow = __builtin_mul_overflow(old_alloc_size, 2, &new_alloc_size);
-  CARBON_CHECK(!overflow, "Computing the new size overflowed `ssize_t`!");
+  MYLANG_CHECK(!overflow, "Computing the new size overflowed `ssize_t`!");
   return new_alloc_size;
 }
 
@@ -1387,7 +1387,7 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::GrowToNextAllocSize(
 
   // Create locals for the old state of the table.
   ssize_t old_size = alloc_size();
-  CARBON_DCHECK(old_size > 0);
+  MYLANG_DCHECK(old_size > 0);
 
   bool old_small = is_small();
   Storage* old_storage = storage();
@@ -1403,7 +1403,7 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::GrowToNextAllocSize(
       llvm::count(llvm::ArrayRef(old_metadata, old_size), MetadataGroup::Empty);
   ssize_t debug_deleted_count = llvm::count(
       llvm::ArrayRef(old_metadata, old_size), MetadataGroup::Deleted);
-  CARBON_DCHECK(
+  MYLANG_DCHECK(
       debug_empty_count >= (old_size - GrowthThresholdForAllocSize(old_size)),
       "debug_empty_count: {0}, debug_deleted_count: {1}, size: {2}",
       debug_empty_count, debug_deleted_count, old_size);
@@ -1448,8 +1448,8 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::GrowToNextAllocSize(
       ++count;
       ssize_t old_index = group_index + byte_index;
       if constexpr (!MetadataGroup::FastByteClear) {
-        CARBON_DCHECK(new_metadata[old_index] == old_metadata[old_index]);
-        CARBON_DCHECK(new_metadata[old_index | old_size] ==
+        MYLANG_DCHECK(new_metadata[old_index] == old_metadata[old_index]);
+        MYLANG_DCHECK(new_metadata[old_index | old_size] ==
                       old_metadata[old_index]);
       }
       HashCode hash =
@@ -1469,7 +1469,7 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::GrowToNextAllocSize(
       }
       ssize_t new_index = hash.ExtractIndexAndTag<7>().first &
                           ComputeProbeMaskFromSize(new_size);
-      CARBON_DCHECK(new_index == old_hash_index ||
+      MYLANG_DCHECK(new_index == old_hash_index ||
                     new_index == (old_hash_index | old_size));
       // Toggle the newly added bit of the index to get to the other possible
       // target index.
@@ -1492,13 +1492,13 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::GrowToNextAllocSize(
       high_g.Store(new_metadata, (group_index | old_size));
     }
   }
-  CARBON_DCHECK((count - static_cast<ssize_t>(probed_indices.size())) ==
+  MYLANG_DCHECK((count - static_cast<ssize_t>(probed_indices.size())) ==
                 (new_size - llvm::count(llvm::ArrayRef(new_metadata, new_size),
                                         MetadataGroup::Empty)));
 #ifndef NDEBUG
-  CARBON_DCHECK((debug_empty_count + debug_deleted_count) ==
+  MYLANG_DCHECK((debug_empty_count + debug_deleted_count) ==
                 (old_size - count));
-  CARBON_DCHECK(llvm::count(llvm::ArrayRef(new_metadata, new_size),
+  MYLANG_DCHECK(llvm::count(llvm::ArrayRef(new_metadata, new_size),
                             MetadataGroup::Empty) ==
                 debug_empty_count + debug_deleted_count +
                     static_cast<ssize_t>(probed_indices.size()) + old_size);
@@ -1522,15 +1522,15 @@ auto BaseImpl<InputKeyT, InputValueT, InputKeyContextT>::GrowToNextAllocSize(
     EntryT* new_entry = InsertIntoEmpty(hash);
     new_entry->MoveFrom(std::move(old_entries[old_index]));
   }
-  CARBON_DCHECK(count ==
+  MYLANG_DCHECK(count ==
                 (new_size - llvm::count(llvm::ArrayRef(new_metadata, new_size),
                                         MetadataGroup::Empty)));
   growth_budget_ -= count;
-  CARBON_DCHECK(growth_budget_ ==
+  MYLANG_DCHECK(growth_budget_ ==
                 (GrowthThresholdForAllocSize(new_size) -
                  (new_size - llvm::count(llvm::ArrayRef(new_metadata, new_size),
                                          MetadataGroup::Empty))));
-  CARBON_DCHECK(growth_budget_ > 0 &&
+  MYLANG_DCHECK(growth_budget_ > 0 &&
                 "Must still have a growth budget after rehash!");
 
   if (!old_small) {
@@ -1562,10 +1562,10 @@ TableImpl<InputBaseT, SmallSize>::TableImpl(const TableImpl& arg)
     : BaseT(arg.alloc_size(), arg.growth_budget_, SmallSize) {
   // Check for completely broken objects. These invariants should be true even
   // in a moved-from state.
-  CARBON_DCHECK(arg.alloc_size() == 0 || !arg.is_small() ||
+  MYLANG_DCHECK(arg.alloc_size() == 0 || !arg.is_small() ||
                 arg.alloc_size() == SmallSize);
-  CARBON_DCHECK(arg.small_alloc_size_ == SmallSize);
-  CARBON_DCHECK(this->small_alloc_size_ == SmallSize);
+  MYLANG_DCHECK(arg.small_alloc_size_ == SmallSize);
+  MYLANG_DCHECK(this->small_alloc_size_ == SmallSize);
 
   if (this->alloc_size() != 0) {
     SetUpStorage();
@@ -1580,10 +1580,10 @@ auto TableImpl<InputBaseT, SmallSize>::operator=(const TableImpl& arg)
 {
   // Check for completely broken objects. These invariants should be true even
   // in a moved-from state.
-  CARBON_DCHECK(arg.alloc_size() == 0 || !arg.is_small() ||
+  MYLANG_DCHECK(arg.alloc_size() == 0 || !arg.is_small() ||
                 arg.alloc_size() == SmallSize);
-  CARBON_DCHECK(arg.small_alloc_size_ == SmallSize);
-  CARBON_DCHECK(this->small_alloc_size_ == SmallSize);
+  MYLANG_DCHECK(arg.small_alloc_size_ == SmallSize);
+  MYLANG_DCHECK(this->small_alloc_size_ == SmallSize);
 
   // We have to end up with an allocation size exactly equivalent to the
   // incoming argument to avoid re-hashing every entry in the table, which isn't
@@ -1595,7 +1595,7 @@ auto TableImpl<InputBaseT, SmallSize>::operator=(const TableImpl& arg)
     if (&arg == this || this->alloc_size() == 0) {
       return *this;
     }
-    CARBON_DCHECK(arg.storage() != this->storage());
+    MYLANG_DCHECK(arg.storage() != this->storage());
     if constexpr (!EntryT::IsTriviallyDestructible) {
       this->view_impl_.ForEachEntry([](EntryT& entry) { entry.Destroy(); },
                                     [](auto...) {});
@@ -1624,10 +1624,10 @@ TableImpl<InputBaseT, SmallSize>::TableImpl(TableImpl&& arg) noexcept
     : BaseT(arg.alloc_size(), arg.growth_budget_, SmallSize) {
   // Check for completely broken objects. These invariants should be true even
   // in a moved-from state.
-  CARBON_DCHECK(arg.alloc_size() == 0 || !arg.is_small() ||
+  MYLANG_DCHECK(arg.alloc_size() == 0 || !arg.is_small() ||
                 arg.alloc_size() == SmallSize);
-  CARBON_DCHECK(arg.small_alloc_size_ == SmallSize);
-  CARBON_DCHECK(this->small_alloc_size_ == SmallSize);
+  MYLANG_DCHECK(arg.small_alloc_size_ == SmallSize);
+  MYLANG_DCHECK(this->small_alloc_size_ == SmallSize);
   this->MoveFrom(std::move(arg), small_storage());
 }
 
@@ -1636,10 +1636,10 @@ auto TableImpl<InputBaseT, SmallSize>::operator=(TableImpl&& arg) noexcept
     -> TableImpl& {
   // Check for completely broken objects. These invariants should be true even
   // in a moved-from state.
-  CARBON_DCHECK(arg.alloc_size() == 0 || !arg.is_small() ||
+  MYLANG_DCHECK(arg.alloc_size() == 0 || !arg.is_small() ||
                 arg.alloc_size() == SmallSize);
-  CARBON_DCHECK(arg.small_alloc_size_ == SmallSize);
-  CARBON_DCHECK(this->small_alloc_size_ == SmallSize);
+  MYLANG_DCHECK(arg.small_alloc_size_ == SmallSize);
+  MYLANG_DCHECK(this->small_alloc_size_ == SmallSize);
 
   // Destroy and deallocate our table.
   this->Destroy();
@@ -1667,7 +1667,7 @@ auto TableImpl<InputBaseT, SmallSize>::ResetImpl() -> void {
   this->Destroy();
 
   // Re-initialize the whole thing.
-  CARBON_DCHECK(this->small_alloc_size() == SmallSize);
+  MYLANG_DCHECK(this->small_alloc_size() == SmallSize);
   this->Construct(small_storage());
 }
 
@@ -1714,9 +1714,9 @@ auto TableImpl<InputBaseT, SmallSize>::small_storage() const -> Storage* {
 // set up. If possible, uses any small storage, otherwise allocates.
 template <typename InputBaseT, ssize_t SmallSize>
 auto TableImpl<InputBaseT, SmallSize>::SetUpStorage() -> void {
-  CARBON_DCHECK(this->small_alloc_size() == SmallSize);
+  MYLANG_DCHECK(this->small_alloc_size() == SmallSize);
   ssize_t local_size = this->alloc_size();
-  CARBON_DCHECK(local_size != 0);
+  MYLANG_DCHECK(local_size != 0);
   if (local_size == SmallSize) {
     this->storage() = small_storage();
   } else {
@@ -1724,6 +1724,6 @@ auto TableImpl<InputBaseT, SmallSize>::SetUpStorage() -> void {
   }
 }
 
-}  // namespace Carbon::RawHashtable
+}  // namespace MyLang::RawHashtable
 
-#endif  // CARBON_COMMON_RAW_HASHTABLE_H_
+#endif  // MYLANG_COMMON_RAW_HASHTABLE_H_

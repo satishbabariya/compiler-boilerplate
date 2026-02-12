@@ -1,16 +1,16 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_SINGLETON_INSTS_H_
-#define CARBON_TOOLCHAIN_SEM_IR_SINGLETON_INSTS_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_SINGLETON_INSTS_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_SINGLETON_INSTS_H_
 
 #include <array>
 
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/inst_kind.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 // The list of singleton instruction kinds. Singleton instructions are created
 // once in the File constructor and are always available. Each singleton
@@ -51,6 +51,6 @@ constexpr auto MakeSingletonTypeInstId() -> TypeInstId {
   return TypeInstId::None;
 }
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_SINGLETON_INSTS_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_SINGLETON_INSTS_H_

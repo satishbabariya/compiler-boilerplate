@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -6,7 +6,7 @@
 
 #include "toolchain/sem_ir/file.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 auto TypeStore::GetConstantId(TypeId type_id) const -> ConstantId {
   if (!type_id.has_value()) {
@@ -64,4 +64,4 @@ auto TypeStore::TryGetAs(TypeId type_id) const -> std::optional<InstT> {
   return GetAsInst(type_id).TryAs<InstT>();
 }
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR

@@ -1,11 +1,11 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_BUILD_DATA_LINKSTAMP_H_
-#define CARBON_COMMON_BUILD_DATA_LINKSTAMP_H_
+#ifndef MYLANG_COMMON_BUILD_DATA_LINKSTAMP_H_
+#define MYLANG_COMMON_BUILD_DATA_LINKSTAMP_H_
 
-namespace Carbon::BuildData::Internal {
+namespace MyLang::BuildData::Internal {
 
 // See build_data.h; the list of names here should match.
 //
@@ -25,6 +25,6 @@ extern const bool build_coverage_enabled;
 extern const char target_name[];
 extern const char build_target[];
 
-}  // namespace Carbon::BuildData::Internal
+}  // namespace MyLang::BuildData::Internal
 
-#endif  // CARBON_COMMON_BUILD_DATA_LINKSTAMP_H_
+#endif  // MYLANG_COMMON_BUILD_DATA_LINKSTAMP_H_

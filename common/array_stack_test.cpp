@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -7,7 +7,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 namespace {
 
 using ::testing::ElementsAre;
@@ -104,4 +104,4 @@ TEST(ArrayStack, PeekArrayAt) {
 }
 
 }  // namespace
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

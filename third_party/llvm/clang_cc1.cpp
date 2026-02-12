@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -33,7 +33,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "toolchain/base/install_paths.h"
 
-namespace Carbon {
+namespace MyLang {
 
 auto RunClangCC1(const InstallPaths& installation,
                  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs,
@@ -46,7 +46,7 @@ auto RunClangCC1(const InstallPaths& installation,
     llvm::errs() << toString(std::move(error)) << '\n';
     return 1;
   }
-  CARBON_CHECK(cc1_args[1] == llvm::StringRef("-cc1"));
+  MYLANG_CHECK(cc1_args[1] == llvm::StringRef("-cc1"));
 
   llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> diag_ids =
       clang::DiagnosticIDs::create();
@@ -97,7 +97,7 @@ auto RunClangCC1(const InstallPaths& installation,
   // However, their implementation is currently not accessible from a library.
   // We should factor the implementation into a reusable location and then use
   // that here.
-  CARBON_CHECK(!clang_instance->getFrontendOpts().PrintSupportedCPUs &&
+  MYLANG_CHECK(!clang_instance->getFrontendOpts().PrintSupportedCPUs &&
                !clang_instance->getFrontendOpts().PrintSupportedExtensions &&
                !clang_instance->getFrontendOpts().PrintEnabledExtensions);
 
@@ -180,4 +180,4 @@ auto RunClangCC1(const InstallPaths& installation,
   return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

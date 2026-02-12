@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_SET_H_
-#define CARBON_COMMON_SET_H_
+#ifndef MYLANG_COMMON_SET_H_
+#define MYLANG_COMMON_SET_H_
 
 #include <concepts>
 #include <type_traits>
@@ -13,7 +13,7 @@
 #include "common/raw_hashtable.h"
 #include "llvm/Support/Compiler.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Forward declarations to resolve cyclic references.
 template <typename KeyT, typename KeyContextT>
@@ -42,7 +42,7 @@ class Set;
 //
 // A specific `KeyContextT` type can optionally be provided to configure how
 // keys will be hashed and compared. The default is `DefaultKeyContext` which is
-// stateless and will hash using `Carbon::HashValue` and compare using
+// stateless and will hash using `MyLang::HashValue` and compare using
 // `operator==`. Every method accepting a lookup key or operating on the keys in
 // the table will also accept an instance of this type. For stateless context
 // types, including the default, an instance will be default constructed if not
@@ -381,7 +381,7 @@ auto SetBase<InputKeyT, InputKeyContextT>::Insert(LookupKeyT lookup_key,
   requires std::invocable<InsertCallbackT, LookupKeyT, void*>
 {
   auto [entry, inserted] = this->InsertImpl(lookup_key, key_context);
-  CARBON_DCHECK(entry, "Should always result in a valid index.");
+  MYLANG_DCHECK(entry, "Should always result in a valid index.");
 
   if (LLVM_LIKELY(!inserted)) {
     return InsertResult(false, entry->key());
@@ -421,6 +421,6 @@ auto Set<InputKeyT, SmallSize, InputKeyContextT>::Reset() -> void {
   this->ResetImpl();
 }
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_SET_H_
+#endif  // MYLANG_COMMON_SET_H_

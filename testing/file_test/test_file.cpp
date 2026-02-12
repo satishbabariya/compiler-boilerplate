@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -19,7 +19,7 @@
 #include "testing/base/file_helpers.h"
 #include "testing/file_test/line.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 using ::testing::Matcher;
 using ::testing::MatchesRegex;
@@ -193,7 +193,7 @@ static auto AutoFillDidOpenParams(llvm::json::Object& params,
     return Error("missing uri in params.textDocument");
   }
 
-  CARBON_ASSIGN_OR_RETURN(auto file_path, ExtractFilePathFromUri(*uri));
+  MYLANG_ASSIGN_OR_RETURN(auto file_path, ExtractFilePathFromUri(*uri));
   const auto* split = FindIfOrNull(splits, [&](const TestFile::Split& split) {
     return split.filename == file_path;
   });
@@ -255,10 +255,10 @@ static auto ReplaceLspKeywordAt(std::string& content, size_t keyword_pos,
       return ErrorBuilder() << "Error parsing extra content: " << err;
     }
     parsed_extra_content = std::move(*parse_result);
-    CARBON_CHECK(parsed_extra_content.kind() == llvm::json::Value::Object);
+    MYLANG_CHECK(parsed_extra_content.kind() == llvm::json::Value::Object);
     if (extra_content_label == "params" &&
         method_or_id == "textDocument/didOpen") {
-      CARBON_RETURN_IF_ERROR(
+      MYLANG_RETURN_IF_ERROR(
           AutoFillDidOpenParams(*parsed_extra_content.getAsObject(), splits));
     }
   }
@@ -385,7 +385,7 @@ static auto ReplaceContentKeywords(llvm::StringRef filename,
   // A counter for LSP calls.
   int lsp_call_id = 0;
   while (keyword_pos != std::string::npos) {
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         auto keyword_end,
         ReplaceContentKeywordAt(content, keyword_pos, test_name, lsp_call_id,
                                 splits));
@@ -398,7 +398,7 @@ static auto ReplaceContentKeywords(llvm::StringRef filename,
 static auto AddSplit(llvm::StringRef filename, std::string& content,
                      llvm::SmallVector<TestFile::Split>& file_splits)
     -> ErrorOr<Success> {
-  CARBON_RETURN_IF_ERROR(
+  MYLANG_RETURN_IF_ERROR(
       ReplaceContentKeywords(filename, content, file_splits));
   file_splits.push_back(
       {.filename = filename.str(), .content = std::move(content)});
@@ -438,7 +438,7 @@ static auto TryConsumeSplit(llvm::StringRef line, llvm::StringRef line_trimmed,
 
   // On a file split, add the previous file, then start a new one.
   if (split.has_splits()) {
-    CARBON_RETURN_IF_ERROR(
+    MYLANG_RETURN_IF_ERROR(
         AddSplit(split.filename, split.content, file_splits));
   } else {
     split.content.clear();
@@ -546,7 +546,7 @@ static auto TransformExpectation(int line_index, llvm::StringRef in)
   while (keyword_pos != std::string::npos) {
     llvm::StringRef line_keyword_cursor =
         llvm::StringRef(str).substr(keyword_pos);
-    CARBON_CHECK(line_keyword_cursor.consume_front("[["));
+    MYLANG_CHECK(line_keyword_cursor.consume_front("[["));
 
     static constexpr llvm::StringLiteral LineKeyword = "@LINE";
     if (!line_keyword_cursor.consume_front(LineKeyword)) {
@@ -632,7 +632,7 @@ static auto TryConsumeCheck(
     } else {
       return ErrorBuilder() << "Unexpected CHECK in input: " << line.str();
     }
-    CARBON_ASSIGN_OR_RETURN(Matcher<std::string> check_matcher,
+    MYLANG_ASSIGN_OR_RETURN(Matcher<std::string> check_matcher,
                             TransformExpectation(line_index, line_trimmed));
     expected->push_back(check_matcher);
   }
@@ -770,7 +770,7 @@ static auto ProcessFileContent(llvm::StringRef filename,
 
     bool is_consumed = false;
 
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         is_consumed,
         TryConsumeConflictMarker(running_autoupdate, line, line_trimmed,
                                  previous_conflict_marker));
@@ -787,7 +787,7 @@ static auto ProcessFileContent(llvm::StringRef filename,
       missing_autoupdate = !*found_autoupdate;
       non_check_lines = &test_file->non_check_lines;
     }
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         is_consumed,
         TryConsumeSplit(line, line_trimmed, missing_autoupdate, line_index,
                         split_state, splits, non_check_lines));
@@ -802,7 +802,7 @@ static auto ProcessFileContent(llvm::StringRef filename,
       continue;
     }
 
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         is_consumed,
         TryConsumeCheck(running_autoupdate, line_index, line, line_trimmed,
                         test_file ? &test_file->expected_stdout : nullptr,
@@ -817,23 +817,23 @@ static auto ProcessFileContent(llvm::StringRef filename,
           FileTestLine(split_state.file_index, line_index, line));
     }
 
-    CARBON_ASSIGN_OR_RETURN(is_consumed,
+    MYLANG_ASSIGN_OR_RETURN(is_consumed,
                             TryConsumeArgs(line, line_trimmed, args));
     if (is_consumed) {
       continue;
     }
-    CARBON_ASSIGN_OR_RETURN(is_consumed,
+    MYLANG_ASSIGN_OR_RETURN(is_consumed,
                             TryConsumeExtraArgs(line_trimmed, extra_args));
     if (is_consumed) {
       continue;
     }
-    CARBON_ASSIGN_OR_RETURN(is_consumed,
+    MYLANG_ASSIGN_OR_RETURN(is_consumed,
                             TryConsumeIncludeFile(line_trimmed, include_files));
     if (is_consumed) {
       continue;
     }
 
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         is_consumed,
         TryConsumeAutoupdate(
             line_index, line_trimmed, found_autoupdate,
@@ -841,7 +841,7 @@ static auto ProcessFileContent(llvm::StringRef filename,
     if (is_consumed) {
       continue;
     }
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         is_consumed,
         TryConsumeSetFlag(
             line_trimmed, "SET-CAPTURE-CONSOLE-OUTPUT",
@@ -849,7 +849,7 @@ static auto ProcessFileContent(llvm::StringRef filename,
     if (is_consumed) {
       continue;
     }
-    CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(
         is_consumed,
         TryConsumeSetFlag(line_trimmed, "SET-CHECK-SUBSET",
                           test_file ? &test_file->check_subset : nullptr));
@@ -858,7 +858,7 @@ static auto ProcessFileContent(llvm::StringRef filename,
     }
   }
 
-  CARBON_RETURN_IF_ERROR(FinishSplit(filename, /*is_include_file=*/!test_file,
+  MYLANG_RETURN_IF_ERROR(FinishSplit(filename, /*is_include_file=*/!test_file,
                                      split_state, splits));
 
   if (test_file) {
@@ -872,7 +872,7 @@ auto ProcessTestFile(llvm::StringRef test_name, bool running_autoupdate)
   TestFile test_file;
 
   // Store the original content, to avoid a read when autoupdating.
-  CARBON_ASSIGN_OR_RETURN(test_file.input_content, ReadFile(test_name.str()));
+  MYLANG_ASSIGN_OR_RETURN(test_file.input_content, ReadFile(test_name.str()));
 
   // Whether either AUTOUDPATE or NOAUTOUPDATE was found.
   bool found_autoupdate = false;
@@ -886,7 +886,7 @@ auto ProcessTestFile(llvm::StringRef test_name, bool running_autoupdate)
   llvm::SmallVector<std::string> main_extra_args;
 
   // Process the main file.
-  CARBON_RETURN_IF_ERROR(ProcessFileContent(
+  MYLANG_RETURN_IF_ERROR(ProcessFileContent(
       test_name, test_file.input_content, running_autoupdate, &test_file,
       &found_autoupdate, test_file.test_args, main_extra_args,
       test_file.file_splits, include_files));
@@ -931,9 +931,9 @@ auto ProcessTestFile(llvm::StringRef test_name, bool running_autoupdate)
       // same file (i.e., repeated indirectly).
       continue;
     }
-    CARBON_ASSIGN_OR_RETURN(std::string content, ReadFile(filename));
+    MYLANG_ASSIGN_OR_RETURN(std::string content, ReadFile(filename));
     // Note autoupdate never touches included files.
-    CARBON_RETURN_IF_ERROR(ProcessFileContent(
+    MYLANG_RETURN_IF_ERROR(ProcessFileContent(
         filename, content, /*running_autoupdate=*/false,
         /*test_file=*/nullptr,
         /*found_autoupdate=*/nullptr, test_file.test_args, test_file.extra_args,
@@ -952,4 +952,4 @@ auto ProcessTestFile(llvm::StringRef test_name, bool running_autoupdate)
   return std::move(test_file);
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

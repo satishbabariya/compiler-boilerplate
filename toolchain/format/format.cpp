@@ -1,18 +1,18 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #include "toolchain/format/format.h"
 
 // TODO: Implement your language's source code formatter here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 //
 // A typical formatter implementation:
 // 1. Walks the token stream
 // 2. Applies formatting rules (indentation, spacing, line breaks)
 // 3. Writes the formatted output to the stream
 
-namespace Carbon::Format {
+namespace MyLang::Format {
 
 auto Format(const Lex::TokenizedBuffer& /*tokens*/, llvm::raw_ostream& /*out*/)
     -> bool {
@@ -21,4 +21,4 @@ auto Format(const Lex::TokenizedBuffer& /*tokens*/, llvm::raw_ostream& /*out*/)
   return false;
 }
 
-}  // namespace Carbon::Format
+}  // namespace MyLang::Format

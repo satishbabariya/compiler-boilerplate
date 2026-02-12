@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_INST_CATEGORIES_H_
-#define CARBON_TOOLCHAIN_SEM_IR_INST_CATEGORIES_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_INST_CATEGORIES_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_INST_CATEGORIES_H_
 
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/inst_kind.h"
@@ -14,9 +14,9 @@
 // which can losslessly represent any inst in the category.
 //
 // TODO: Add your language's instruction categories here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 // Declares a category consisting of `TypedInsts...`.
 template <typename... TypedInsts>
@@ -33,6 +33,6 @@ struct AnyBranch {
   AnyRawId arg1;
 };
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_INST_CATEGORIES_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_INST_CATEGORIES_H_

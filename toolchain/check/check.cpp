@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -8,7 +8,7 @@
 #include "toolchain/sem_ir/file.h"
 
 // TODO: Implement your language's semantic checking here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 //
 // The checker walks the parse tree and builds the SemIR representation.
 // Key responsibilities include:
@@ -17,7 +17,7 @@
 // - Building SemIR instructions from parse nodes
 // - Constant evaluation
 
-namespace Carbon::Check {
+namespace MyLang::Check {
 
 auto CheckParseTrees(
     llvm::MutableArrayRef<Unit> units,
@@ -26,7 +26,7 @@ auto CheckParseTrees(
     const CheckParseTreesOptions& options,
     std::shared_ptr<clang::CompilerInvocation> /*clang_invocation*/) -> void {
   for (auto& unit : units) {
-    CARBON_VLOG_TO(options.vlog_stream, "*** Checking: {0} ***\n",
+    MYLANG_VLOG_TO(options.vlog_stream, "*** Checking: {0} ***\n",
                    unit.sem_ir->filename());
 
     // TODO: Walk the parse tree and build the SemIR.
@@ -54,4 +54,4 @@ auto CheckParseTrees(
   }
 }
 
-}  // namespace Carbon::Check
+}  // namespace MyLang::Check

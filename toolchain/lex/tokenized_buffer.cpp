@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -21,7 +21,7 @@
 #include "toolchain/lex/numeric_literal.h"
 #include "toolchain/lex/string_literal.h"
 
-namespace Carbon::Lex {
+namespace MyLang::Lex {
 
 auto TokenizedBuffer::GetLine(TokenIndex token) const -> LineIndex {
   return FindLineIndex(token_infos_.Get(token).byte_offset());
@@ -76,7 +76,7 @@ auto TokenizedBuffer::GetTokenText(TokenIndex token) const -> llvm::StringRef {
     std::optional<NumericLiteral> relexed_token =
         NumericLiteral::Lex(source_->text().substr(token_info.byte_offset()),
                             token_info.kind() == TokenKind::RealLiteral);
-    CARBON_CHECK(relexed_token, "Could not reform numeric literal token.");
+    MYLANG_CHECK(relexed_token, "Could not reform numeric literal token.");
     return relexed_token->text();
   }
 
@@ -86,7 +86,7 @@ auto TokenizedBuffer::GetTokenText(TokenIndex token) const -> llvm::StringRef {
       token_info.kind() == TokenKind::CharLiteral) {
     std::optional<StringLiteral> relexed_token =
         StringLiteral::Lex(source_->text().substr(token_info.byte_offset()));
-    CARBON_CHECK(relexed_token, "Could not reform string literal token.");
+    MYLANG_CHECK(relexed_token, "Could not reform string literal token.");
     return relexed_token->text();
   }
 
@@ -104,28 +104,28 @@ auto TokenizedBuffer::GetTokenText(TokenIndex token) const -> llvm::StringRef {
     return llvm::StringRef();
   }
 
-  CARBON_CHECK(token_info.kind() == TokenKind::Identifier, "{0}",
+  MYLANG_CHECK(token_info.kind() == TokenKind::Identifier, "{0}",
                token_info.kind());
   return value_stores_->identifiers().Get(token_info.ident_id());
 }
 
 auto TokenizedBuffer::GetIdentifier(TokenIndex token) const -> IdentifierId {
   const auto& token_info = token_infos_.Get(token);
-  CARBON_CHECK(token_info.kind() == TokenKind::Identifier, "{0}",
+  MYLANG_CHECK(token_info.kind() == TokenKind::Identifier, "{0}",
                token_info.kind());
   return token_info.ident_id();
 }
 
 auto TokenizedBuffer::GetIntLiteral(TokenIndex token) const -> IntId {
   const auto& token_info = token_infos_.Get(token);
-  CARBON_CHECK(token_info.kind() == TokenKind::IntLiteral, "{0}",
+  MYLANG_CHECK(token_info.kind() == TokenKind::IntLiteral, "{0}",
                token_info.kind());
   return token_info.int_id();
 }
 
 auto TokenizedBuffer::GetRealLiteral(TokenIndex token) const -> RealId {
   const auto& token_info = token_infos_.Get(token);
-  CARBON_CHECK(token_info.kind() == TokenKind::RealLiteral, "{0}",
+  MYLANG_CHECK(token_info.kind() == TokenKind::RealLiteral, "{0}",
                token_info.kind());
   return token_info.real_id();
 }
@@ -133,7 +133,7 @@ auto TokenizedBuffer::GetRealLiteral(TokenIndex token) const -> RealId {
 auto TokenizedBuffer::GetStringLiteralValue(TokenIndex token) const
     -> StringLiteralValueId {
   const auto& token_info = token_infos_.Get(token);
-  CARBON_CHECK(token_info.kind() == TokenKind::StringLiteral, "{0}",
+  MYLANG_CHECK(token_info.kind() == TokenKind::StringLiteral, "{0}",
                token_info.kind());
   return token_info.string_literal_id();
 }
@@ -141,14 +141,14 @@ auto TokenizedBuffer::GetStringLiteralValue(TokenIndex token) const
 auto TokenizedBuffer::GetCharLiteralValue(TokenIndex token) const
     -> CharLiteralValue {
   const auto& token_info = token_infos_.Get(token);
-  CARBON_CHECK(token_info.kind() == TokenKind::CharLiteral, "{0}",
+  MYLANG_CHECK(token_info.kind() == TokenKind::CharLiteral, "{0}",
                token_info.kind());
   return token_info.char_literal();
 }
 
 auto TokenizedBuffer::GetTypeLiteralSize(TokenIndex token) const -> IntId {
   const auto& token_info = token_infos_.Get(token);
-  CARBON_CHECK(token_info.kind().is_sized_type_literal(), "{0}",
+  MYLANG_CHECK(token_info.kind().is_sized_type_literal(), "{0}",
                token_info.kind());
   return token_info.int_id();
 }
@@ -156,7 +156,7 @@ auto TokenizedBuffer::GetTypeLiteralSize(TokenIndex token) const -> IntId {
 auto TokenizedBuffer::GetMatchedClosingToken(TokenIndex opening_token) const
     -> TokenIndex {
   const auto& opening_token_info = token_infos_.Get(opening_token);
-  CARBON_CHECK(opening_token_info.kind().is_opening_symbol(), "{0}",
+  MYLANG_CHECK(opening_token_info.kind().is_opening_symbol(), "{0}",
                opening_token_info.kind());
   return opening_token_info.closing_token_index();
 }
@@ -164,7 +164,7 @@ auto TokenizedBuffer::GetMatchedClosingToken(TokenIndex opening_token) const
 auto TokenizedBuffer::GetMatchedOpeningToken(TokenIndex closing_token) const
     -> TokenIndex {
   const auto& closing_token_info = token_infos_.Get(closing_token);
-  CARBON_CHECK(closing_token_info.kind().is_closing_symbol(), "{0}",
+  MYLANG_CHECK(closing_token_info.kind().is_closing_symbol(), "{0}",
                closing_token_info.kind());
   return closing_token_info.opening_token_index();
 }
@@ -194,7 +194,7 @@ auto TokenizedBuffer::PrintWidths::Widen(const PrintWidths& widths) -> void {
 //
 // This routine requires its argument to be *non-negative*.
 static auto ComputeDecimalPrintedWidth(int number) -> int {
-  CARBON_CHECK(number >= 0, "Negative numbers are not supported.");
+  MYLANG_CHECK(number >= 0, "Negative numbers are not supported.");
   if (number == 0) {
     return 1;
   }
@@ -328,7 +328,7 @@ auto TokenizedBuffer::PrintToken(llvm::raw_ostream& output_stream,
 // This takes advantage of the lines being sorted by their starting byte offsets
 // to do a binary search for the line that contains the provided offset.
 auto TokenizedBuffer::FindLineIndex(int32_t byte_offset) const -> LineIndex {
-  CARBON_DCHECK(line_infos_.size() > 0);
+  MYLANG_DCHECK(line_infos_.size() > 0);
 
   auto line_range = line_infos_.values();
   auto line_it =
@@ -344,7 +344,7 @@ auto TokenizedBuffer::FindLineIndex(int32_t byte_offset) const -> LineIndex {
       line_it->start == static_cast<int32_t>(source_->text().size())) {
     --line_it;
   }
-  CARBON_DCHECK(line_it->start <= byte_offset);
+  MYLANG_DCHECK(line_it->start <= byte_offset);
   return LineIndex(line_it - line_range.begin());
 }
 
@@ -382,7 +382,7 @@ auto TokenizedBuffer::CollectMemUsage(MemUsage& mem_usage,
 
 auto TokenizedBuffer::SourcePointerToDiagnosticLoc(const char* loc) const
     -> Diagnostics::ConvertedLoc {
-  CARBON_CHECK(StringRefContainsPointer(source_->text(), loc),
+  MYLANG_CHECK(StringRefContainsPointer(source_->text(), loc),
                "location not within buffer");
   int32_t offset = loc - source_->text().begin();
 
@@ -394,7 +394,7 @@ auto TokenizedBuffer::SourcePointerToDiagnosticLoc(const char* loc) const
       [offset](const LineInfo& line) { return line.start <= offset; });
 
   // Step back one line to find the line containing the given position.
-  CARBON_CHECK(next_line_it != line_range.begin(),
+  MYLANG_CHECK(next_line_it != line_range.begin(),
                "location precedes the start of the first line");
   const auto line_it = std::prev(next_line_it);
   int line_number = line_it - line_range.begin();
@@ -436,7 +436,7 @@ auto TokenizedBuffer::TokenToDiagnosticLoc(TokenIndex token) const
 
 auto TokenizedBuffer::OverlapsWithDumpSemIRRange(
     Lex::InclusiveTokenRange range) const -> bool {
-  CARBON_CHECK(!dump_sem_ir_ranges_.empty());
+  MYLANG_CHECK(!dump_sem_ir_ranges_.empty());
 
   // Ranges are ordered, so we can decide overlap as soon as we find a range
   // that ends after `begin`.
@@ -448,4 +448,4 @@ auto TokenizedBuffer::OverlapsWithDumpSemIRRange(
   return false;
 }
 
-}  // namespace Carbon::Lex
+}  // namespace MyLang::Lex

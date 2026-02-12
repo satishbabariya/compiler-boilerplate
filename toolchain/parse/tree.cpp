@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -13,7 +13,7 @@
 #include "toolchain/parse/tree_and_subtrees.h"
 #include "toolchain/parse/typed_nodes.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 auto Tree::postorder() const -> llvm::iterator_range<PostorderIterator> {
   return llvm::iterator_range<PostorderIterator>(
@@ -22,7 +22,7 @@ auto Tree::postorder() const -> llvm::iterator_range<PostorderIterator> {
 }
 
 auto Tree::node_token(NodeId n) const -> Lex::TokenIndex {
-  CARBON_CHECK(n.has_value());
+  MYLANG_CHECK(n.has_value());
   return node_impls_[n.index].token();
 }
 
@@ -63,7 +63,7 @@ auto Tree::Verify() const -> ErrorOr<Success> {
 
 #ifndef NDEBUG
   TreeAndSubtrees subtrees(*tokens_, *this);
-  CARBON_RETURN_IF_ERROR(subtrees.Verify());
+  MYLANG_RETURN_IF_ERROR(subtrees.Verify());
 #endif  // NDEBUG
 
   return Success();
@@ -77,7 +77,7 @@ auto Tree::CollectMemUsage(MemUsage& mem_usage, llvm::StringRef label) const
 
 auto Tree::PostorderIterator::MakeRange(NodeId begin, NodeId end)
     -> llvm::iterator_range<PostorderIterator> {
-  CARBON_CHECK(begin.has_value() && end.has_value());
+  MYLANG_CHECK(begin.has_value() && end.has_value());
   return llvm::iterator_range<PostorderIterator>(
       PostorderIterator(begin), PostorderIterator(NodeId(end.index + 1)));
 }
@@ -86,4 +86,4 @@ auto Tree::PostorderIterator::Print(llvm::raw_ostream& output) const -> void {
   output << node_;
 }
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse

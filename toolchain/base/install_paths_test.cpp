@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -19,7 +19,7 @@
 #include "testing/base/global_exe_path.h"
 #include "tools/cpp/runfiles/runfiles.h"
 
-namespace Carbon {
+namespace MyLang {
 
 class InstallPathsTestPeer {
  public:
@@ -44,7 +44,7 @@ class InstallPathsTest : public ::testing::Test {
   InstallPathsTest() {
     std::string error;
     test_runfiles_.reset(Runfiles::Create(Testing::GetExePath().str(), &error));
-    CARBON_CHECK(test_runfiles_ != nullptr, "{0}", error);
+    MYLANG_CHECK(test_runfiles_ != nullptr, "{0}", error);
   }
 
   // Test the install paths found with the given `exe_path`. Will check that
@@ -63,11 +63,11 @@ class InstallPathsTest : public ::testing::Test {
 
     // Check that the root is located in the expected part of the FHS layout.
     // TODO: Adjust this to work equally well on Windows.
-    EXPECT_THAT(root_path.native(), EndsWith("lib/carbon/"));
+    EXPECT_THAT(root_path.native(), EndsWith("lib/mylang/"));
     EXPECT_THAT(
-        root.Access("../../bin/carbon", Filesystem::AccessCheckFlags::Execute),
+        root.Access("../../bin/mylang", Filesystem::AccessCheckFlags::Execute),
         IsSuccess(Eq(true)))
-        << "path: " << (root_path / "../../bin/carbon");
+        << "path: " << (root_path / "../../bin/mylang");
 
     std::filesystem::path core_package_path = paths.core_package();
     ASSERT_THAT(core_package_path, StartsWith(root_path));
@@ -94,7 +94,7 @@ class InstallPathsTest : public ::testing::Test {
 
 TEST_F(InstallPathsTest, RootBusybox) {
   std::string installed_busybox_path = test_runfiles_->Rlocation(
-      "carbon/toolchain/install/prefix/lib/carbon/carbon-busybox");
+      "mylang/toolchain/install/prefix/lib/mylang/mylang-busybox");
 
   auto paths = InstallPaths::MakeExeRelative(installed_busybox_path);
   ASSERT_THAT(paths.error(), Eq(std::nullopt)) << *paths.error();
@@ -103,10 +103,10 @@ TEST_F(InstallPathsTest, RootBusybox) {
 
 TEST_F(InstallPathsTest, RootExplicit) {
   std::string marker_path = test_runfiles_->Rlocation(
-      "carbon/toolchain/install/prefix/lib/carbon/carbon_install.txt");
+      "mylang/toolchain/install/prefix/lib/mylang/mylang_install.txt");
 
   llvm::StringRef root_path = marker_path;
-  CARBON_CHECK(root_path.consume_back("carbon_install.txt"),
+  MYLANG_CHECK(root_path.consume_back("mylang_install.txt"),
                "Unexpected suffix of the marker path: {0}", marker_path);
 
   auto paths = InstallPaths::Make(root_path);
@@ -122,7 +122,7 @@ TEST_F(InstallPathsTest, TestRunfiles) {
 
 TEST_F(InstallPathsTest, BinaryRunfiles) {
   std::filesystem::path test_binary_path =
-      test_runfiles_->Rlocation("carbon/toolchain/base/test_binary");
+      test_runfiles_->Rlocation("mylang/toolchain/base/test_binary");
   ASSERT_THAT(Filesystem::Cwd().Access(test_binary_path,
                                        Filesystem::AccessCheckFlags::Execute),
               IsSuccess(Eq(true)))
@@ -147,4 +147,4 @@ TEST_F(InstallPathsTest, Errors) {
 }
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

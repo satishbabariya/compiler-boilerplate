@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -19,7 +19,7 @@
 // limited by command line architecture.
 // NOLINTBEGIN(misc-no-recursion)
 
-namespace Carbon::CommandLine {
+namespace MyLang::CommandLine {
 
 auto operator<<(llvm::raw_ostream& output, ParseResult result)
     -> llvm::raw_ostream& {
@@ -29,7 +29,7 @@ auto operator<<(llvm::raw_ostream& output, ParseResult result)
     case ParseResult::Success:
       return output << "Success";
   }
-  CARBON_FATAL("Corrupt parse result!");
+  MYLANG_FATAL("Corrupt parse result!");
 }
 
 auto operator<<(llvm::raw_ostream& output, ArgKind kind) -> llvm::raw_ostream& {
@@ -47,7 +47,7 @@ auto operator<<(llvm::raw_ostream& output, ArgKind kind) -> llvm::raw_ostream& {
     case ArgKind::Invalid:
       return output << "Invalid";
   }
-  CARBON_FATAL("Corrupt argument kind!");
+  MYLANG_FATAL("Corrupt argument kind!");
 }
 
 auto operator<<(llvm::raw_ostream& output, CommandKind kind)
@@ -62,7 +62,7 @@ auto operator<<(llvm::raw_ostream& output, CommandKind kind)
     case CommandKind::MetaAction:
       return output << "MetaAction";
   }
-  CARBON_FATAL("Corrupt command kind!");
+  MYLANG_FATAL("Corrupt command kind!");
 }
 
 template <typename T, typename ToPrintable>
@@ -346,7 +346,7 @@ auto MetaPrinter::PrintHelpForSubcommandName(
 }
 
 auto MetaPrinter::PrintVersion(const Command& command) const -> void {
-  CARBON_CHECK(
+  MYLANG_CHECK(
       !command.info.version.empty(),
       "Printing should not be enabled without a version string configured.");
   PrintRawVersion(command, /*indent=*/"");
@@ -492,12 +492,12 @@ auto MetaPrinter::PrintOptionUsage(const Arg& option) const -> void {
 }
 
 auto MetaPrinter::PrintOptionShortName(const Arg& arg) const -> void {
-  CARBON_CHECK(!arg.info.short_name.empty(), "No short name to use.");
+  MYLANG_CHECK(!arg.info.short_name.empty(), "No short name to use.");
   *out_ << "-" << arg.info.short_name;
 }
 
 auto MetaPrinter::PrintArgShortValues(const Arg& arg) const -> void {
-  CARBON_CHECK(
+  MYLANG_CHECK(
       arg.kind == Arg::Kind::OneOf,
       "Only one-of arguments have interesting value snippets to print.");
   llvm::ListSeparator sep;
@@ -547,7 +547,7 @@ auto MetaPrinter::PrintArgHelp(const Arg& arg, llvm::StringRef indent) const
       // No value help.
       break;
     case Arg::Kind::Invalid:
-      CARBON_FATAL("Argument configured without any action or kind!");
+      MYLANG_FATAL("Argument configured without any action or kind!");
   }
 }
 
@@ -824,10 +824,10 @@ auto Parser::PopulateMaps(const Command& command) -> void {
     if (option->info.short_name.empty()) {
       continue;
     }
-    CARBON_CHECK(option->info.short_name.size() == 1,
+    MYLANG_CHECK(option->info.short_name.size() == 1,
                  "Short option names must have exactly one character.");
     unsigned char short_char = option->info.short_name[0];
-    CARBON_CHECK(short_char < short_option_table_.size(),
+    MYLANG_CHECK(short_char < short_option_table_.size(),
                  "Short option name outside of the expected range.");
     short_option_table_[short_char] = &map_entry.second;
   }
@@ -838,7 +838,7 @@ auto Parser::PopulateMaps(const Command& command) -> void {
 }
 
 auto Parser::SetOptionDefault(const Arg& option) -> void {
-  CARBON_CHECK(option.has_default, "No default value available!");
+  MYLANG_CHECK(option.has_default, "No default value available!");
   switch (option.kind) {
     case Arg::Kind::Flag:
       *option.flag_storage = option.default_flag;
@@ -853,9 +853,9 @@ auto Parser::SetOptionDefault(const Arg& option) -> void {
       option.default_action(option);
       break;
     case Arg::Kind::MetaActionOnly:
-      CARBON_FATAL("Can't set a default value for a meta action!");
+      MYLANG_FATAL("Can't set a default value for a meta action!");
     case Arg::Kind::Invalid:
-      CARBON_FATAL("Option configured without any action or kind!");
+      MYLANG_FATAL("Option configured without any action or kind!");
   }
 }
 
@@ -878,7 +878,7 @@ auto Parser::ParseNegatedFlag(const Arg& flag,
 
 auto Parser::ParseFlag(const Arg& flag, std::optional<llvm::StringRef> value)
     -> ErrorOr<Success> {
-  CARBON_CHECK(flag.kind == Arg::Kind::Flag, "Incorrect kind: {0}", flag.kind);
+  MYLANG_CHECK(flag.kind == Arg::Kind::Flag, "Incorrect kind: {0}", flag.kind);
   if (!value || *value == "true") {
     *flag.flag_storage = true;
   } else if (*value == "false") {
@@ -893,7 +893,7 @@ auto Parser::ParseFlag(const Arg& flag, std::optional<llvm::StringRef> value)
 
 auto Parser::ParseIntegerArgValue(const Arg& arg, llvm::StringRef value)
     -> ErrorOr<Success> {
-  CARBON_CHECK(arg.kind == Arg::Kind::Integer, "Incorrect kind: {0}", arg.kind);
+  MYLANG_CHECK(arg.kind == Arg::Kind::Integer, "Incorrect kind: {0}", arg.kind);
   int integer_value;
   // Note that this method returns *true* on error!
   if (value.getAsInteger(/*Radix=*/0, integer_value)) {
@@ -911,7 +911,7 @@ auto Parser::ParseIntegerArgValue(const Arg& arg, llvm::StringRef value)
 
 auto Parser::ParseStringArgValue(const Arg& arg, llvm::StringRef value)
     -> ErrorOr<Success> {
-  CARBON_CHECK(arg.kind == Arg::Kind::String, "Incorrect kind: {0}", arg.kind);
+  MYLANG_CHECK(arg.kind == Arg::Kind::String, "Incorrect kind: {0}", arg.kind);
   if (!arg.is_append) {
     *arg.string_storage = value;
   } else {
@@ -922,7 +922,7 @@ auto Parser::ParseStringArgValue(const Arg& arg, llvm::StringRef value)
 
 auto Parser::ParseOneOfArgValue(const Arg& arg, llvm::StringRef value)
     -> ErrorOr<Success> {
-  CARBON_CHECK(arg.kind == Arg::Kind::OneOf, "Incorrect kind: {0}", arg.kind);
+  MYLANG_CHECK(arg.kind == Arg::Kind::OneOf, "Incorrect kind: {0}", arg.kind);
   if (!arg.value_action(arg, value)) {
     RawStringOstream error;
     error << "option `--" << arg.info.name << "=";
@@ -992,7 +992,7 @@ auto Parser::ParseArg(const Arg& arg, bool short_spelling,
           name, value));
     case Arg::Kind::Flag:
     case Arg::Kind::Invalid:
-      CARBON_FATAL("Invalid kind!");
+      MYLANG_FATAL("Invalid kind!");
   }
 }
 
@@ -1009,7 +1009,7 @@ auto Parser::SplitValue(llvm::StringRef& unparsed_arg)
 }
 
 auto Parser::ParseLongOption(llvm::StringRef unparsed_arg) -> ErrorOr<Success> {
-  CARBON_CHECK(unparsed_arg.starts_with("--") && unparsed_arg.size() > 2,
+  MYLANG_CHECK(unparsed_arg.starts_with("--") && unparsed_arg.size() > 2,
                "Must only be called on a potential long option.");
 
   // Walk past the double dash.
@@ -1034,7 +1034,7 @@ auto Parser::ParseLongOption(llvm::StringRef unparsed_arg) -> ErrorOr<Success> {
 
 auto Parser::ParseShortOptionSeq(llvm::StringRef unparsed_arg)
     -> ErrorOr<Success> {
-  CARBON_CHECK(unparsed_arg.starts_with("-") && unparsed_arg.size() > 1,
+  MYLANG_CHECK(unparsed_arg.starts_with("-") && unparsed_arg.size() > 1,
                "Must only be called on a potential short option sequence.");
 
   unparsed_arg = unparsed_arg.drop_front();
@@ -1059,7 +1059,7 @@ auto Parser::ParseShortOptionSeq(llvm::StringRef unparsed_arg)
 
     // Parse the argument, including the value if this is the last.
     const Arg& arg = *arg_entry->getPointer();
-    CARBON_RETURN_IF_ERROR(ParseArg(arg, /*short_spelling=*/true, value));
+    MYLANG_RETURN_IF_ERROR(ParseArg(arg, /*short_spelling=*/true, value));
   }
   return Success();
 }
@@ -1138,7 +1138,7 @@ auto Parser::ParseSubcommand(llvm::StringRef unparsed_arg) -> ErrorOr<Success> {
 
   // Before we recurse into the subcommand, verify that all the required
   // arguments for this command were in fact parsed.
-  CARBON_RETURN_IF_ERROR(FinalizeParsedOptions());
+  MYLANG_RETURN_IF_ERROR(FinalizeParsedOptions());
 
   // Recurse into the subcommand, tracking the active command.
   command_ = subcommand_it->second;
@@ -1156,12 +1156,12 @@ auto Parser::FinalizeParse() -> ErrorOr<ParseResult> {
   }
 
   // Verify we're not missing any arguments.
-  CARBON_RETURN_IF_ERROR(FinalizeParsedOptions());
+  MYLANG_RETURN_IF_ERROR(FinalizeParsedOptions());
 
   // If we were appending to a positional argument, mark that as complete.
   llvm::ArrayRef positional_args = command_->positional_args;
   if (appending_to_positional_arg_) {
-    CARBON_CHECK(
+    MYLANG_CHECK(
         static_cast<size_t>(positional_arg_index_) < positional_args.size(),
         "Appending to a positional argument with an invalid index: {0}",
         positional_arg_index_);
@@ -1180,7 +1180,7 @@ auto Parser::FinalizeParse() -> ErrorOr<ParseResult> {
                         missing_arg.info.name));
     }
     for (const auto& arg_ptr : unparsed_positional_args) {
-      CARBON_CHECK(
+      MYLANG_CHECK(
           !arg_ptr->is_required,
           "Cannot have required positional parameters after an optional one.");
     }
@@ -1188,7 +1188,7 @@ auto Parser::FinalizeParse() -> ErrorOr<ParseResult> {
 
   switch (command_->kind) {
     case Command::Kind::Invalid:
-      CARBON_FATAL("Should never have a parser with an invalid command!");
+      MYLANG_FATAL("Should never have a parser with an invalid command!");
     case Command::Kind::RequiresSubcommand: {
       RawStringOstream error;
       error << "no subcommand specified; available subcommands: ";
@@ -1208,10 +1208,10 @@ auto Parser::FinalizeParse() -> ErrorOr<ParseResult> {
 
 auto Parser::ParsePositionalSuffix(
     llvm::ArrayRef<llvm::StringRef> unparsed_args) -> ErrorOr<Success> {
-  CARBON_CHECK(
+  MYLANG_CHECK(
       !command_->positional_args.empty(),
       "Cannot do positional suffix parsing without positional arguments!");
-  CARBON_CHECK(
+  MYLANG_CHECK(
       !unparsed_args.empty() && unparsed_args.front() == "--",
       "Must be called with a suffix of arguments starting with a `--` that "
       "switches to positional suffix parsing.");
@@ -1222,7 +1222,7 @@ auto Parser::ParsePositionalSuffix(
     llvm::StringRef unparsed_arg = unparsed_args.consume_front();
 
     if (unparsed_arg != "--") {
-      CARBON_RETURN_IF_ERROR(ParsePositionalArg(unparsed_arg));
+      MYLANG_RETURN_IF_ERROR(ParsePositionalArg(unparsed_arg));
       empty_positional = false;
       continue;
     }
@@ -1275,7 +1275,7 @@ auto Parser::Parse(llvm::ArrayRef<llvm::StringRef> unparsed_args)
             "despite already having parsed all positional arguments for this "
             "command");
       }
-      CARBON_RETURN_IF_ERROR(ParsePositionalSuffix(unparsed_args));
+      MYLANG_RETURN_IF_ERROR(ParsePositionalSuffix(unparsed_args));
       // No more unparsed arguments to handle.
       break;
     }
@@ -1286,16 +1286,16 @@ auto Parser::Parse(llvm::ArrayRef<llvm::StringRef> unparsed_args)
 
     if (unparsed_arg.starts_with("--")) {
       // Note that the exact argument "--" has been handled above already.
-      CARBON_RETURN_IF_ERROR(ParseLongOption(unparsed_arg));
+      MYLANG_RETURN_IF_ERROR(ParseLongOption(unparsed_arg));
       continue;
     }
 
     if (unparsed_arg.starts_with("-") && unparsed_arg.size() > 1) {
-      CARBON_RETURN_IF_ERROR(ParseShortOptionSeq(unparsed_arg));
+      MYLANG_RETURN_IF_ERROR(ParseShortOptionSeq(unparsed_arg));
       continue;
     }
 
-    CARBON_CHECK(
+    MYLANG_CHECK(
         command_->positional_args.empty() || command_->subcommands.empty(),
         "Cannot have both positional arguments and subcommands!");
     if (command_->positional_args.empty() && command_->subcommands.empty()) {
@@ -1305,10 +1305,10 @@ auto Parser::Parse(llvm::ArrayRef<llvm::StringRef> unparsed_args)
     }
 
     if (!command_->positional_args.empty()) {
-      CARBON_RETURN_IF_ERROR(ParsePositionalArg(unparsed_arg));
+      MYLANG_RETURN_IF_ERROR(ParsePositionalArg(unparsed_arg));
       continue;
     }
-    CARBON_RETURN_IF_ERROR(ParseSubcommand(unparsed_arg));
+    MYLANG_RETURN_IF_ERROR(ParseSubcommand(unparsed_arg));
   }
 
   return FinalizeParse();
@@ -1450,11 +1450,11 @@ auto CommandBuilder::AddOneOfPositionalArg(
 auto CommandBuilder::AddSubcommand(
     const CommandInfo& info,
     llvm::function_ref<auto(CommandBuilder&)->void> build) -> void {
-  CARBON_CHECK(IsValidName(info.name), "Invalid subcommand name: {0}",
+  MYLANG_CHECK(IsValidName(info.name), "Invalid subcommand name: {0}",
                info.name);
-  CARBON_CHECK(subcommand_names_.insert(info.name).second,
+  MYLANG_CHECK(subcommand_names_.insert(info.name).second,
                "Added a duplicate subcommand: {0}", info.name);
-  CARBON_CHECK(
+  MYLANG_CHECK(
       command_->positional_args.empty(),
       "Cannot add subcommands to a command with a positional argument.");
 
@@ -1469,18 +1469,18 @@ auto CommandBuilder::HelpHidden(bool is_help_hidden) -> void {
 }
 
 auto CommandBuilder::RequiresSubcommand() -> void {
-  CARBON_CHECK(!command_->subcommands.empty(),
+  MYLANG_CHECK(!command_->subcommands.empty(),
                "Cannot require subcommands unless there are subcommands.");
-  CARBON_CHECK(command_->positional_args.empty(),
+  MYLANG_CHECK(command_->positional_args.empty(),
                "Cannot require subcommands and have a positional argument.");
-  CARBON_CHECK(command_->kind == Kind::Invalid,
+  MYLANG_CHECK(command_->kind == Kind::Invalid,
                "Already established the kind of this command as: {0}",
                command_->kind);
   command_->kind = Kind::RequiresSubcommand;
 }
 
 auto CommandBuilder::Do(ActionT action) -> void {
-  CARBON_CHECK(command_->kind == Kind::Invalid,
+  MYLANG_CHECK(command_->kind == Kind::Invalid,
                "Already established the kind of this command as: {0}",
                command_->kind);
   command_->kind = Kind::Action;
@@ -1488,7 +1488,7 @@ auto CommandBuilder::Do(ActionT action) -> void {
 }
 
 auto CommandBuilder::Meta(ActionT action) -> void {
-  CARBON_CHECK(command_->kind == Kind::Invalid,
+  MYLANG_CHECK(command_->kind == Kind::Invalid,
                "Already established the kind of this command as: {0}",
                command_->kind);
   command_->kind = Kind::MetaAction;
@@ -1499,8 +1499,8 @@ CommandBuilder::CommandBuilder(Command* command, MetaPrinter* meta_printer)
     : command_(command), meta_printer_(meta_printer) {}
 
 auto CommandBuilder::AddArgImpl(const ArgInfo& info, Arg::Kind kind) -> Arg* {
-  CARBON_CHECK(IsValidName(info.name), "Invalid argument name: {0}", info.name);
-  CARBON_CHECK(arg_names_.insert(info.name).second,
+  MYLANG_CHECK(IsValidName(info.name), "Invalid argument name: {0}", info.name);
+  MYLANG_CHECK(arg_names_.insert(info.name).second,
                "Added a duplicate argument name: {0}", info.name);
 
   command_->options.emplace_back(new Arg(info));
@@ -1512,8 +1512,8 @@ auto CommandBuilder::AddArgImpl(const ArgInfo& info, Arg::Kind kind) -> Arg* {
 auto CommandBuilder::AddPositionalArgImpl(
     const ArgInfo& info, Arg::Kind kind,
     llvm::function_ref<auto(Arg&)->void> build) -> void {
-  CARBON_CHECK(IsValidName(info.name), "Invalid argument name: {0}", info.name);
-  CARBON_CHECK(
+  MYLANG_CHECK(IsValidName(info.name), "Invalid argument name: {0}", info.name);
+  MYLANG_CHECK(
       command_->subcommands.empty(),
       "Cannot add a positional argument to a command with subcommands.");
 
@@ -1522,11 +1522,11 @@ auto CommandBuilder::AddPositionalArgImpl(
   arg.kind = kind;
   build(arg);
 
-  CARBON_CHECK(!arg.is_help_hidden,
+  MYLANG_CHECK(!arg.is_help_hidden,
                "Cannot have a help-hidden positional argument.");
 
   if (arg.is_required && command_->positional_args.size() > 1) {
-    CARBON_CHECK((*std::prev(command_->positional_args.end(), 2))->is_required,
+    MYLANG_CHECK((*std::prev(command_->positional_args.end(), 2))->is_required,
                  "A required positional argument cannot be added after an "
                  "optional one.");
   }
@@ -1548,6 +1548,6 @@ auto Parse(llvm::ArrayRef<llvm::StringRef> unparsed_args,
   return parser.Parse(unparsed_args);
 }
 
-}  // namespace Carbon::CommandLine
+}  // namespace MyLang::CommandLine
 
 // NOLINTEND(misc-no-recursion)

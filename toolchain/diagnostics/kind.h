@@ -1,20 +1,20 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DIAGNOSTICS_KIND_H_
-#define CARBON_TOOLCHAIN_DIAGNOSTICS_KIND_H_
+#ifndef MYLANG_TOOLCHAIN_DIAGNOSTICS_KIND_H_
+#define MYLANG_TOOLCHAIN_DIAGNOSTICS_KIND_H_
 
 #include <cstdint>
 
 #include "common/enum_base.h"
 
-namespace Carbon::Diagnostics {
+namespace MyLang::Diagnostics {
 
 // Although this currently fits into int8_t, it shouldn't be expected to
 // long-term.
-CARBON_DEFINE_RAW_ENUM_CLASS(Kind, uint16_t) {
-#define CARBON_DIAGNOSTIC_KIND(Name) CARBON_RAW_ENUM_ENUMERATOR(Name)
+MYLANG_DEFINE_RAW_ENUM_CLASS(Kind, uint16_t) {
+#define MYLANG_DIAGNOSTIC_KIND(Name) MYLANG_RAW_ENUM_ENUMERATOR(Name)
 #include "toolchain/diagnostics/kind.def"
 };
 
@@ -26,18 +26,18 @@ CARBON_DEFINE_RAW_ENUM_CLASS(Kind, uint16_t) {
 // definitions centrally is expected to create a compilation bottleneck
 // long-term, and we also see value to keeping diagnostic format strings close
 // to the consuming code.
-class Kind : public CARBON_ENUM_BASE(Kind) {
+class Kind : public MYLANG_ENUM_BASE(Kind) {
  public:
-#define CARBON_DIAGNOSTIC_KIND(Name) CARBON_ENUM_CONSTANT_DECL(Name)
+#define MYLANG_DIAGNOSTIC_KIND(Name) MYLANG_ENUM_CONSTANT_DECL(Name)
 #include "toolchain/diagnostics/kind.def"
 };
 
-#define CARBON_DIAGNOSTIC_KIND(Name) CARBON_ENUM_CONSTANT_DEFINITION(Kind, Name)
+#define MYLANG_DIAGNOSTIC_KIND(Name) MYLANG_ENUM_CONSTANT_DEFINITION(Kind, Name)
 #include "toolchain/diagnostics/kind.def"
 
 // We expect Kind to fit into 2 bits.
 static_assert(sizeof(Kind) == 2, "Kind includes padding!");
 
-}  // namespace Carbon::Diagnostics
+}  // namespace MyLang::Diagnostics
 
-#endif  // CARBON_TOOLCHAIN_DIAGNOSTICS_KIND_H_
+#endif  // MYLANG_TOOLCHAIN_DIAGNOSTICS_KIND_H_

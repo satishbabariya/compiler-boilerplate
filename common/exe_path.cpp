@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -12,7 +12,7 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Program.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Returns true if a found path resolves to the actual executable path.
 static auto RealPathMatches(const char* found_path, llvm::StringRef exe_path)
@@ -46,7 +46,7 @@ auto FindExecutablePath(const char* argv0) -> std::string {
   // If we can find `argv[0]` in `$PATH`, use the form from that.
   //
   // For example, `llvm-symbolizer` is subprocessed with `argv[0]` that uses
-  // this path. If `LLVM_SYMBOLIZER_PATH` is set to Carbon, but
+  // this path. If `LLVM_SYMBOLIZER_PATH` is set to MyLang, but
   // `llvm-symbolizer` in `$PATH` is a different binary, that can lead to
   // problems -- which is why we verify the match.
   if (llvm::ErrorOr<std::string> path = llvm::sys::findProgramByName(argv0_ref);
@@ -58,4 +58,4 @@ auto FindExecutablePath(const char* argv0) -> std::string {
   return exe_path;
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

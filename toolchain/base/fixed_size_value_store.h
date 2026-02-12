@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_FIXED_SIZE_VALUE_STORE_H_
-#define CARBON_TOOLCHAIN_BASE_FIXED_SIZE_VALUE_STORE_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_FIXED_SIZE_VALUE_STORE_H_
+#define MYLANG_TOOLCHAIN_BASE_FIXED_SIZE_VALUE_STORE_H_
 
 #include <concepts>
 #include <type_traits>
@@ -16,7 +16,7 @@
 #include "toolchain/base/value_store.h"
 #include "toolchain/base/value_store_types.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // A value store with a predetermined size.
 template <typename IdT, typename ValueT, typename TagIdT = Untagged>
@@ -147,21 +147,21 @@ class FixedSizeValueStore {
 
   // Sets the value for an ID.
   auto Set(IdT id, ValueType value) -> void {
-    CARBON_DCHECK(id.index >= 0, "{0}", id);
+    MYLANG_DCHECK(id.index >= 0, "{0}", id);
     auto index = tag_.Remove(id);
     values_[index] = value;
   }
 
   // Returns a mutable value for an ID.
   auto Get(IdT id) -> RefType {
-    CARBON_DCHECK(id.index >= 0, "{0}", id);
+    MYLANG_DCHECK(id.index >= 0, "{0}", id);
     auto index = tag_.Remove(id);
     return values_[index];
   }
 
   // Returns the value for an ID.
   auto Get(IdT id) const -> ConstRefType {
-    CARBON_DCHECK(id.index >= 0, "{0}", id);
+    MYLANG_DCHECK(id.index >= 0, "{0}", id);
     auto index = tag_.Remove(id);
     return values_[index];
   }
@@ -194,6 +194,6 @@ class FixedSizeValueStore {
   IdTagType tag_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_BASE_FIXED_SIZE_VALUE_STORE_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_FIXED_SIZE_VALUE_STORE_H_

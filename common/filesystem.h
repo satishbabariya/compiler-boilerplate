@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_FILESYSTEM_H_
-#define CARBON_COMMON_FILESYSTEM_H_
+#ifndef MYLANG_COMMON_FILESYSTEM_H_
+#define MYLANG_COMMON_FILESYSTEM_H_
 
 #include <dirent.h>
 #include <fcntl.h>
@@ -27,7 +27,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/FormatVariadic.h"
 
-// Provides a filesystem library for use in the Carbon project.
+// Provides a filesystem library for use in the MyLang project.
 //
 // This library provides an API designed to support modern Unix / Linux / POSIX
 // style filesystem operations, often called "Unix-like"[1] here, efficiently
@@ -76,7 +76,7 @@
 //      POSIX subsystem or modern WSL, as those aren't the primary filesystem
 //      APIs for the (non-WSL) Windows platform. This also matches the rough OS
 //      classification used in LLVM.
-namespace Carbon::Filesystem {
+namespace MyLang::Filesystem {
 
 // The different creation options available when opening a file or directory.
 //
@@ -1105,7 +1105,7 @@ class DirRef::Iterator
   Iterator() = default;
 
   auto operator==(const Iterator& rhs) const -> bool {
-    CARBON_DCHECK(dirp_ == nullptr || rhs.dirp_ == nullptr ||
+    MYLANG_DCHECK(dirp_ == nullptr || rhs.dirp_ == nullptr ||
                   dirp_ == rhs.dirp_);
     return entry_.dent_ == rhs.entry_.dent_;
   }
@@ -1335,7 +1335,7 @@ inline auto FileLock::Destroy() -> void {
   // The only realistic error is `EBADF` that would represent a programming
   // error the type system should prevent. We conservatively check-fail if an
   // error occurs here.
-  CARBON_CHECK(result == 0, "{0}",
+  MYLANG_CHECK(result == 0, "{0}",
                FdError(errno, "Unexpected error while _unlocking_ '{0}'", fd_));
 }
 
@@ -1459,7 +1459,7 @@ inline auto Internal::FileRefBase::ReadOnlyDestroy() -> void {
 }
 
 inline auto Internal::FileRefBase::WriteableDestroy() -> void {
-  CARBON_CHECK(
+  MYLANG_CHECK(
       fd_ == -1,
       "Cannot destroy an open writable file, they _must_ be destroyed by "
       "calling `Close` and handling any errors to avoid data loss.");
@@ -1534,7 +1534,7 @@ inline auto DirRef::Read() -> ErrorOr<Reader, FdError> {
 inline auto DirRef::ReadEntries()
     -> ErrorOr<llvm::SmallVector<std::filesystem::path>, FdError> {
   llvm::SmallVector<std::filesystem::path> entries;
-  CARBON_RETURN_IF_ERROR(AppendEntriesIf(entries));
+  MYLANG_RETURN_IF_ERROR(AppendEntriesIf(entries));
   return entries;
 }
 
@@ -1669,7 +1669,7 @@ inline auto DirRef::Chdir(const std::filesystem::path& path)
     return Success();
   }
 
-  CARBON_ASSIGN_OR_RETURN(Dir d, OpenDir(path));
+  MYLANG_ASSIGN_OR_RETURN(Dir d, OpenDir(path));
   auto result = d.Chdir();
   if (result.ok()) {
     return Success();
@@ -1771,7 +1771,7 @@ constexpr auto Dir::Destroy() -> void {
     // retries, this code should handle that. Until then, we require these to
     // succeed so we will learn about any issues during porting to new
     // platforms.
-    CARBON_CHECK(result == 0, "{0}",
+    MYLANG_CHECK(result == 0, "{0}",
                  FdError(errno, "Dir::Destroy on '{0}'", dfd_));
   }
   dfd_ = -1;
@@ -1780,12 +1780,12 @@ constexpr auto Dir::Destroy() -> void {
 inline RemovingDir::~RemovingDir() {
   if (dfd_ != -1) {
     auto result = std::move(*this).Remove();
-    CARBON_CHECK(result.ok(), "{0}", result.error());
+    MYLANG_CHECK(result.ok(), "{0}", result.error());
   }
 }
 
 inline auto RemovingDir::Remove() && -> ErrorOr<Success, PathError> {
-  CARBON_CHECK(dfd_ != -1,
+  MYLANG_CHECK(dfd_ != -1,
                "Unexpected explicit remove on a `RemovingDir` with no owned "
                "directory!");
 
@@ -1795,14 +1795,14 @@ inline auto RemovingDir::Remove() && -> ErrorOr<Success, PathError> {
 }
 
 inline auto Dir::Iterator::operator++() -> Iterator& {
-  CARBON_CHECK(dirp_, "Cannot increment an end-iterator");
+  MYLANG_CHECK(dirp_, "Cannot increment an end-iterator");
 
   errno = 0;
   entry_.dent_ = readdir(dirp_);
   // There are no documented errors beyond an erroneous `dirp_` which would be
   // a programming error and not due to any recoverable failure of the
   // filesystem.
-  CARBON_CHECK(entry_.dent_ != nullptr || errno == 0,
+  MYLANG_CHECK(entry_.dent_ != nullptr || errno == 0,
                "Using a directory iterator with a non-directory, errno '{0}'",
                errno);
   if (entry_.dent_ == nullptr) {
@@ -1829,13 +1829,13 @@ inline auto Dir::Reader::Destroy() -> void {
     // See the detailed comment on `Dir::Destroy` for more context on closing of
     // directories, why we check-fail, and what we should do if we discover
     // platforms where an error needs to be handled here.
-    CARBON_CHECK(result == 0, "{0}",
+    MYLANG_CHECK(result == 0, "{0}",
                  FdError(errno, "Dir::Reader::Destroy on '{0}'", dfd_));
     dirp_ = nullptr;
     dfd_ = -1;
   }
 }
 
-}  // namespace Carbon::Filesystem
+}  // namespace MyLang::Filesystem
 
-#endif  // CARBON_COMMON_FILESYSTEM_H_
+#endif  // MYLANG_COMMON_FILESYSTEM_H_

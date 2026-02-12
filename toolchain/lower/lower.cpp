@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -11,7 +11,7 @@
 #include "llvm/IR/Verifier.h"
 
 // TODO: Implement your language's SemIR-to-LLVM-IR lowering here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 //
 // The lowerer walks the SemIR and builds LLVM IR instructions.
 // Key responsibilities include:
@@ -20,7 +20,7 @@
 // - Lowering SemIR instructions to LLVM IR instructions
 // - Handling control flow (branches, returns)
 
-namespace Carbon::Lower {
+namespace MyLang::Lower {
 
 auto LowerToLLVM(llvm::LLVMContext& llvm_context,
                  llvm::StringRef module_name,
@@ -29,7 +29,7 @@ auto LowerToLLVM(llvm::LLVMContext& llvm_context,
     -> std::unique_ptr<llvm::Module> {
   auto module = std::make_unique<llvm::Module>(module_name, llvm_context);
 
-  CARBON_VLOG_TO(options.vlog_stream, "*** Lowering: {0} ***\n",
+  MYLANG_VLOG_TO(options.vlog_stream, "*** Lowering: {0} ***\n",
                  sem_ir.filename());
 
   // TODO: Walk the SemIR and build LLVM IR.
@@ -45,17 +45,17 @@ auto LowerToLLVM(llvm::LLVMContext& llvm_context,
   // 4. Run the LLVM verifier on the result
 
   if (options.vlog_stream) {
-    CARBON_VLOG_TO(options.vlog_stream, "*** llvm::Module ***\n");
+    MYLANG_VLOG_TO(options.vlog_stream, "*** llvm::Module ***\n");
     module->print(*options.vlog_stream, /*AAW=*/nullptr,
                   /*ShouldPreserveUseListOrder=*/false,
                   /*IsForDebug=*/true);
   }
 
   if (options.llvm_verifier_stream) {
-    CARBON_CHECK(!llvm::verifyModule(*module, options.llvm_verifier_stream));
+    MYLANG_CHECK(!llvm::verifyModule(*module, options.llvm_verifier_stream));
   }
 
   return module;
 }
 
-}  // namespace Carbon::Lower
+}  // namespace MyLang::Lower

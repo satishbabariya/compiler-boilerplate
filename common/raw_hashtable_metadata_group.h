@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_RAW_HASHTABLE_METADATA_GROUP_H_
-#define CARBON_COMMON_RAW_HASHTABLE_METADATA_GROUP_H_
+#ifndef MYLANG_COMMON_RAW_HASHTABLE_METADATA_GROUP_H_
+#define MYLANG_COMMON_RAW_HASHTABLE_METADATA_GROUP_H_
 
 #include <cstddef>
 #include <cstring>
@@ -26,10 +26,10 @@
 // - https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
 #if defined(__SSSE3__)
 #include <x86intrin.h>
-#define CARBON_X86_SIMD_SUPPORT 1
+#define MYLANG_X86_SIMD_SUPPORT 1
 #elif defined(__ARM_NEON)
 #include <arm_neon.h>
-#define CARBON_NEON_SIMD_SUPPORT 1
+#define MYLANG_NEON_SIMD_SUPPORT 1
 #endif
 
 // This namespace collects low-level utilities for implementing hashtable
@@ -38,7 +38,7 @@
 // - Primitives to manage "groups" of hashtable entries that have densely packed
 //   control bytes we can scan rapidly as a group, often using SIMD facilities
 //   to process the entire group at once.
-namespace Carbon::RawHashtable {
+namespace MyLang::RawHashtable {
 
 // We define a constant max group size. The particular group size used in
 // practice may vary, but we want to have some upper bound used to ensure
@@ -83,14 +83,14 @@ class BitIndex
 
   // Returns true when there are no matches for the tag.
   auto empty() const -> bool {
-    CARBON_DCHECK((bits_ & ZeroMask) == 0, "Unexpected non-zero bits!");
+    MYLANG_DCHECK((bits_ & ZeroMask) == 0, "Unexpected non-zero bits!");
     __builtin_assume((bits_ & ZeroMask) == 0);
     return bits_ == 0;
   }
 
   // Returns the index of the first matched tag.
   auto index() -> ssize_t {
-    CARBON_DCHECK(bits_ != 0, "Cannot get an index from zero bits!");
+    MYLANG_DCHECK(bits_ != 0, "Cannot get an index from zero bits!");
     __builtin_assume(bits_ != 0);
     ssize_t index = unscaled_index();
 
@@ -105,7 +105,7 @@ class BitIndex
   // Optimized tool to index a pointer `p` by `index()`.
   template <typename T>
   auto index_ptr(T* pointer) -> T* {
-    CARBON_DCHECK(bits_ != 0, "Cannot get an index from zero bits!");
+    MYLANG_DCHECK(bits_ != 0, "Cannot get an index from zero bits!");
     __builtin_assume(bits_ != 0);
     if constexpr (!ByteEncoding) {
       return &pointer[unscaled_index()];
@@ -116,7 +116,7 @@ class BitIndex
     // Scale the index as we counted zero *bits* and not zero *bytes*.
     // However, we can fold that scale with the size of `T` when it is a power
     // of two or divisible by 8.
-    CARBON_DCHECK(
+    MYLANG_DCHECK(
         (index & ((static_cast<size_t>(1) << ByteEncodingShift) - 1)) == 0);
     if constexpr (sizeof(T) % 8 == 0) {
       constexpr size_t FoldedScale = sizeof(T) / 8;
@@ -197,7 +197,7 @@ class BitIndexRange
     }
 
     auto operator*() -> ssize_t& {
-      CARBON_DCHECK(bits_ != 0, "Cannot get an index from zero bits!");
+      MYLANG_DCHECK(bits_ != 0, "Cannot get an index from zero bits!");
       __builtin_assume(bits_ != 0);
       index_ = BitIndexT(bits_).index();
       // Note that we store the index in a member so we can return a reference
@@ -211,7 +211,7 @@ class BitIndexRange
     }
 
     auto operator++() -> Iterator& {
-      CARBON_DCHECK(bits_ != 0, "Must not increment past the end!");
+      MYLANG_DCHECK(bits_ != 0, "Must not increment past the end!");
       __builtin_assume(bits_ != 0);
 
       if constexpr (ByteEncodingMask != 0) {
@@ -282,12 +282,12 @@ class BitIndexRange
 
 // A group of metadata bytes that can be manipulated together.
 //
-// The metadata bytes used Carbon's hashtable implementation are designed to
+// The metadata bytes used MyLang's hashtable implementation are designed to
 // support being manipulating as groups, either using architecture specific SIMD
 // code sequences or using portable SIMD-in-an-integer-register code sequences.
 // These operations are unusually performance sensitive and in sometimes
 // surprising ways. The implementations here are crafted specifically to
-// optimize the particular usages in Carbon's hashtable and should not be
+// optimize the particular usages in MyLang's hashtable and should not be
 // expected to be reusable in any other context.
 //
 // Throughout the functions operating on this type we try to use patterns with a
@@ -308,7 +308,7 @@ class BitIndexRange
 //   }
 //   if (UseSimd || DebugSimd) {
 //     simd_result = SimdOperation(...)
-//     CARBON_DCHECK(result == portable_result, "{0}", ...);
+//     MYLANG_DCHECK(result == portable_result, "{0}", ...);
 //   }
 //   return UseSimd ? simd_result : portable_result;
 // }
@@ -316,7 +316,7 @@ class BitIndexRange
 class MetadataGroup : public Printable<MetadataGroup> {
  public:
   static constexpr ssize_t Size =
-#if CARBON_X86_SIMD_SUPPORT
+#if MYLANG_X86_SIMD_SUPPORT
       16;
 #else
       8;
@@ -345,7 +345,7 @@ class MetadataGroup : public Printable<MetadataGroup> {
   // implementation, we do not always have to use it in the event that it is
   // less efficient than the portable version.
   static constexpr bool UseSimd =
-#if CARBON_X86_SIMD_SUPPORT
+#if MYLANG_X86_SIMD_SUPPORT
       true;
 #else
       false;
@@ -355,7 +355,7 @@ class MetadataGroup : public Printable<MetadataGroup> {
   // in a byte-encoded form rather than a bit-encoded form. This encoding
   // changes verification and other aspects of our algorithms.
   static constexpr bool ByteEncoding =
-#if CARBON_X86_SIMD_SUPPORT
+#if MYLANG_X86_SIMD_SUPPORT
       false;
 #else
       true;
@@ -403,10 +403,10 @@ class MetadataGroup : public Printable<MetadataGroup> {
   union {
     uint8_t metadata_bytes[Size];
     uint64_t metadata_ints[Size / 8];
-#if CARBON_NEON_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT
     uint8x8_t metadata_vec = {};
     static_assert(sizeof(metadata_vec) == Size);
-#elif CARBON_X86_SIMD_SUPPORT
+#elif MYLANG_X86_SIMD_SUPPORT
     __m128i metadata_vec = {};
     static_assert(sizeof(metadata_vec) == Size);
 #endif
@@ -484,7 +484,7 @@ class MetadataGroup : public Printable<MetadataGroup> {
   // used due to performance reasons, and easily re-enable it if the performance
   // changes.
   static constexpr bool DebugSimd =
-#if !defined(NDEBUG) && (CARBON_NEON_SIMD_SUPPORT || CARBON_X86_SIMD_SUPPORT)
+#if !defined(NDEBUG) && (MYLANG_NEON_SIMD_SUPPORT || MYLANG_X86_SIMD_SUPPORT)
       true;
 #else
       false;
@@ -566,7 +566,7 @@ class MetadataGroup : public Printable<MetadataGroup> {
 
   static auto SimdCompareEqual(MetadataGroup lhs, MetadataGroup rhs) -> bool;
 
-#if CARBON_X86_SIMD_SUPPORT
+#if MYLANG_X86_SIMD_SUPPORT
   // A common routine for x86 SIMD matching that can be used for matching
   // present, empty, and deleted bytes with equal efficiency.
   auto X86SimdMatch(uint8_t match_byte) const -> SimdMatchRange;
@@ -588,7 +588,7 @@ inline auto MetadataGroup::Load(const uint8_t* metadata, ssize_t index)
     }
   }
   MetadataGroup g = SimdLoad(metadata, index);
-  CARBON_DCHECK(g == portable_g);
+  MYLANG_DCHECK(g == portable_g);
   return g;
 }
 
@@ -599,7 +599,7 @@ inline auto MetadataGroup::Store(uint8_t* metadata, ssize_t index) const
   } else {
     SimdStore(metadata, index);
   }
-  CARBON_DCHECK(0 == std::memcmp(metadata + index, &metadata_bytes, Size));
+  MYLANG_DCHECK(0 == std::memcmp(metadata + index, &metadata_bytes, Size));
 }
 
 template <bool IsCalled>
@@ -620,7 +620,7 @@ inline auto MetadataGroup::ClearDeleted() -> void {
   }
   if constexpr (UseSimd || DebugSimd) {
     simd_g.SimdClearDeleted();
-    CARBON_DCHECK(
+    MYLANG_DCHECK(
         simd_g == portable_g,
         "SIMD cleared group '{0}' doesn't match portable cleared group '{1}'",
         simd_g, portable_g);
@@ -632,7 +632,7 @@ inline auto MetadataGroup::Match(uint8_t tag) const -> MatchRange {
   // The caller should provide us with the present byte hash, and not set any
   // present bit tag on it so that this layer can manage tagging the high bit of
   // a present byte.
-  CARBON_DCHECK((tag & PresentMask) == 0, "{0:x}", tag);
+  MYLANG_DCHECK((tag & PresentMask) == 0, "{0:x}", tag);
 
   PortableMatchRange portable_result;
   SimdMatchRange simd_result;
@@ -641,7 +641,7 @@ inline auto MetadataGroup::Match(uint8_t tag) const -> MatchRange {
   }
   if constexpr (UseSimd || DebugSimd) {
     simd_result = SimdMatch(tag);
-    CARBON_DCHECK(simd_result == portable_result,
+    MYLANG_DCHECK(simd_result == portable_result,
                   "SIMD result '{0}' doesn't match portable result '{1}'",
                   simd_result, portable_result);
   }
@@ -657,7 +657,7 @@ inline auto MetadataGroup::MatchPresent() const -> MatchPresentRange {
   }
   if constexpr (UseSimd || DebugSimd) {
     simd_result = SimdMatchPresent();
-    CARBON_DCHECK(simd_result == portable_result,
+    MYLANG_DCHECK(simd_result == portable_result,
                   "SIMD result '{0}' doesn't match portable result '{1}'",
                   simd_result, portable_result);
   }
@@ -673,7 +673,7 @@ inline auto MetadataGroup::MatchEmpty() const -> MatchIndex {
   }
   if constexpr (UseSimd || DebugSimd) {
     simd_result = SimdMatchEmpty();
-    CARBON_DCHECK(simd_result == portable_result,
+    MYLANG_DCHECK(simd_result == portable_result,
                   "SIMD result '{0}' doesn't match portable result '{1}'",
                   simd_result, portable_result);
   }
@@ -688,7 +688,7 @@ inline auto MetadataGroup::MatchDeleted() const -> MatchIndex {
   }
   if constexpr (UseSimd || DebugSimd) {
     simd_result = SimdMatchDeleted();
-    CARBON_DCHECK(simd_result == portable_result,
+    MYLANG_DCHECK(simd_result == portable_result,
                   "SIMD result '{0}' doesn't match portable result '{1}'",
                   simd_result, portable_result);
   }
@@ -704,7 +704,7 @@ inline auto MetadataGroup::CompareEqual(MetadataGroup lhs, MetadataGroup rhs)
   }
   if constexpr (UseSimd || DebugSimd) {
     simd_result = SimdCompareEqual(lhs, rhs);
-    CARBON_DCHECK(simd_result == portable_result);
+    MYLANG_DCHECK(simd_result == portable_result);
   }
   return UseSimd ? simd_result : portable_result;
 }
@@ -715,20 +715,20 @@ inline auto MetadataGroup::VerifyIndexBits(
   for (ssize_t byte_index : llvm::seq<ssize_t>(0, Size)) {
     if constexpr (!ByteEncoding) {
       if (byte_match(metadata_bytes[byte_index])) {
-        CARBON_CHECK(((index_bits >> byte_index) & 1) == 1,
+        MYLANG_CHECK(((index_bits >> byte_index) & 1) == 1,
                      "Bit not set at matching byte index: {0}", byte_index);
         // Only the first match is needed, so stop scanning once found.
         break;
       }
 
-      CARBON_CHECK(((index_bits >> byte_index) & 1) == 0,
+      MYLANG_CHECK(((index_bits >> byte_index) & 1) == 0,
                    "Bit set at non-matching byte index: {0}", byte_index);
     } else {
       // `index_bits` is byte-encoded rather than bit encoded, so extract a
       // byte.
       uint8_t index_byte = (index_bits >> (byte_index * 8)) & 0xFF;
       if (byte_match(metadata_bytes[byte_index])) {
-        CARBON_CHECK(
+        MYLANG_CHECK(
             (index_byte & 0x80) == 0x80,
             "Should have the high bit set for a matching byte, found: {0:x}",
             index_byte);
@@ -736,7 +736,7 @@ inline auto MetadataGroup::VerifyIndexBits(
         break;
       }
 
-      CARBON_CHECK(
+      MYLANG_CHECK(
           index_byte == 0,
           "Should have no bits set for an unmatched byte, found: {0:x}",
           index_byte);
@@ -751,10 +751,10 @@ inline auto MetadataGroup::VerifyPortableRangeBits(
   for (ssize_t byte_index : llvm::seq<ssize_t>(0, Size)) {
     if constexpr (!ByteEncoding) {
       if (byte_match(metadata_bytes[byte_index])) {
-        CARBON_CHECK(((range_bits >> byte_index) & 1) == 1,
+        MYLANG_CHECK(((range_bits >> byte_index) & 1) == 1,
                      "Bit not set at matching byte index: {0}", byte_index);
       } else {
-        CARBON_CHECK(((range_bits >> byte_index) & 1) == 0,
+        MYLANG_CHECK(((range_bits >> byte_index) & 1) == 0,
                      "Bit set at non-matching byte index: {0}", byte_index);
       }
     } else {
@@ -762,12 +762,12 @@ inline auto MetadataGroup::VerifyPortableRangeBits(
       // byte.
       uint8_t range_byte = (range_bits >> (byte_index * 8)) & 0xFF;
       if (byte_match(metadata_bytes[byte_index])) {
-        CARBON_CHECK(range_byte == 0x80,
+        MYLANG_CHECK(range_byte == 0x80,
                      "Should just have the high bit set for a matching byte, "
                      "found: {0:x}",
                      range_byte);
       } else {
-        CARBON_CHECK(
+        MYLANG_CHECK(
             range_byte == 0,
             "Should have no bits set for an unmatched byte, found: {0:x}",
             range_byte);
@@ -809,7 +809,7 @@ inline auto MetadataGroup::PortableMatch(uint8_t tag) const -> MatchRange {
   // The caller should provide us with the present byte hash, and not set any
   // present bit tag on it so that this layer can manage tagging the high bit of
   // a present byte.
-  CARBON_DCHECK((tag & PresentMask) == 0, "{0:x}", tag);
+  MYLANG_DCHECK((tag & PresentMask) == 0, "{0:x}", tag);
 
   // Use a simple fallback approach for sizes beyond 8.
   // TODO: Instead of a simple fallback, we should generalize the below
@@ -862,7 +862,7 @@ inline auto MetadataGroup::PortableMatch(uint8_t tag) const -> MatchRange {
   // know that the add cannot carry, and this way it can be lowered using
   // combined multiply-add instructions if available.
   uint64_t broadcast = Lsbs * tag + Msbs;
-  CARBON_DCHECK(broadcast == (Lsbs * tag | Msbs),
+  MYLANG_DCHECK(broadcast == (Lsbs * tag | Msbs),
                 "Unexpected carry from addition!");
 
   // Xor the broadcast byte pattern. This makes bytes with matches become 0, and
@@ -880,7 +880,7 @@ inline auto MetadataGroup::PortableMatch(uint8_t tag) const -> MatchRange {
 
   // At this point, `match_bits` has the high bit set for bytes where the
   // original group byte equals `tag` plus the high bit.
-  CARBON_DCHECK(VerifyPortableRangeBits(
+  MYLANG_DCHECK(VerifyPortableRangeBits(
       match_bits, [&](uint8_t byte) { return byte == (tag | PresentMask); }));
   return MatchRange(match_bits);
 }
@@ -907,7 +907,7 @@ inline auto MetadataGroup::PortableMatchPresent() const -> MatchRange {
   // represents a present slot.
   uint64_t match_bits = metadata_ints[0] & Msbs;
 
-  CARBON_DCHECK(VerifyPortableRangeBits(
+  MYLANG_DCHECK(VerifyPortableRangeBits(
       match_bits, [&](uint8_t byte) { return (byte & PresentMask) != 0; }));
   return MatchRange(match_bits);
 }
@@ -941,7 +941,7 @@ inline auto MetadataGroup::PortableMatchEmpty() const -> MatchIndex {
 
   // The high bits of the bytes of `match_bits` are set if the corresponding
   // metadata byte is `Empty`.
-  CARBON_DCHECK(
+  MYLANG_DCHECK(
       VerifyIndexBits(match_bits, [](uint8_t byte) { return byte == Empty; }));
   return MatchIndex(match_bits);
 }
@@ -975,7 +975,7 @@ inline auto MetadataGroup::PortableMatchDeleted() const -> MatchIndex {
 
   // The high bits of the bytes of `match_bits` are set if the corresponding
   // metadata byte is `Deleted`.
-  CARBON_DCHECK(VerifyIndexBits(match_bits,
+  MYLANG_DCHECK(VerifyIndexBits(match_bits,
                                 [](uint8_t byte) { return byte == Deleted; }));
   return MatchIndex(match_bits);
 }
@@ -988,9 +988,9 @@ inline auto MetadataGroup::PortableCompareEqual(MetadataGroup lhs,
 inline auto MetadataGroup::SimdLoad(const uint8_t* metadata, ssize_t index)
     -> MetadataGroup {
   MetadataGroup g;
-#if CARBON_NEON_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT
   g.metadata_vec = vld1_u8(metadata + index);
-#elif CARBON_X86_SIMD_SUPPORT
+#elif MYLANG_X86_SIMD_SUPPORT
   g.metadata_vec =
       _mm_load_si128(reinterpret_cast<const __m128i*>(metadata + index));
 #else
@@ -1004,9 +1004,9 @@ inline auto MetadataGroup::SimdLoad(const uint8_t* metadata, ssize_t index)
 // NOLINTNEXTLINE(readability-non-const-parameter): Mutation is in #if.
 inline auto MetadataGroup::SimdStore(uint8_t* metadata, ssize_t index) const
     -> void {
-#if CARBON_NEON_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT
   vst1_u8(metadata + index, metadata_vec);
-#elif CARBON_X86_SIMD_SUPPORT
+#elif MYLANG_X86_SIMD_SUPPORT
   _mm_store_si128(reinterpret_cast<__m128i*>(metadata + index), metadata_vec);
 #else
   static_assert(!UseSimd, "Unimplemented SIMD operation");
@@ -1016,13 +1016,13 @@ inline auto MetadataGroup::SimdStore(uint8_t* metadata, ssize_t index) const
 }
 
 inline auto MetadataGroup::SimdClearDeleted() -> void {
-#if CARBON_NEON_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT
   // There is no good Neon operation to implement this, so do it using integer
   // code. This is reasonably fast, but unfortunate because it forces the group
   // out of a SIMD register and into a general purpose register, which can have
   // high latency.
   metadata_ints[0] &= (~Lsbs | metadata_ints[0] >> 7);
-#elif CARBON_X86_SIMD_SUPPORT
+#elif MYLANG_X86_SIMD_SUPPORT
   // For each byte, use `metadata_vec` if the byte's high bit is set (indicating
   // it is present), otherwise (it is empty or deleted) replace it with zero
   // (representing empty).
@@ -1035,7 +1035,7 @@ inline auto MetadataGroup::SimdClearDeleted() -> void {
 
 inline auto MetadataGroup::SimdMatch(uint8_t tag) const -> SimdMatchRange {
   SimdMatchRange result;
-#if CARBON_NEON_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT
   // Broadcast byte we want to match to every byte in the vector.
   auto match_byte_vec = vdup_n_u8(tag | PresentMask);
   // Result bytes have all bits set for the bytes that match, so we have to
@@ -1044,7 +1044,7 @@ inline auto MetadataGroup::SimdMatch(uint8_t tag) const -> SimdMatchRange {
   uint64_t match_bits = vreinterpret_u64_u8(match_byte_cmp_vec)[0];
   // Note that the range will lazily mask to the Msbs as part of incrementing.
   result = SimdMatchRange(match_bits);
-#elif CARBON_X86_SIMD_SUPPORT
+#elif MYLANG_X86_SIMD_SUPPORT
   result = X86SimdMatch(tag | PresentMask);
 #else
   static_assert(!UseSimd && !DebugSimd, "Unimplemented SIMD operation");
@@ -1055,13 +1055,13 @@ inline auto MetadataGroup::SimdMatch(uint8_t tag) const -> SimdMatchRange {
 
 inline auto MetadataGroup::SimdMatchPresent() const -> SimdMatchPresentRange {
   SimdMatchPresentRange result;
-#if CARBON_NEON_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT
   // Just extract the metadata directly.
   uint64_t match_bits = vreinterpret_u64_u8(metadata_vec)[0];
   // Even though the Neon SIMD range will do its own masking, we have to mask
   // here so that `empty` is correct.
   result = SimdMatchPresentRange(match_bits & Msbs);
-#elif CARBON_X86_SIMD_SUPPORT
+#elif MYLANG_X86_SIMD_SUPPORT
   // We arranged the byte vector so that present bytes have the high bit set,
   // which this instruction extracts.
   result = SimdMatchPresentRange(_mm_movemask_epi8(metadata_vec));
@@ -1073,7 +1073,7 @@ inline auto MetadataGroup::SimdMatchPresent() const -> SimdMatchPresentRange {
 
 inline auto MetadataGroup::SimdMatchEmpty() const -> MatchIndex {
   MatchIndex result;
-#if CARBON_NEON_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT
   // Compare all bytes with zero, as that is the empty byte value. Result will
   // have all bits set for any input zero byte, so we zero all but the high bits
   // below.
@@ -1084,7 +1084,7 @@ inline auto MetadataGroup::SimdMatchEmpty() const -> MatchIndex {
   // mask in the scalar domain rather than the SIMD domain. So we do the mask
   // here rather than above prior to extracting the match bits.
   result = MatchIndex(metadata_bits & Msbs);
-#elif CARBON_X86_SIMD_SUPPORT
+#elif MYLANG_X86_SIMD_SUPPORT
   // Even though we only need the first match rather than all matches, we don't
   // have a more efficient way to compute this on x86 and so we reuse the
   // general match infrastructure that computes all matches in a bit-encoding.
@@ -1098,7 +1098,7 @@ inline auto MetadataGroup::SimdMatchEmpty() const -> MatchIndex {
 
 inline auto MetadataGroup::SimdMatchDeleted() const -> MatchIndex {
   MatchIndex result;
-#if CARBON_NEON_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT
   // Broadcast the `Deleted` byte across the vector and compare the bytes of
   // that with the metadata vector. The result will have all bits set for any
   // input zero byte, so we zero all but the high bits below.
@@ -1109,7 +1109,7 @@ inline auto MetadataGroup::SimdMatchDeleted() const -> MatchIndex {
   // mask in the scalar domain rather than the SIMD domain. So we do the mask
   // here rather than above prior to extracting the match bits.
   result = MatchIndex(match_bits & Msbs);
-#elif CARBON_X86_SIMD_SUPPORT
+#elif MYLANG_X86_SIMD_SUPPORT
   // Even though we only need the first match rather than all matches, we don't
   // have a more efficient way to compute this on x86 and so we reuse the
   // general match infrastructure that computes all matches in a bit-encoding.
@@ -1123,10 +1123,10 @@ inline auto MetadataGroup::SimdMatchDeleted() const -> MatchIndex {
 
 inline auto MetadataGroup::SimdCompareEqual(MetadataGroup lhs,
                                             MetadataGroup rhs) -> bool {
-#if CARBON_NEON_SIMD_SUPPORT
+#if MYLANG_NEON_SIMD_SUPPORT
   return vreinterpret_u64_u8(vceq_u8(lhs.metadata_vec, rhs.metadata_vec))[0] ==
          static_cast<uint64_t>(-1LL);
-#elif CARBON_X86_SIMD_SUPPORT
+#elif MYLANG_X86_SIMD_SUPPORT
   // Different x86 SIMD extensions provide different comparison functionality
   // available.
 #if __SSE4_2__
@@ -1149,7 +1149,7 @@ inline auto MetadataGroup::SimdCompareEqual(MetadataGroup lhs,
 #endif
 }
 
-#if CARBON_X86_SIMD_SUPPORT
+#if MYLANG_X86_SIMD_SUPPORT
 inline auto MetadataGroup::X86SimdMatch(uint8_t match_byte) const
     -> MatchRange {
   // Broadcast the byte we're matching against to all bytes in a vector, and
@@ -1163,6 +1163,6 @@ inline auto MetadataGroup::X86SimdMatch(uint8_t match_byte) const
 }
 #endif
 
-}  // namespace Carbon::RawHashtable
+}  // namespace MyLang::RawHashtable
 
-#endif  // CARBON_COMMON_RAW_HASHTABLE_METADATA_GROUP_H_
+#endif  // MYLANG_COMMON_RAW_HASHTABLE_METADATA_GROUP_H_

@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_LEX_TOKEN_KIND_H_
-#define CARBON_TOOLCHAIN_LEX_TOKEN_KIND_H_
+#ifndef MYLANG_TOOLCHAIN_LEX_TOKEN_KIND_H_
+#define MYLANG_TOOLCHAIN_LEX_TOKEN_KIND_H_
 
 #include <cstdint>
 
@@ -13,16 +13,16 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/FormatVariadicDetails.h"
 
-namespace Carbon::Lex {
+namespace MyLang::Lex {
 
-CARBON_DEFINE_RAW_ENUM_CLASS(TokenKind, uint8_t) {
-#define CARBON_TOKEN(TokenName) CARBON_RAW_ENUM_ENUMERATOR(TokenName)
+MYLANG_DEFINE_RAW_ENUM_CLASS(TokenKind, uint8_t) {
+#define MYLANG_TOKEN(TokenName) MYLANG_RAW_ENUM_ENUMERATOR(TokenName)
 #include "toolchain/lex/token_kind.def"
 };
 
-class TokenKind : public CARBON_ENUM_BASE(TokenKind) {
+class TokenKind : public MYLANG_ENUM_BASE(TokenKind) {
  public:
-#define CARBON_TOKEN(TokenName) CARBON_ENUM_CONSTANT_DECL(TokenName)
+#define MYLANG_TOKEN(TokenName) MYLANG_ENUM_CONSTANT_DECL(TokenName)
 #include "toolchain/lex/token_kind.def"
 
   // An array of all the keyword tokens.
@@ -56,7 +56,7 @@ class TokenKind : public CARBON_ENUM_BASE(TokenKind) {
   // The token kind must be an opening symbol.
   auto closing_symbol() const -> TokenKind {
     auto result = ClosingSymbol[AsInt()];
-    CARBON_DCHECK(result != Error, "Only opening symbols are valid!");
+    MYLANG_DCHECK(result != Error, "Only opening symbols are valid!");
     return result;
   }
 
@@ -68,7 +68,7 @@ class TokenKind : public CARBON_ENUM_BASE(TokenKind) {
   // The token kind must be a closing symbol.
   auto opening_symbol() const -> TokenKind {
     auto result = OpeningSymbol[AsInt()];
-    CARBON_DCHECK(result != Error, "Only closing symbols are valid!");
+    MYLANG_DCHECK(result != Error, "Only closing symbols are valid!");
     return result;
   }
 
@@ -126,24 +126,24 @@ class TokenKind : public CARBON_ENUM_BASE(TokenKind) {
   static const int8_t ExpectedParseTreeSize[];
 };
 
-#define CARBON_TOKEN(TokenName) \
-  CARBON_ENUM_CONSTANT_DEFINITION(TokenKind, TokenName)
+#define MYLANG_TOKEN(TokenName) \
+  MYLANG_ENUM_CONSTANT_DEFINITION(TokenKind, TokenName)
 #include "toolchain/lex/token_kind.def"
 
 inline constexpr TokenKind TokenKind::KeywordTokensStorage[] = {
-#define CARBON_KEYWORD_TOKEN(TokenName, Spelling) TokenKind::TokenName,
+#define MYLANG_KEYWORD_TOKEN(TokenName, Spelling) TokenKind::TokenName,
 #include "toolchain/lex/token_kind.def"
 };
 inline constexpr llvm::ArrayRef<TokenKind> TokenKind::KeywordTokens =
     KeywordTokensStorage;
 
-}  // namespace Carbon::Lex
+}  // namespace MyLang::Lex
 
 // We use formatv primarily for diagnostics. In these cases, it's expected that
 // the spelling in source code should be used.
 template <>
-struct llvm::format_provider<Carbon::Lex::TokenKind> {
-  static void format(const Carbon::Lex::TokenKind& kind, raw_ostream& out,
+struct llvm::format_provider<MyLang::Lex::TokenKind> {
+  static void format(const MyLang::Lex::TokenKind& kind, raw_ostream& out,
                      StringRef /*style*/) {
     auto spelling = kind.fixed_spelling();
     if (!spelling.empty()) {
@@ -155,4 +155,4 @@ struct llvm::format_provider<Carbon::Lex::TokenKind> {
   }
 };
 
-#endif  // CARBON_TOOLCHAIN_LEX_TOKEN_KIND_H_
+#endif  // MYLANG_TOOLCHAIN_LEX_TOKEN_KIND_H_

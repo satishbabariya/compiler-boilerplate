@@ -3,7 +3,7 @@
 """Checks various LLVM tool symlinks behave as expected."""
 
 __copyright__ = """
-Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 Exceptions. See /LICENSE for license information.
 SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 """
@@ -26,7 +26,7 @@ class LLVMSymlinksTest(unittest.TestCase):
         self.test_o_file.touch()
         self.runfiles = runfiles.Create()
         self.prebuilt_runtimes = self.runfiles.Rlocation(
-            "carbon/toolchain/driver/prebuilt_runtimes_tree"
+            "mylang/toolchain/driver/prebuilt_runtimes_tree"
         )
 
     def get_link_cmd(self, clang: Path) -> list[str | Path]:
@@ -34,10 +34,10 @@ class LLVMSymlinksTest(unittest.TestCase):
             clang,
             # Verbose printing to help with debugging.
             "-v",
-            # Pass a parameter to the underlying Carbon busybox using `-Xcarbon`
+            # Pass a parameter to the underlying MyLang busybox using `-Xmylang`
             # to switch it to use the prebuilt runtimes rather than building
             # runtimes on demand.
-            f"-Xcarbon=--prebuilt-runtimes={self.prebuilt_runtimes}",
+            f"-Xmylang=--prebuilt-runtimes={self.prebuilt_runtimes}",
             # Print out the link command rather than running it.
             "-###",
             # Give the link command an output.
@@ -55,10 +55,10 @@ class LLVMSymlinksTest(unittest.TestCase):
     # runtime libraries on demand, which requires the host to be able to compile
     # and link for the target. Instead, we test linking with the default target
     # (the host), as that is the one that should reliably work if we're
-    # developing Carbon, and encode all the different platform results in the
+    # developing MyLang, and encode all the different platform results in the
     # test expectations.
     def test_clang(self) -> None:
-        bin = self.install_root / "lib/carbon/llvm/bin/clang"
+        bin = self.install_root / "lib/mylang/llvm/bin/clang"
         # Most errors are caught by ensuring the command succeeds.
         run = subprocess.run(
             self.get_link_cmd(bin), check=True, capture_output=True, text=True
@@ -71,7 +71,7 @@ class LLVMSymlinksTest(unittest.TestCase):
     # Note that we can't test `clang` vs. `clang++` portably. See the comment on
     # `test_clang` for details.
     def test_clangplusplus(self) -> None:
-        bin = self.install_root / "lib/carbon/llvm/bin/clang++"
+        bin = self.install_root / "lib/mylang/llvm/bin/clang++"
         run = subprocess.run(
             self.get_link_cmd(bin), check=True, capture_output=True, text=True
         )
@@ -81,7 +81,7 @@ class LLVMSymlinksTest(unittest.TestCase):
         self.assertRegex(run.stderr, r'"-lc\+\+"')
 
     def test_clang_cl(self) -> None:
-        bin = self.install_root / "lib/carbon/llvm/bin/clang-cl"
+        bin = self.install_root / "lib/mylang/llvm/bin/clang-cl"
         run = subprocess.run(
             # Use the `cl.exe`-specific help flag to test the mode.
             [bin, "/?"],
@@ -104,7 +104,7 @@ class LLVMSymlinksTest(unittest.TestCase):
         # Run the preprocessor using a CPP-specific command line reading from
         # the test file and writing to stdout. We define a macro that we'll
         # check is expanded.
-        bin = self.install_root / "lib/carbon/llvm/bin/clang-cpp"
+        bin = self.install_root / "lib/mylang/llvm/bin/clang-cpp"
         try:
             run = subprocess.run(
                 [bin, "-D", "TEST=SUCCESS", text_file, "-"],

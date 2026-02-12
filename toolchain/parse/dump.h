@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -14,20 +14,20 @@
 // The `DumpNoNewline` functions are helpers that exclude a trailing newline.
 // They're intended to be composed by `Dump` function implementations.
 
-#ifndef CARBON_TOOLCHAIN_PARSE_DUMP_H_
-#define CARBON_TOOLCHAIN_PARSE_DUMP_H_
+#ifndef MYLANG_TOOLCHAIN_PARSE_DUMP_H_
+#define MYLANG_TOOLCHAIN_PARSE_DUMP_H_
 
 #ifndef NDEBUG
 
 #include "toolchain/parse/tree.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 auto Dump(const Tree& tree, Lex::TokenIndex token) -> std::string;
 auto Dump(const Tree& tree, NodeId node_id) -> std::string;
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse
 
 #endif  // NDEBUG
 
-#endif  // CARBON_TOOLCHAIN_PARSE_DUMP_H_
+#endif  // MYLANG_TOOLCHAIN_PARSE_DUMP_H_

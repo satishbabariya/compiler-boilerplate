@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_HASHING_H_
-#define CARBON_COMMON_HASHING_H_
+#ifndef MYLANG_COMMON_HASHING_H_
+#define MYLANG_COMMON_HASHING_H_
 
 #include <concepts>
 #include <string>
@@ -24,9 +24,9 @@
 #include <arm_acle.h>
 #endif
 
-namespace Carbon {
+namespace MyLang {
 
-// A 64-bit hash code produced by `Carbon::HashValue`.
+// A 64-bit hash code produced by `MyLang::HashValue`.
 //
 // This provides methods for extracting high-quality bits from the hash code
 // quickly.
@@ -379,7 +379,7 @@ class Hasher {
   // This routine allows sampling it at byte indices, which allows getting 64 -
   // 8 different random 64-bit results. The offset must be in the range [0, 56).
   static auto SampleRandomData(ssize_t offset) -> uint64_t {
-    CARBON_DCHECK(offset + sizeof(uint64_t) < sizeof(StaticRandomData));
+    MYLANG_DCHECK(offset + sizeof(uint64_t) < sizeof(StaticRandomData));
     uint64_t data;
     memcpy(&data,
            reinterpret_cast<const unsigned char*>(&StaticRandomData) + offset,
@@ -390,7 +390,7 @@ class Hasher {
   // As above, but for small offsets, we can use aligned loads, which are
   // faster. The offset must be in the range [0, 8).
   static auto SampleAlignedRandomData(ssize_t offset) -> uint64_t {
-    CARBON_DCHECK(static_cast<size_t>(offset) <
+    MYLANG_DCHECK(static_cast<size_t>(offset) <
                   sizeof(StaticRandomData) / sizeof(uint64_t));
     return StaticRandomData[offset];
   }
@@ -666,19 +666,19 @@ constexpr auto HashCode::ExtractIndexAndTag() -> std::pair<ssize_t, uint32_t> {
           static_cast<uint32_t>(value_ & ((1U << N) - 1))};
 }
 
-// Building with `-DCARBON_MCA_MARKERS` will enable `llvm-mca` annotations in
+// Building with `-DMYLANG_MCA_MARKERS` will enable `llvm-mca` annotations in
 // the source code. These can interfere with optimization, but allows analyzing
 // the generated `.s` file with the `llvm-mca` tool. Documentation for these
 // markers is here:
 // https://llvm.org/docs/CommandGuide/llvm-mca.html#using-markers-to-analyze-specific-code-blocks
-#if CARBON_MCA_MARKERS
-#define CARBON_MCA_BEGIN(NAME) \
+#if MYLANG_MCA_MARKERS
+#define MYLANG_MCA_BEGIN(NAME) \
   __asm volatile("# LLVM-MCA-BEGIN " NAME "" ::: "memory");
-#define CARBON_MCA_END(NAME) \
+#define MYLANG_MCA_END(NAME) \
   __asm volatile("# LLVM-MCA-END " NAME "" ::: "memory");
 #else
-#define CARBON_MCA_BEGIN(NAME)
-#define CARBON_MCA_END(NAME)
+#define MYLANG_MCA_BEGIN(NAME)
+#define MYLANG_MCA_END(NAME)
 #endif
 
 inline auto Hasher::Read1(const std::byte* data) -> uint64_t {
@@ -904,23 +904,23 @@ inline auto Hasher::HashRaw(const T& value) -> void {
     // 8-bytes potentially bit-packed with data), we rarely expect the incoming
     // data to fully and densely populate all 8 bytes. For these cases we have a
     // `WeakMix` routine that is lower latency but lower quality.
-    CARBON_MCA_BEGIN("fixed-8b");
+    MYLANG_MCA_BEGIN("fixed-8b");
     buffer = WeakMix(buffer ^ ReadSmall(value));
-    CARBON_MCA_END("fixed-8b");
+    MYLANG_MCA_END("fixed-8b");
     return;
   }
 
   const auto* data_ptr = reinterpret_cast<const std::byte*>(&value);
   if constexpr (8 < sizeof(T) && sizeof(T) <= 16) {
-    CARBON_MCA_BEGIN("fixed-16b");
+    MYLANG_MCA_BEGIN("fixed-16b");
     auto values = Read8To16(data_ptr, sizeof(T));
     HashDense(values.first, values.second);
-    CARBON_MCA_END("fixed-16b");
+    MYLANG_MCA_END("fixed-16b");
     return;
   }
 
   if constexpr (16 < sizeof(T) && sizeof(T) <= 32) {
-    CARBON_MCA_BEGIN("fixed-32b");
+    MYLANG_MCA_BEGIN("fixed-32b");
     // Essentially the same technique used for dynamically sized byte sequences
     // of this size, but we start with a fixed XOR of random data.
     buffer ^= StaticRandomData[0];
@@ -930,7 +930,7 @@ inline auto Hasher::HashRaw(const T& value) -> void {
     uint64_t m1 = Mix(Read8(tail_16b_ptr) ^ StaticRandomData[3],
                       Read8(tail_16b_ptr + 8) ^ buffer);
     buffer = m0 ^ m1;
-    CARBON_MCA_END("fixed-32b");
+    MYLANG_MCA_END("fixed-32b");
     return;
   }
 
@@ -947,7 +947,7 @@ inline auto Hasher::HashSizedBytes(llvm::ArrayRef<std::byte> bytes) -> void {
   // bit for short strings.
   if (size <= 8) {
     if (size >= 4) {
-      CARBON_MCA_BEGIN("dynamic-8b");
+      MYLANG_MCA_BEGIN("dynamic-8b");
       uint64_t data = Read4To8(data_ptr, size);
       // We optimize for latency on short strings by hashing both the data and
       // size in a single multiply here, using the small nature of size to
@@ -959,7 +959,7 @@ inline auto Hasher::HashSizedBytes(llvm::ArrayRef<std::byte> bytes) -> void {
       // to use sampled random data to encode the size, which may not be as
       // effective without the full 128-bit folded result.
       buffer = Mix(data ^ buffer, SampleAlignedRandomData(size - 1));
-      CARBON_MCA_END("dynamic-8b");
+      MYLANG_MCA_END("dynamic-8b");
       return;
     }
 
@@ -968,19 +968,19 @@ inline auto Hasher::HashSizedBytes(llvm::ArrayRef<std::byte> bytes) -> void {
     // existing buffer. For 1-3 byte lengths we do 3 one-byte reads adjusted to
     // always read in-bounds without branching. Then we OR the size into the 4th
     // byte and use `WeakMix`.
-    CARBON_MCA_BEGIN("dynamic-4b");
+    MYLANG_MCA_BEGIN("dynamic-4b");
     if (size == 0) {
       buffer ^= StaticRandomData[0];
     } else {
       uint64_t data = Read1To3(data_ptr, size) | size << 24;
       buffer = WeakMix(data);
     }
-    CARBON_MCA_END("dynamic-4b");
+    MYLANG_MCA_END("dynamic-4b");
     return;
   }
 
   if (size <= 16) {
-    CARBON_MCA_BEGIN("dynamic-16b");
+    MYLANG_MCA_BEGIN("dynamic-16b");
     // Similar to the above, we optimize primarily for latency here and spread
     // the incoming data across both ends of the multiply. Note that this does
     // have a drawback -- any time one half of the mix function becomes zero it
@@ -996,12 +996,12 @@ inline auto Hasher::HashSizedBytes(llvm::ArrayRef<std::byte> bytes) -> void {
     uint64_t size_hash = SampleRandomData(size);
     auto data = Read8To16(data_ptr, size);
     buffer = Mix(data.first ^ size_hash, data.second ^ buffer);
-    CARBON_MCA_END("dynamic-16b");
+    MYLANG_MCA_END("dynamic-16b");
     return;
   }
 
   if (size <= 32) {
-    CARBON_MCA_BEGIN("dynamic-32b");
+    MYLANG_MCA_BEGIN("dynamic-32b");
     // Do two mixes of overlapping 16-byte ranges in parallel to minimize
     // latency. We also incorporate the size by sampling random data into the
     // seed before both.
@@ -1017,13 +1017,13 @@ inline auto Hasher::HashSizedBytes(llvm::ArrayRef<std::byte> bytes) -> void {
     // way longer string hashing does) increases the latency on x86-64
     // significantly (approx. 20%).
     buffer = m0 ^ m1;
-    CARBON_MCA_END("dynamic-32b");
+    MYLANG_MCA_END("dynamic-32b");
     return;
   }
 
   HashSizedBytesLarge(bytes);
 }
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_HASHING_H_
+#endif  // MYLANG_COMMON_HASHING_H_

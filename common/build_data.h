@@ -1,14 +1,14 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_BUILD_DATA_H_
-#define CARBON_COMMON_BUILD_DATA_H_
+#ifndef MYLANG_COMMON_BUILD_DATA_H_
+#define MYLANG_COMMON_BUILD_DATA_H_
 
 #include "common/build_data_linkstamp.h"
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon::BuildData {
+namespace MyLang::BuildData {
 
 // Build information for a binary, from bazel. Stamped values come from:
 // https://github.com/bazelbuild/bazel/blob/master/src/main/java/com/google/devtools/build/lib/rules/cpp/CppLinkstampCompileHelper.java
@@ -31,6 +31,6 @@ extern const llvm::StringRef BuildTarget;
 
 // NOLINTEND(readability-identifier-naming)
 
-}  // namespace Carbon::BuildData
+}  // namespace MyLang::BuildData
 
-#endif  // CARBON_COMMON_BUILD_DATA_H_
+#endif  // MYLANG_COMMON_BUILD_DATA_H_

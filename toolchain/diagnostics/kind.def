@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
@@ -10,33 +10,33 @@
 //
 // The viable X-macros to define prior to including the header are:
 //
-// - `CARBON_DIAGNOSTIC_KIND`
+// - `MYLANG_DIAGNOSTIC_KIND`
 
-#ifndef CARBON_DIAGNOSTIC_KIND
+#ifndef MYLANG_DIAGNOSTIC_KIND
 #error "Must define the x-macro to use this file."
-#define CARBON_DIAGNOSTIC_KIND(Name)
+#define MYLANG_DIAGNOSTIC_KIND(Name)
 #endif
 
 // ============================================================================
 // Driver and subcommand diagnostics
 // ============================================================================
 
-CARBON_DIAGNOSTIC_KIND(DriverInstallInvalid)
-CARBON_DIAGNOSTIC_KIND(DriverRuntimesCacheInvalid)
-CARBON_DIAGNOSTIC_KIND(DriverPrebuiltRuntimesInvalid)
-CARBON_DIAGNOSTIC_KIND(DriverCommandLineParseFailed)
-CARBON_DIAGNOSTIC_KIND(CompilePhaseFlagConflict)
-CARBON_DIAGNOSTIC_KIND(CompilePreludeManifestError)
-CARBON_DIAGNOSTIC_KIND(CompileInputNotRegularFile)
-CARBON_DIAGNOSTIC_KIND(CompileOutputFileOpenError)
-CARBON_DIAGNOSTIC_KIND(CompileTargetInvalid)
-CARBON_DIAGNOSTIC_KIND(ConfigFailedToReadDigest)
-CARBON_DIAGNOSTIC_KIND(ConfigFailedToSetupTarget)
-CARBON_DIAGNOSTIC_KIND(FailureBuildingRuntimes)
-CARBON_DIAGNOSTIC_KIND(FailureRunningClang)
-CARBON_DIAGNOSTIC_KIND(FailureRunningClangToLink)
-CARBON_DIAGNOSTIC_KIND(FormatMultipleFilesToOneOutput)
-CARBON_DIAGNOSTIC_KIND(ToolFuzzingDisallowed)
+MYLANG_DIAGNOSTIC_KIND(DriverInstallInvalid)
+MYLANG_DIAGNOSTIC_KIND(DriverRuntimesCacheInvalid)
+MYLANG_DIAGNOSTIC_KIND(DriverPrebuiltRuntimesInvalid)
+MYLANG_DIAGNOSTIC_KIND(DriverCommandLineParseFailed)
+MYLANG_DIAGNOSTIC_KIND(CompilePhaseFlagConflict)
+MYLANG_DIAGNOSTIC_KIND(CompilePreludeManifestError)
+MYLANG_DIAGNOSTIC_KIND(CompileInputNotRegularFile)
+MYLANG_DIAGNOSTIC_KIND(CompileOutputFileOpenError)
+MYLANG_DIAGNOSTIC_KIND(CompileTargetInvalid)
+MYLANG_DIAGNOSTIC_KIND(ConfigFailedToReadDigest)
+MYLANG_DIAGNOSTIC_KIND(ConfigFailedToSetupTarget)
+MYLANG_DIAGNOSTIC_KIND(FailureBuildingRuntimes)
+MYLANG_DIAGNOSTIC_KIND(FailureRunningClang)
+MYLANG_DIAGNOSTIC_KIND(FailureRunningClangToLink)
+MYLANG_DIAGNOSTIC_KIND(FormatMultipleFilesToOneOutput)
+MYLANG_DIAGNOSTIC_KIND(ToolFuzzingDisallowed)
 
 // TODO: Add your language's driver diagnostics here.
 
@@ -44,10 +44,10 @@ CARBON_DIAGNOSTIC_KIND(ToolFuzzingDisallowed)
 // SourceBuffer diagnostics
 // ============================================================================
 
-CARBON_DIAGNOSTIC_KIND(ErrorOpeningFile)
-CARBON_DIAGNOSTIC_KIND(ErrorStattingFile)
-CARBON_DIAGNOSTIC_KIND(FileTooLarge)
-CARBON_DIAGNOSTIC_KIND(ErrorReadingFile)
+MYLANG_DIAGNOSTIC_KIND(ErrorOpeningFile)
+MYLANG_DIAGNOSTIC_KIND(ErrorStattingFile)
+MYLANG_DIAGNOSTIC_KIND(FileTooLarge)
+MYLANG_DIAGNOSTIC_KIND(ErrorReadingFile)
 
 // TODO: Add your language's source buffer diagnostics here.
 
@@ -55,10 +55,10 @@ CARBON_DIAGNOSTIC_KIND(ErrorReadingFile)
 // Lexer diagnostics
 // ============================================================================
 
-CARBON_DIAGNOSTIC_KIND(TooManyTokens)
-CARBON_DIAGNOSTIC_KIND(UnmatchedOpening)
-CARBON_DIAGNOSTIC_KIND(UnmatchedClosing)
-CARBON_DIAGNOSTIC_KIND(UnrecognizedCharacters)
+MYLANG_DIAGNOSTIC_KIND(TooManyTokens)
+MYLANG_DIAGNOSTIC_KIND(UnmatchedOpening)
+MYLANG_DIAGNOSTIC_KIND(UnmatchedClosing)
+MYLANG_DIAGNOSTIC_KIND(UnrecognizedCharacters)
 
 // TODO: Add your language's lexer diagnostics here.
 
@@ -66,13 +66,13 @@ CARBON_DIAGNOSTIC_KIND(UnrecognizedCharacters)
 // Parser diagnostics
 // ============================================================================
 
-CARBON_DIAGNOSTIC_KIND(ExpectedCloseSymbol)
-CARBON_DIAGNOSTIC_KIND(ExpectedExpr)
-CARBON_DIAGNOSTIC_KIND(ExpectedCodeBlock)
-CARBON_DIAGNOSTIC_KIND(ExpectedDeclSemi)
-CARBON_DIAGNOSTIC_KIND(ExpectedDeclSemiOrDefinition)
-CARBON_DIAGNOSTIC_KIND(ExpectedDeclName)
-CARBON_DIAGNOSTIC_KIND(UnrecognizedDecl)
+MYLANG_DIAGNOSTIC_KIND(ExpectedCloseSymbol)
+MYLANG_DIAGNOSTIC_KIND(ExpectedExpr)
+MYLANG_DIAGNOSTIC_KIND(ExpectedCodeBlock)
+MYLANG_DIAGNOSTIC_KIND(ExpectedDeclSemi)
+MYLANG_DIAGNOSTIC_KIND(ExpectedDeclSemiOrDefinition)
+MYLANG_DIAGNOSTIC_KIND(ExpectedDeclName)
+MYLANG_DIAGNOSTIC_KIND(UnrecognizedDecl)
 
 // TODO: Add your language's parser diagnostics here.
 
@@ -80,7 +80,7 @@ CARBON_DIAGNOSTIC_KIND(UnrecognizedDecl)
 // Semantics diagnostics
 // ============================================================================
 
-CARBON_DIAGNOSTIC_KIND(SemanticsTodo)
+MYLANG_DIAGNOSTIC_KIND(SemanticsTodo)
 
 // TODO: Add your language's semantic analysis diagnostics here.
 
@@ -88,7 +88,7 @@ CARBON_DIAGNOSTIC_KIND(SemanticsTodo)
 // CodeGen diagnostics
 // ============================================================================
 
-CARBON_DIAGNOSTIC_KIND(CodeGenUnableToEmit)
+MYLANG_DIAGNOSTIC_KIND(CodeGenUnableToEmit)
 
 // TODO: Add your language's code generation diagnostics here.
 
@@ -96,18 +96,18 @@ CARBON_DIAGNOSTIC_KIND(CodeGenUnableToEmit)
 // Language server diagnostics
 // ============================================================================
 
-CARBON_DIAGNOSTIC_KIND(LanguageServerFileUnknown)
-CARBON_DIAGNOSTIC_KIND(LanguageServerFileUnsupported)
-CARBON_DIAGNOSTIC_KIND(LanguageServerMissingInputStream)
-CARBON_DIAGNOSTIC_KIND(LanguageServerNotificationParseError)
-CARBON_DIAGNOSTIC_KIND(LanguageServerTransportError)
-CARBON_DIAGNOSTIC_KIND(LanguageServerUnexpectedReply)
-CARBON_DIAGNOSTIC_KIND(LanguageServerUnsupportedNotification)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerFileUnknown)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerFileUnsupported)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerMissingInputStream)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerNotificationParseError)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerTransportError)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerUnexpectedReply)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerUnsupportedNotification)
 
 // Document handling.
-CARBON_DIAGNOSTIC_KIND(LanguageServerOpenDuplicateFile)
-CARBON_DIAGNOSTIC_KIND(LanguageServerCloseUnknownFile)
-CARBON_DIAGNOSTIC_KIND(LanguageServerDiagnosticInWrongFile)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerOpenDuplicateFile)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerCloseUnknownFile)
+MYLANG_DIAGNOSTIC_KIND(LanguageServerDiagnosticInWrongFile)
 
 // TODO: Add your language's language server diagnostics here.
 
@@ -116,9 +116,9 @@ CARBON_DIAGNOSTIC_KIND(LanguageServerDiagnosticInWrongFile)
 // ============================================================================
 
 // TestDiagnostic is only for unit tests.
-CARBON_DIAGNOSTIC_KIND(TestDiagnostic)
-CARBON_DIAGNOSTIC_KIND(TestDiagnosticNote)
+MYLANG_DIAGNOSTIC_KIND(TestDiagnostic)
+MYLANG_DIAGNOSTIC_KIND(TestDiagnosticNote)
 
 // TODO: Add your language's test diagnostics here.
 
-#undef CARBON_DIAGNOSTIC_KIND
+#undef MYLANG_DIAGNOSTIC_KIND

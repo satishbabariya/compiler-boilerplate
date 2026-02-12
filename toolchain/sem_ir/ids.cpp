@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,7 +10,7 @@
 #include "toolchain/sem_ir/singleton_insts.h"
 #include "toolchain/sem_ir/typed_insts.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 auto InstId::Print(llvm::raw_ostream& out) const -> void {
   if (IsSingletonInstId(*this)) {
@@ -41,7 +41,7 @@ auto ConstantId::Print(llvm::raw_ostream& out, bool disambiguate) const
   } else if (is_symbolic()) {
     out << symbolic_id();
   } else {
-    CARBON_CHECK(!is_constant());
+    MYLANG_CHECK(!is_constant());
     out << "runtime";
   }
 }
@@ -79,7 +79,7 @@ auto BoolValue::Print(llvm::raw_ostream& out) const -> void {
   } else if (*this == True) {
     out << "true";
   } else {
-    CARBON_FATAL("Invalid bool value {0}", index);
+    MYLANG_FATAL("Invalid bool value {0}", index);
   }
 }
 
@@ -96,7 +96,7 @@ auto IntKind::Print(llvm::raw_ostream& out) const -> void {
   } else if (*this == Signed) {
     out << "signed";
   } else {
-    CARBON_FATAL("Invalid int kind value {0}", index);
+    MYLANG_FATAL("Invalid int kind value {0}", index);
   }
 }
 
@@ -144,7 +144,7 @@ auto FloatKind::Semantics() const -> const llvm::fltSemantics& {
     case PPCFloat128.index:
       return llvm::APFloat::PPCDoubleDouble();
     default:
-      CARBON_FATAL("Unexpected float kind {0}", *this);
+      MYLANG_FATAL("Unexpected float kind {0}", *this);
   }
 }
 
@@ -157,7 +157,7 @@ auto NameId::ForIdentifier(IdentifierId id) -> NameId {
   } else if (!id.has_value()) {
     return NameId::None;
   } else {
-    CARBON_FATAL("Unexpected identifier ID {0}", id);
+    MYLANG_FATAL("Unexpected identifier ID {0}", id);
   }
 }
 
@@ -171,7 +171,7 @@ auto NameId::ForPackageName(PackageNameId id) -> NameId {
   } else if (!id.has_value()) {
     return NameId::None;
   } else {
-    CARBON_FATAL("Unexpected package ID {0}", id);
+    MYLANG_FATAL("Unexpected package ID {0}", id);
   }
 }
 
@@ -182,15 +182,15 @@ auto NameId::Print(llvm::raw_ostream& out) const -> void {
   }
   out << Label << "(";
   auto special_name_id = AsSpecialNameId();
-  CARBON_CHECK(special_name_id, "Unknown index {0}", index);
+  MYLANG_CHECK(special_name_id, "Unknown index {0}", index);
 
   switch (*special_name_id) {
-#define CARBON_SPECIAL_NAME_ID_FOR_PRINT(Name) \
+#define MYLANG_SPECIAL_NAME_ID_FOR_PRINT(Name) \
   case SpecialNameId::Name:                    \
     out << #Name;                              \
     break;
-    CARBON_SPECIAL_NAME_ID(CARBON_SPECIAL_NAME_ID_FOR_PRINT)
-#undef CARBON_SPECIAL_NAME_ID_FOR_PRINT
+    MYLANG_SPECIAL_NAME_ID(MYLANG_SPECIAL_NAME_ID_FOR_PRINT)
+#undef MYLANG_SPECIAL_NAME_ID_FOR_PRINT
   }
   out << ")";
 }
@@ -241,7 +241,7 @@ auto TypeId::Print(llvm::raw_ostream& out) const -> void {
 
 auto LibraryNameId::ForStringLiteralValueId(StringLiteralValueId id)
     -> LibraryNameId {
-  CARBON_CHECK(id.index >= NoneIndex, "Unexpected library name ID {0}", id);
+  MYLANG_CHECK(id.index >= NoneIndex, "Unexpected library name ID {0}", id);
   if (id == StringLiteralValueId::None) {
     // Prior to SemIR, we use `None` to indicate `default`.
     return LibraryNameId::Default;
@@ -288,4 +288,4 @@ auto LocId::Print(llvm::raw_ostream& out) const -> void {
   }
 }
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR

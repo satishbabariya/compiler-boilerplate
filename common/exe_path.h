@@ -1,13 +1,13 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_EXE_PATH_H_
-#define CARBON_COMMON_EXE_PATH_H_
+#ifndef MYLANG_COMMON_EXE_PATH_H_
+#define MYLANG_COMMON_EXE_PATH_H_
 
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Computes the executable path for the given `argv[0]` value from `main`.
 // `argv0` is required to be null-terminated.
@@ -18,6 +18,6 @@ namespace Carbon {
 // path.
 auto FindExecutablePath(const char* argv0) -> std::string;
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_EXE_PATH_H_
+#endif  // MYLANG_COMMON_EXE_PATH_H_

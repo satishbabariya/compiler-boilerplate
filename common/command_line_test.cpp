@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -13,11 +13,11 @@
 #include "common/raw_string_ostream.h"
 #include "llvm/Support/FormatVariadic.h"
 
-namespace Carbon::CommandLine {
+namespace MyLang::CommandLine {
 namespace {
 
-using ::Carbon::Testing::IsError;
-using ::Carbon::Testing::IsSuccess;
+using ::MyLang::Testing::IsError;
+using ::MyLang::Testing::IsSuccess;
 using ::testing::ElementsAre;
 using ::testing::Eq;
 using ::testing::StrEq;
@@ -971,4 +971,4 @@ Options:
 }
 
 }  // namespace
-}  // namespace Carbon::CommandLine
+}  // namespace MyLang::CommandLine

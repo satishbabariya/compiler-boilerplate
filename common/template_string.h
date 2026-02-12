@@ -1,13 +1,13 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_TEMPLATE_STRING_H_
-#define CARBON_COMMON_TEMPLATE_STRING_H_
+#ifndef MYLANG_COMMON_TEMPLATE_STRING_H_
+#define MYLANG_COMMON_TEMPLATE_STRING_H_
 
 #include "llvm/ADT/StringRef.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Represents a compile-time string in a form suitable for use as a non-type
 // template argument.
@@ -74,6 +74,6 @@ struct TemplateString {
 template <int M>
 TemplateString(const char (&str)[M]) -> TemplateString<M - 1>;
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_TEMPLATE_STRING_H_
+#endif  // MYLANG_COMMON_TEMPLATE_STRING_H_

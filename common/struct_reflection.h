@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_STRUCT_REFLECTION_H_
-#define CARBON_COMMON_STRUCT_REFLECTION_H_
+#ifndef MYLANG_COMMON_STRUCT_REFLECTION_H_
+#define MYLANG_COMMON_STRUCT_REFLECTION_H_
 
 // Reflection support for simple struct types.
 //
@@ -28,7 +28,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace Carbon::StructReflection {
+namespace MyLang::StructReflection {
 
 namespace Internal {
 
@@ -196,6 +196,6 @@ auto AsTuple(T value) -> auto {
   return Internal::FieldAccessor<Internal::CountFields<T>()>::Get(value);
 }
 
-}  // namespace Carbon::StructReflection
+}  // namespace MyLang::StructReflection
 
-#endif  // CARBON_COMMON_STRUCT_REFLECTION_H_
+#endif  // MYLANG_COMMON_STRUCT_REFLECTION_H_

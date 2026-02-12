@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -8,7 +8,7 @@
 
 #include "toolchain/sem_ir/file.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 auto Inst::Print(llvm::raw_ostream& out) const -> void {
   out << "{kind: " << kind();
@@ -24,7 +24,7 @@ auto Inst::Print(llvm::raw_ostream& out) const -> void {
   };
 
   switch (kind()) {
-#define CARBON_SEM_IR_INST_KIND(Name)               \
+#define MYLANG_SEM_IR_INST_KIND(Name)               \
   case Name::Kind:                                  \
     print_args(Internal::InstLikeTypeInfo<Name>()); \
     break;
@@ -49,7 +49,7 @@ static constexpr auto IdKindFor() -> IdKind {
 }
 
 const std::pair<IdKind, IdKind> Inst::ArgKindTable[] = {
-#define CARBON_SEM_IR_INST_KIND(Name) \
+#define MYLANG_SEM_IR_INST_KIND(Name) \
   {IdKindFor<Name, 0>(), IdKindFor<Name, 1>()},
 #include "toolchain/sem_ir/inst_kind.def"
 };
@@ -61,4 +61,4 @@ auto InstStore::GetUnattachedType(TypeId type_id) const -> TypeId {
   return file_->types().GetUnattachedType(type_id);
 }
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR

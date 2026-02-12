@@ -1,16 +1,16 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_FIND_H_
-#define CARBON_COMMON_FIND_H_
+#ifndef MYLANG_COMMON_FIND_H_
+#define MYLANG_COMMON_FIND_H_
 
 #include <concepts>
 #include <type_traits>
 
 #include "llvm/ADT/STLExtras.h"
 
-namespace Carbon {
+namespace MyLang {
 
 namespace Internal {
 
@@ -87,6 +87,6 @@ constexpr auto Contains(Range&& range, const Query& query) -> bool {
   return llvm::find(range, query) != range.end();
 }
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_FIND_H_
+#endif  // MYLANG_COMMON_FIND_H_

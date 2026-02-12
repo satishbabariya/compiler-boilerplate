@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_RAW_HASHTABLE_TEST_HELPERS_H_
-#define CARBON_COMMON_RAW_HASHTABLE_TEST_HELPERS_H_
+#ifndef MYLANG_COMMON_RAW_HASHTABLE_TEST_HELPERS_H_
+#define MYLANG_COMMON_RAW_HASHTABLE_TEST_HELPERS_H_
 
 #include <compare>
 
@@ -12,16 +12,16 @@
 #include "common/hashtable_key_context.h"
 #include "common/ostream.h"
 
-namespace Carbon::RawHashtable {
+namespace MyLang::RawHashtable {
 
 // Non-trivial type for testing.
 struct TestData : Printable<TestData> {
   int value;
 
   // NOLINTNEXTLINE: google-explicit-constructor
-  TestData(int v) : value(v) { CARBON_CHECK(value >= 0); }
+  TestData(int v) : value(v) { MYLANG_CHECK(value >= 0); }
   ~TestData() {
-    CARBON_CHECK(value >= 0);
+    MYLANG_CHECK(value >= 0);
     value = -1;
   }
   TestData(const TestData& other) : TestData(other.value) {}
@@ -39,7 +39,7 @@ struct TestData : Printable<TestData> {
   }
 
   friend auto CarbonHashValue(TestData data, uint64_t seed) -> HashCode {
-    return Carbon::HashValue(data.value, seed);
+    return MyLang::HashValue(data.value, seed);
   }
 };
 
@@ -50,9 +50,9 @@ struct MoveOnlyTestData : Printable<TestData> {
   int value;
 
   // NOLINTNEXTLINE: google-explicit-constructor
-  MoveOnlyTestData(int v) : value(v) { CARBON_CHECK(value >= 0); }
+  MoveOnlyTestData(int v) : value(v) { MYLANG_CHECK(value >= 0); }
   ~MoveOnlyTestData() {
-    CARBON_CHECK(value >= 0);
+    MYLANG_CHECK(value >= 0);
     value = -1;
   }
   MoveOnlyTestData(MoveOnlyTestData&& other) noexcept
@@ -78,7 +78,7 @@ struct MoveOnlyTestData : Printable<TestData> {
 
   friend auto CarbonHashValue(const MoveOnlyTestData& data, uint64_t seed)
       -> HashCode {
-    return Carbon::HashValue(data.value, seed);
+    return MyLang::HashValue(data.value, seed);
   }
 };
 
@@ -114,13 +114,13 @@ struct FixedHashKeyContext : DefaultKeyContext {
     if (FixIndexBits) {
       raw_hash &= TagMask;
       raw_hash |= FixedVal << TagBits;
-      CARBON_DCHECK(HashCode(raw_hash).ExtractIndexAndTag<TagBits>().first ==
+      MYLANG_DCHECK(HashCode(raw_hash).ExtractIndexAndTag<TagBits>().first ==
                     (FixedVal & (~static_cast<uint64_t>(0) >> TagBits)));
     }
     if (FixTagBits) {
       raw_hash &= ~TagMask;
       raw_hash |= FixedVal & TagMask;
-      CARBON_DCHECK(HashCode(raw_hash).ExtractIndexAndTag<TagBits>().second ==
+      MYLANG_DCHECK(HashCode(raw_hash).ExtractIndexAndTag<TagBits>().second ==
                     (FixedVal & TagMask));
     }
     return HashCode(raw_hash);
@@ -149,6 +149,6 @@ class IndexKeyContext : public TranslatingKeyContext<IndexKeyContext<T>> {
   llvm::ArrayRef<T> array_;
 };
 
-}  // namespace Carbon::RawHashtable
+}  // namespace MyLang::RawHashtable
 
-#endif  // CARBON_COMMON_RAW_HASHTABLE_TEST_HELPERS_H_
+#endif  // MYLANG_COMMON_RAW_HASHTABLE_TEST_HELPERS_H_

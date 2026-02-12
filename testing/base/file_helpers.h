@@ -1,16 +1,16 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TESTING_BASE_FILE_HELPERS_H_
-#define CARBON_TESTING_BASE_FILE_HELPERS_H_
+#ifndef MYLANG_TESTING_BASE_FILE_HELPERS_H_
+#define MYLANG_TESTING_BASE_FILE_HELPERS_H_
 
 #include <filesystem>
 #include <string>
 
 #include "common/error.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // Returns a directory that should be used to hold temporary files created by
 // test execution.
@@ -36,6 +36,6 @@ auto ReadFile(std::filesystem::path path) -> ErrorOr<std::string>;
 auto WriteTestFile(llvm::StringRef name, llvm::StringRef contents)
     -> ErrorOr<std::filesystem::path>;
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TESTING_BASE_FILE_HELPERS_H_
+#endif  // MYLANG_TESTING_BASE_FILE_HELPERS_H_

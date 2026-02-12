@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -12,7 +12,7 @@
 #include "toolchain/lex/dump.h"
 #include "toolchain/parse/context.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 LLVM_DUMP_METHOD auto Dump(const Tree& tree, Lex::TokenIndex token)
     -> std::string {
@@ -44,6 +44,6 @@ static LLVM_DUMP_METHOD auto Dump(const Context& context, NodeId node_id)
   return Dump(context.tree(), node_id);
 }
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse
 
 #endif  // NDEBUG

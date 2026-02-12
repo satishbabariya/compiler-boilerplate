@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,7 +10,7 @@
 #include "common/ostream.h"
 #include "llvm/Support/Signals.h"
 
-namespace Carbon::Internal {
+namespace MyLang::Internal {
 
 auto CheckFailImpl(const char* kind, const char* file, int line,
                    const char* condition_str, llvm::StringRef extra_message)
@@ -22,7 +22,7 @@ auto CheckFailImpl(const char* kind, const char* file, int line,
       extra_message.empty() ? "" : ": ", extra_message);
 
   // This macro is defined by `--config=non-fatal-checks`.
-#ifdef CARBON_NON_FATAL_CHECKS
+#ifdef MYLANG_NON_FATAL_CHECKS
 #ifdef NDEBUG
 #error "--config=non-fatal-checks is incompatible with -c opt"
 #endif
@@ -46,4 +46,4 @@ auto CheckFailImpl(const char* kind, const char* file, int line,
 #endif
 }
 
-}  // namespace Carbon::Internal
+}  // namespace MyLang::Internal

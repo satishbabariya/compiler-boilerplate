@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -18,9 +18,9 @@
 #include "toolchain/sem_ir/typed_insts.h"
 
 // TODO: Implement your language's semantic IR file here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 File::File(const Parse::Tree* parse_tree, CheckIRId check_ir_id,
            const std::optional<Parse::Tree::PackagingDecl>& packaging_decl,
@@ -139,4 +139,4 @@ auto File::CollectMemUsage(MemUsage& mem_usage, llvm::StringRef label) const
   mem_usage.Collect(MemUsage::ConcatLabel(label, "types_"), types_);
 }
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR

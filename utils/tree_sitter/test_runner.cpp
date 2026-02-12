@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -31,7 +31,7 @@ auto main(int argc, char** argv) -> int {
   std::vector<std::string> incorrect;
   for (int i = 1; i < argc; i++) {
     std::string file_path = argv[i];
-    std::string source = std::move(*Carbon::Testing::ReadFile(file_path));
+    std::string source = std::move(*MyLang::Testing::ReadFile(file_path));
 
     auto* tree =
         ts_parser_parse_string(parser, nullptr, source.data(), source.size());

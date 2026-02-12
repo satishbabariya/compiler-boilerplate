@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -11,7 +11,7 @@
 #include "llvm/Support/ErrorOr.h"
 #include "toolchain/diagnostics/file_diagnostics.h"
 
-namespace Carbon {
+namespace MyLang {
 
 auto SourceBuffer::MakeFromStdin(Diagnostics::Consumer& consumer)
     -> std::optional<SourceBuffer> {
@@ -28,7 +28,7 @@ auto SourceBuffer::MakeFromFile(llvm::vfs::FileSystem& fs,
   llvm::ErrorOr<std::unique_ptr<llvm::vfs::File>> file =
       fs.openFileForRead(filename);
   if (file.getError()) {
-    CARBON_DIAGNOSTIC(ErrorOpeningFile, Error,
+    MYLANG_DIAGNOSTIC(ErrorOpeningFile, Error,
                       "error opening file for read: {0}", std::string);
     emitter.Emit(filename, ErrorOpeningFile, file.getError().message());
     return std::nullopt;
@@ -36,7 +36,7 @@ auto SourceBuffer::MakeFromFile(llvm::vfs::FileSystem& fs,
 
   llvm::ErrorOr<llvm::vfs::Status> status = (*file)->status();
   if (status.getError()) {
-    CARBON_DIAGNOSTIC(ErrorStattingFile, Error, "error statting file: {0}",
+    MYLANG_DIAGNOSTIC(ErrorStattingFile, Error, "error statting file: {0}",
                       std::string);
     emitter.Emit(filename, ErrorStattingFile, file.getError().message());
     return std::nullopt;
@@ -69,14 +69,14 @@ auto SourceBuffer::MakeFromMemoryBuffer(
   Diagnostics::FileEmitter emitter(&consumer);
 
   if (buffer.getError()) {
-    CARBON_DIAGNOSTIC(ErrorReadingFile, Error, "error reading file: {0}",
+    MYLANG_DIAGNOSTIC(ErrorReadingFile, Error, "error reading file: {0}",
                       std::string);
     emitter.Emit(filename, ErrorReadingFile, buffer.getError().message());
     return std::nullopt;
   }
 
   if (buffer.get()->getBufferSize() >= std::numeric_limits<int32_t>::max()) {
-    CARBON_DIAGNOSTIC(FileTooLarge, Error,
+    MYLANG_DIAGNOSTIC(FileTooLarge, Error,
                       "file is over the 2GiB input limit; size is {0} bytes",
                       int64_t);
     emitter.Emit(filename, FileTooLarge, buffer.get()->getBufferSize());
@@ -86,4 +86,4 @@ auto SourceBuffer::MakeFromMemoryBuffer(
   return SourceBuffer(filename.str(), std::move(buffer.get()), is_regular_file);
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

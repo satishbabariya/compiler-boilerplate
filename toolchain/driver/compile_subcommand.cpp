@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -32,7 +32,7 @@
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/source/source_buffer.h"
 
-namespace Carbon {
+namespace MyLang {
 
 auto CompileOptions::Build(CommandLine::CommandBuilder& b) -> void {
   b.AddStringPositionalArg(
@@ -280,7 +280,7 @@ static auto PhaseToString(CompileOptions::Phase phase) -> std::string {
 
 auto CompileSubcommand::ValidateOptions(
     Diagnostics::NoLocEmitter& emitter) const -> bool {
-  CARBON_DIAGNOSTIC(
+  MYLANG_DIAGNOSTIC(
       CompilePhaseFlagConflict, Error,
       "requested dumping {0} but compile phase is limited to `{1}`",
       std::string, std::string);
@@ -436,7 +436,7 @@ auto CompilationUnit::RunLex() -> void {
     mem_usage_->Add("source_", source_->text().size(), source_->text().size());
   }
 
-  CARBON_VLOG("*** SourceBuffer ***\n```\n{0}\n```\n", source_->text());
+  MYLANG_VLOG("*** SourceBuffer ***\n```\n{0}\n```\n", source_->text());
 
   LogCall("Lex::Lex", "lex", [&] {
     Lex::LexOptions options;
@@ -476,8 +476,8 @@ auto CompilationUnit::RunParse() -> void {
 }
 
 auto CompilationUnit::GetCheckUnit() -> Check::Unit {
-  CARBON_CHECK(parse_tree_, "Must call RunParse first");
-  CARBON_CHECK(!sem_ir_, "Called GetCheckUnit twice");
+  MYLANG_CHECK(parse_tree_, "Must call RunParse first");
+  MYLANG_CHECK(!sem_ir_, "Called GetCheckUnit twice");
 
   tree_and_subtrees_getter_ = [this]() -> const Parse::TreeAndSubtrees& {
     return this->GetParseTreeAndSubtrees();
@@ -496,7 +496,7 @@ auto CompilationUnit::GetCheckUnit() -> Check::Unit {
 }
 
 auto CompilationUnit::PostCheck() -> void {
-  CARBON_CHECK(sem_ir_, "Must call GetCheckUnit first");
+  MYLANG_CHECK(sem_ir_, "Must call GetCheckUnit first");
   consumer_->Flush();
 
   if (mem_usage_) {
@@ -525,8 +525,8 @@ auto CompilationUnit::RunLower() -> void {
 }
 
 auto CompilationUnit::MakeTargetMachine() -> void {
-  CARBON_CHECK(module_, "Must call RunLower first");
-  CARBON_CHECK(!target_machine_, "Should not call this multiple times");
+  MYLANG_CHECK(module_, "Must call RunLower first");
+  MYLANG_CHECK(!target_machine_, "Should not call this multiple times");
 
   llvm::Triple target_triple(options_->codegen_options.target);
   module_->setTargetTriple(target_triple);
@@ -554,7 +554,7 @@ static auto GetLLVMOptimizationLevel(Lower::OptimizationLevel opt_level)
 }
 
 auto CompilationUnit::RunOptimize() -> void {
-  CARBON_CHECK(module_, "Must call RunLower first");
+  MYLANG_CHECK(module_, "Must call RunLower first");
 
   MakeTargetMachine();
 
@@ -595,20 +595,20 @@ auto CompilationUnit::RunOptimize() -> void {
       GetLLVMOptimizationLevel(options_->opt_level));
 
   if (vlog_stream_) {
-    CARBON_VLOG("*** Running pass pipeline: ");
+    MYLANG_VLOG("*** Running pass pipeline: ");
     pass_manager.printPipeline(
         *vlog_stream_, [&pic](llvm::StringRef class_name) {
           auto pass_name = pic.getPassNameForClassName(class_name);
           return pass_name.empty() ? class_name : pass_name;
         });
-    CARBON_VLOG(" ***\n");
+    MYLANG_VLOG(" ***\n");
   }
 
   LogCall("ModulePassManager::run", "optimize",
           [&] { pass_manager.run(*module_, mam); });
 
   if (vlog_stream_) {
-    CARBON_VLOG("*** Optimized llvm::Module ***\n");
+    MYLANG_VLOG("*** Optimized llvm::Module ***\n");
     module_->print(*vlog_stream_, /*AAW=*/nullptr,
                    /*ShouldPreserveUseListOrder=*/false,
                    /*IsForDebug=*/true);
@@ -616,7 +616,7 @@ auto CompilationUnit::RunOptimize() -> void {
 }
 
 auto CompilationUnit::PostLower() -> void {
-  CARBON_CHECK(module_, "Must call RunLower first");
+  MYLANG_CHECK(module_, "Must call RunLower first");
   if (options_->dump_llvm_ir && IncludeInDumps()) {
     module_->print(*driver_env_->output_stream, /*AAW=*/nullptr,
                    /*ShouldPreserveUseListOrder=*/true);
@@ -624,7 +624,7 @@ auto CompilationUnit::PostLower() -> void {
 }
 
 auto CompilationUnit::RunCodeGen() -> void {
-  CARBON_CHECK(module_, "Must call RunLower first");
+  MYLANG_CHECK(module_, "Must call RunLower first");
   LogCall("CodeGen", "codegen", [&] { success_ = RunCodeGenHelper(); });
 }
 
@@ -646,12 +646,12 @@ auto CompilationUnit::PostCompile() -> void {
 }
 
 auto CompilationUnit::RunCodeGenHelper() -> bool {
-  CARBON_CHECK(module_, "Must call RunLower first");
-  CARBON_CHECK(target_machine_, "Must call MakeTargetMachine first");
+  MYLANG_CHECK(module_, "Must call RunLower first");
+  MYLANG_CHECK(target_machine_, "Must call MakeTargetMachine first");
 
   CodeGen codegen(module_.get(), target_machine_.get(), consumer_);
   if (vlog_stream_) {
-    CARBON_VLOG("*** Assembly ***\n");
+    MYLANG_VLOG("*** Assembly ***\n");
     codegen.EmitAssembly(*vlog_stream_);
   }
 
@@ -669,7 +669,7 @@ auto CompilationUnit::RunCodeGenHelper() -> bool {
     llvm::SmallString<256> output_filename = options_->output_filename;
     if (output_filename.empty()) {
       if (!source_->is_regular_file()) {
-        CARBON_DIAGNOSTIC(CompileInputNotRegularFile, Error,
+        MYLANG_DIAGNOSTIC(CompileInputNotRegularFile, Error,
                           "output file name must be specified for input `{0}` "
                           "that is not a regular file",
                           std::string);
@@ -680,13 +680,13 @@ auto CompilationUnit::RunCodeGenHelper() -> bool {
       llvm::sys::path::replace_extension(output_filename,
                                          options_->asm_output ? ".s" : ".o");
     }
-    CARBON_VLOG("Writing output to: {0}\n", output_filename);
+    MYLANG_VLOG("Writing output to: {0}\n", output_filename);
 
     std::error_code ec;
     llvm::raw_fd_ostream output_file(output_filename, ec,
                                      llvm::sys::fs::OF_None);
     if (ec) {
-      CARBON_DIAGNOSTIC(CompileOutputFileOpenError, Error,
+      MYLANG_DIAGNOSTIC(CompileOutputFileOpenError, Error,
                         "could not open output file `{0}`: {1}", std::string,
                         std::string);
       driver_env_->emitter.Emit(CompileOutputFileOpenError,
@@ -724,10 +724,10 @@ auto CompilationUnit::LogCall(llvm::StringLiteral logging_label,
   PrettyStackTraceFunction trace_file([&](llvm::raw_ostream& out) {
     out << "Filename: " << input_filename_ << "\n";
   });
-  CARBON_VLOG("*** {0}: {1} ***\n", logging_label, input_filename_);
+  MYLANG_VLOG("*** {0}: {1} ***\n", logging_label, input_filename_);
   Timings::ScopedTiming timing(timings_ ? &*timings_ : nullptr, timing_label);
   fn();
-  CARBON_VLOG("*** {0} done ***\n", logging_label);
+  MYLANG_VLOG("*** {0} done ***\n", logging_label);
 }
 
 auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
@@ -740,7 +740,7 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
   const llvm::Target* target = llvm::TargetRegistry::lookupTarget(
       llvm::Triple(options_.codegen_options.target), target_error);
   if (!target) {
-    CARBON_DIAGNOSTIC(CompileTargetInvalid, Error, "invalid target: {0}",
+    MYLANG_DIAGNOSTIC(CompileTargetInvalid, Error, "invalid target: {0}",
                       std::string);
     driver_env.emitter.Emit(CompileTargetInvalid, target_error);
     return {.success = false};
@@ -825,7 +825,7 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
     }
   }
 
-  CARBON_VLOG_TO(driver_env.vlog_stream, "*** Check::CheckParseTrees ***\n");
+  MYLANG_VLOG_TO(driver_env.vlog_stream, "*** Check::CheckParseTrees ***\n");
   Check::CheckParseTreesOptions check_options;
   check_options.prelude_import = options_.prelude_import;
   check_options.vlog_stream = driver_env.vlog_stream;
@@ -863,7 +863,7 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
 
   Check::CheckParseTrees(check_units, tree_and_subtrees_getters,
                          driver_env.fs, check_options, clang_invocation);
-  CARBON_VLOG_TO(driver_env.vlog_stream,
+  MYLANG_VLOG_TO(driver_env.vlog_stream,
                  "*** Check::CheckParseTrees done ***\n");
   for (auto& unit : units) {
     if (unit->has_source()) {
@@ -876,7 +876,7 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
 
   // Errors block further progress.
   if (llvm::any_of(units, [&](const auto& unit) { return !unit->success(); })) {
-    CARBON_VLOG_TO(driver_env.vlog_stream,
+    MYLANG_VLOG_TO(driver_env.vlog_stream,
                    "*** Stopping before lowering due to errors ***\n");
     return make_result();
   }
@@ -895,7 +895,7 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
       options_.phase == CompileOptions::Phase::Optimize) {
     return make_result();
   }
-  CARBON_CHECK(options_.phase == CompileOptions::Phase::CodeGen,
+  MYLANG_CHECK(options_.phase == CompileOptions::Phase::CodeGen,
                "CodeGen should be the last stage");
 
   // Codegen.
@@ -905,4 +905,4 @@ auto CompileSubcommand::Run(DriverEnv& driver_env) -> DriverResult {
   return make_result();
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

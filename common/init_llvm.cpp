@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -7,7 +7,7 @@
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_ostream.h"
 
-namespace Carbon {
+namespace MyLang {
 
 InitLLVM::InitLLVM(int& argc, char**& argv)
     : init_llvm_(argc, argv),
@@ -26,7 +26,7 @@ InitLLVM::InitLLVM(int& argc, char**& argv)
 
   llvm::setBugReportMsg(
       "Please report issues to "
-      "https://github.com/carbon-language/carbon-lang/issues and include the "
+      "https://TODO: Update with your project issue tracker and include the "
       "crash backtrace.\n");
 
   // Initialize LLVM targets if //common:all_llvm_targets was linked in.
@@ -41,4 +41,4 @@ InitLLVM::InitLLVM(int& argc, char**& argv)
 
 InitLLVM::InitializeTargetsFn* InitLLVM::InitializeTargets = nullptr;
 
-}  // namespace Carbon
+}  // namespace MyLang

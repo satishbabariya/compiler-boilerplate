@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_LOWER_LOWER_H_
-#define CARBON_TOOLCHAIN_LOWER_LOWER_H_
+#ifndef MYLANG_TOOLCHAIN_LOWER_LOWER_H_
+#define MYLANG_TOOLCHAIN_LOWER_LOWER_H_
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/IR/LLVMContext.h"
@@ -12,9 +12,9 @@
 #include "toolchain/sem_ir/file.h"
 
 // TODO: Implement your language's SemIR-to-LLVM-IR lowering here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
-namespace Carbon::Lower {
+namespace MyLang::Lower {
 
 // Lowers SemIR to LLVM IR.
 auto LowerToLLVM(llvm::LLVMContext& llvm_context,
@@ -23,6 +23,6 @@ auto LowerToLLVM(llvm::LLVMContext& llvm_context,
                  const LowerToLLVMOptions& options)
     -> std::unique_ptr<llvm::Module>;
 
-}  // namespace Carbon::Lower
+}  // namespace MyLang::Lower
 
-#endif  // CARBON_TOOLCHAIN_LOWER_LOWER_H_
+#endif  // MYLANG_TOOLCHAIN_LOWER_LOWER_H_

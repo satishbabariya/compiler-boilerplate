@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_TYPE_H_
-#define CARBON_TOOLCHAIN_SEM_IR_TYPE_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_TYPE_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_TYPE_H_
 
 #include "common/map.h"
 #include "llvm/ADT/SmallVector.h"
@@ -13,9 +13,9 @@
 #include "toolchain/sem_ir/inst_kind.h"
 
 // TODO: Implement your language's type system here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 // Forward declaration.
 class File;
@@ -139,9 +139,9 @@ class TypeStore : public Yaml::Printable<TypeStore> {
 
   // Sets the `CompleteTypeInfo` associated with a type.
   auto SetComplete(TypeId type_id, const CompleteTypeInfo& info) -> void {
-    CARBON_CHECK(info.value_repr.kind != ValueRepr::Unknown);
+    MYLANG_CHECK(info.value_repr.kind != ValueRepr::Unknown);
     auto insert_info = complete_type_info_.Insert(type_id, info);
-    CARBON_CHECK(insert_info.is_inserted(), "Type {0} completed more than once",
+    MYLANG_CHECK(insert_info.is_inserted(), "Type {0} completed more than once",
                  type_id);
     complete_types_.push_back(type_id);
   }
@@ -181,6 +181,6 @@ class TypeStore : public Yaml::Printable<TypeStore> {
   llvm::SmallVector<TypeId> complete_types_;
 };
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_TYPE_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_TYPE_H_

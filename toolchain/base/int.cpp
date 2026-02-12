@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <string>
 
-namespace Carbon {
+namespace MyLang {
 
 auto IntStore::CanonicalBitWidth(int significant_bits) -> int {
   // For larger integers, we store them in as a signed APInt with a canonical
@@ -66,4 +66,4 @@ auto IntStore::CollectMemUsage(MemUsage& mem_usage, llvm::StringRef label) const
   mem_usage.Collect(std::string(label), values_);
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

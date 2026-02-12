@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TESTING_FILE_TEST_FILE_TEST_BASE_H_
-#define CARBON_TESTING_FILE_TEST_FILE_TEST_BASE_H_
+#ifndef MYLANG_TESTING_FILE_TEST_FILE_TEST_BASE_H_
+#define MYLANG_TESTING_FILE_TEST_FILE_TEST_BASE_H_
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -21,7 +21,7 @@
 #include "testing/file_test/autoupdate.h"
 #include "testing/file_test/manifest.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // A framework for testing files. See README.md for documentation.
 class FileTestBase {
@@ -146,18 +146,18 @@ struct FileTestFactory {
 // container initialization and test instantiation by InitGoogleTest, but this
 // also allows us more flexibility in execution.
 //
-// The `CARBON_FILE_TEST_FACTOR` macro below provides a standard, convenient way
+// The `MYLANG_FILE_TEST_FACTOR` macro below provides a standard, convenient way
 // to implement this function.
 extern auto GetFileTestFactory() -> FileTestFactory;
 
 // Provides a standard GetFileTestFactory implementation.
-#define CARBON_FILE_TEST_FACTORY(Name)                                       \
+#define MYLANG_FILE_TEST_FACTORY(Name)                                       \
   auto GetFileTestFactory() -> FileTestFactory {                             \
     return {#Name, [](llvm::StringRef exe_path, llvm::StringRef test_name) { \
               return std::make_unique<Name>(exe_path, test_name);            \
             }};                                                              \
   }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TESTING_FILE_TEST_FILE_TEST_BASE_H_
+#endif  // MYLANG_TESTING_FILE_TEST_FILE_TEST_BASE_H_

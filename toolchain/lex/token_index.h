@@ -1,14 +1,14 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_LEX_TOKEN_INDEX_H_
-#define CARBON_TOOLCHAIN_LEX_TOKEN_INDEX_H_
+#ifndef MYLANG_TOOLCHAIN_LEX_TOKEN_INDEX_H_
+#define MYLANG_TOOLCHAIN_LEX_TOKEN_INDEX_H_
 
 #include "toolchain/base/index_base.h"
 #include "toolchain/lex/token_kind.h"
 
-namespace Carbon::Lex {
+namespace MyLang::Lex {
 
 class TokenInfo;
 
@@ -54,10 +54,10 @@ struct TokenIndexForKind : public TokenIndex {
 template <const TokenKind& K>
 const TokenKind& TokenIndexForKind<K>::Kind = K;
 
-#define CARBON_TOKEN(TokenName) \
+#define MYLANG_TOKEN(TokenName) \
   using TokenName##TokenIndex = TokenIndexForKind<TokenKind::TokenName>;
 #include "toolchain/lex/token_kind.def"
 
-}  // namespace Carbon::Lex
+}  // namespace MyLang::Lex
 
-#endif  // CARBON_TOOLCHAIN_LEX_TOKEN_INDEX_H_
+#endif  // MYLANG_TOOLCHAIN_LEX_TOKEN_INDEX_H_

@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_PARSE_TYPED_NODES_H_
-#define CARBON_TOOLCHAIN_PARSE_TYPED_NODES_H_
+#ifndef MYLANG_TOOLCHAIN_PARSE_TYPED_NODES_H_
+#define MYLANG_TOOLCHAIN_PARSE_TYPED_NODES_H_
 
 #include <optional>
 
@@ -11,7 +11,7 @@
 #include "toolchain/parse/node_ids.h"
 #include "toolchain/parse/node_kind.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 // Helpers for defining different kinds of parse nodes.
 // ----------------------------------------------------
@@ -1163,21 +1163,21 @@ struct UnsafeModifier {
 
 // Literals, operators, and modifiers
 
-#define CARBON_PARSE_NODE_KIND(Name)
-#define CARBON_PARSE_NODE_KIND_TOKEN_LITERAL(Name, LexTokenKind)       \
+#define MYLANG_PARSE_NODE_KIND(Name)
+#define MYLANG_PARSE_NODE_KIND_TOKEN_LITERAL(Name, LexTokenKind)       \
   using Name = LeafNode<NodeKind::Name, Lex::LexTokenKind##TokenIndex, \
                         NodeCategory::Expr>;
-#define CARBON_PARSE_NODE_KIND_TOKEN_MODIFIER(Name)             \
+#define MYLANG_PARSE_NODE_KIND_TOKEN_MODIFIER(Name)             \
   using Name##Modifier =                                        \
       LeafNode<NodeKind::Name##Modifier, Lex::Name##TokenIndex, \
                NodeCategory::Modifier>;
-#define CARBON_PARSE_NODE_KIND_PREFIX_OPERATOR(Name) \
+#define MYLANG_PARSE_NODE_KIND_PREFIX_OPERATOR(Name) \
   using PrefixOperator##Name =                       \
       PrefixOperator<NodeKind::PrefixOperator##Name, Lex::Name##TokenIndex>;
-#define CARBON_PARSE_NODE_KIND_INFIX_OPERATOR(Name) \
+#define MYLANG_PARSE_NODE_KIND_INFIX_OPERATOR(Name) \
   using InfixOperator##Name =                       \
       InfixOperator<NodeKind::InfixOperator##Name, Lex::Name##TokenIndex>;
-#define CARBON_PARSE_NODE_KIND_POSTFIX_OPERATOR(Name) \
+#define MYLANG_PARSE_NODE_KIND_POSTFIX_OPERATOR(Name) \
   using PostfixOperator##Name =                       \
       PostfixOperator<NodeKind::PostfixOperator##Name, Lex::Name##TokenIndex>;
 #include "toolchain/parse/node_kind.def"
@@ -1699,13 +1699,13 @@ struct File {
 };
 
 // Define `Foo` as the node type for the ID type `FooId`.
-#define CARBON_PARSE_NODE_KIND(KindName) \
+#define MYLANG_PARSE_NODE_KIND(KindName) \
   template <>                            \
   struct NodeForId<KindName##Id> {       \
     using TypedNode = KindName;          \
   };
 #include "toolchain/parse/node_kind.def"
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse
 
-#endif  // CARBON_TOOLCHAIN_PARSE_TYPED_NODES_H_
+#endif  // MYLANG_TOOLCHAIN_PARSE_TYPED_NODES_H_

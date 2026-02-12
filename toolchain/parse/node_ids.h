@@ -1,15 +1,15 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_PARSE_NODE_IDS_H_
-#define CARBON_TOOLCHAIN_PARSE_NODE_IDS_H_
+#ifndef MYLANG_TOOLCHAIN_PARSE_NODE_IDS_H_
+#define MYLANG_TOOLCHAIN_PARSE_NODE_IDS_H_
 
 #include "toolchain/base/index_base.h"
 #include "toolchain/lex/token_index.h"
 #include "toolchain/parse/node_kind.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 // Represents an invalid node id of any type
 struct NoneNodeId {};
@@ -33,7 +33,7 @@ struct NodeId : public IdBase<NodeId> {
   static constexpr NoneNodeId None;
 
   constexpr explicit NodeId(int32_t index) : IdBase(index) {
-    CARBON_DCHECK(index < Max, "Index out of range: {0}", index);
+    MYLANG_DCHECK(index < Max, "Index out of range: {0}", index);
   }
 
   explicit(false) constexpr NodeId(NoneNodeId /*none*/) : IdBase(NoneIndex) {}
@@ -67,7 +67,7 @@ struct NodeIdForKind : public NodeId {
 template <const NodeKind& K>
 const NodeKind& NodeIdForKind<K>::Kind = K;
 
-#define CARBON_PARSE_NODE_KIND(KindName) \
+#define MYLANG_PARSE_NODE_KIND(KindName) \
   using KindName##Id = NodeIdForKind<NodeKind::KindName>;
 #include "toolchain/parse/node_kind.def"
 
@@ -85,7 +85,7 @@ struct NodeIdInCategory : public NodeId {
   template <const NodeKind& Kind>
   explicit(false) NodeIdInCategory(NodeIdForKind<Kind> node_id)
       : NodeId(node_id) {
-    CARBON_CHECK(Kind.category().HasAnyOf(Category));
+    MYLANG_CHECK(Kind.category().HasAnyOf(Category));
   }
 
   explicit(false) constexpr NodeIdInCategory(NoneNodeId /*none*/)
@@ -191,6 +191,6 @@ struct NodeIdNot : public NodeId {
 // Note that the support for extracting these types using the `Tree::Extract*`
 // functions is defined in `extract.cpp`.
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse
 
-#endif  // CARBON_TOOLCHAIN_PARSE_NODE_IDS_H_
+#endif  // MYLANG_TOOLCHAIN_PARSE_NODE_IDS_H_

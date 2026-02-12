@@ -1,15 +1,15 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DIAGNOSTICS_MOCKS_H_
-#define CARBON_TOOLCHAIN_DIAGNOSTICS_MOCKS_H_
+#ifndef MYLANG_TOOLCHAIN_DIAGNOSTICS_MOCKS_H_
+#define MYLANG_TOOLCHAIN_DIAGNOSTICS_MOCKS_H_
 
 #include <gmock/gmock.h>
 
 #include "toolchain/diagnostics/emitter.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 class MockDiagnosticConsumer : public Diagnostics::Consumer {
  public:
@@ -63,14 +63,14 @@ inline auto IsSingleDiagnostic(testing::Matcher<Diagnostics::Kind> kind,
                                                       column_number, message)));
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-namespace Carbon::Diagnostics {
+namespace MyLang::Diagnostics {
 
 // Printing helpers for tests.
 auto PrintTo(const Diagnostic& diagnostic, std::ostream* os) -> void;
 auto PrintTo(Level level, std::ostream* os) -> void;
 
-}  // namespace Carbon::Diagnostics
+}  // namespace MyLang::Diagnostics
 
-#endif  // CARBON_TOOLCHAIN_DIAGNOSTICS_MOCKS_H_
+#endif  // MYLANG_TOOLCHAIN_DIAGNOSTICS_MOCKS_H_

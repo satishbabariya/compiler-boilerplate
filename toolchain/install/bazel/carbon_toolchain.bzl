@@ -1,17 +1,17 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-"""Module extension to configure Carbon's `cc_toolchain`s.
+"""Module extension to configure MyLang's `cc_toolchain`s.
 
-This extension extracts configuration from the Carbon toolchain into
+This extension extracts configuration from the MyLang toolchain into
 `carbon_detected_variables.bzl`. These values are then used by the
-`cc_toolchain` to setup the Carbon toolchain as a viable C++ Bazel toolchain.
+`cc_toolchain` to setup the MyLang toolchain as a viable C++ Bazel toolchain.
 """
 
-def _compute_config_vars(repository_ctx, carbon):
-    """Runs the `carbon` binary to get its config variables."""
-    exec_result = repository_ctx.execute([carbon, "config", "--json"])
+def _compute_config_vars(repository_ctx, mylang):
+    """Runs the `mylang` binary to get its config variables."""
+    exec_result = repository_ctx.execute([mylang, "config", "--json"])
     if exec_result.return_code != 0:
         fail("Command failed with return code {0}:\n{1}".format(
             exec_result.return_code,
@@ -28,7 +28,7 @@ def _compute_config_vars(repository_ctx, carbon):
     return {key: str(value) for key, value in vars.items()}
 
 def _create_config_repo_impl(repository_ctx):
-    vars = _compute_config_vars(repository_ctx, repository_ctx.attr._carbon)
+    vars = _compute_config_vars(repository_ctx, repository_ctx.attr._mylang)
 
     repository_ctx.template(
         "carbon_detected_variables.bzl",
@@ -43,8 +43,8 @@ exports_files(["carbon_detected_variables.bzl"])
 _create_config_repo = repository_rule(
     implementation = _create_config_repo_impl,
     attrs = {
-        "_carbon": attr.label(
-            default = "//:carbon-busybox",
+        "_mylang": attr.label(
+            default = "//:mylang-busybox",
             allow_single_file = True,
         ),
         "_template": attr.label(

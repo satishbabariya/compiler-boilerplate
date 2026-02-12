@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -18,7 +18,7 @@
 #include "toolchain/driver/driver.h"
 #include "toolchain/install/busybox_info.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // The actual `main` implementation. Can return an exit code or an `Error`
 // (which causes EXIT_FAILRUE).
@@ -26,7 +26,7 @@ static auto Main(int argc, char** argv) -> ErrorOr<int> {
   InitLLVM init_llvm(argc, argv);
 
   // Start by resolving any symlinks.
-  CARBON_ASSIGN_OR_RETURN(auto busybox_info, GetBusyboxInfo(argv[0]));
+  MYLANG_ASSIGN_OR_RETURN(auto busybox_info, GetBusyboxInfo(argv[0]));
 
   std::filesystem::path exe_path = busybox_info.bin_path.string();
   exe_path = SetWorkingDirForBazelRun(exe_path);
@@ -79,19 +79,19 @@ static auto Main(int argc, char** argv) -> ErrorOr<int> {
     // to subcommands. If any of these end up needing more advanced
     // translation, that can be factored into the `.def` file to provide custom
     // expansion here.
-#define CARBON_LLVM_TOOL(Id, Name, BinName, MainFn) \
+#define MYLANG_LLVM_TOOL(Id, Name, BinName, MainFn) \
   .Case(BinName, {"llvm", Name, "--"})
 #include "toolchain/base/llvm_tools.def"
 
             .Default({*busybox_info.mode, "--"});
 
     // When we're operating as a busybox, we also support a special command line
-    // syntax for passing flags to the base Carbon driver as
-    // `-Xcarbon=--some-carbon-flag=some-value`. Extract any arguments of that
+    // syntax for passing flags to the base MyLang driver as
+    // `-Xmylang=--some-mylang-flag=some-value`. Extract any arguments of that
     // form, remove the prefix, and prepend them to the arg list prior to the
     // busybox subcommand arguments.
     llvm::erase_if(raw_args, [&args](llvm::StringRef raw_arg) {
-      if (raw_arg.consume_front("-Xcarbon=")) {
+      if (raw_arg.consume_front("-Xmylang=")) {
         args.push_back(raw_arg);
         return true;
       }
@@ -109,10 +109,10 @@ static auto Main(int argc, char** argv) -> ErrorOr<int> {
   return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-}  // namespace Carbon
+}  // namespace MyLang
 
 auto main(int argc, char** argv) -> int {
-  auto result = Carbon::Main(argc, argv);
+  auto result = MyLang::Main(argc, argv);
   if (result.ok()) {
     return *result;
   } else {

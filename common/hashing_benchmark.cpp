@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -14,7 +14,7 @@
 #include "common/hashing.h"
 #include "llvm/ADT/Hashing.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
 // We want the benchmark working set to fit in the L1 cache where possible so
@@ -308,4 +308,4 @@ LATENCY_STRING_SIZE_BENCHMARKS(CarbonHashBench);
 LATENCY_STRING_SIZE_BENCHMARKS(AbseilHashBench);
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

@@ -1,10 +1,10 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #include "toolchain/driver/driver_subcommand.h"
 
-namespace Carbon {
+namespace MyLang {
 
 auto DriverSubcommand::TestAndDiagnoseIfFuzzingExternalLibraries(
     DriverEnv& driver_env, llvm::StringRef name) -> bool {
@@ -13,7 +13,7 @@ auto DriverSubcommand::TestAndDiagnoseIfFuzzingExternalLibraries(
     return false;
   }
 
-  CARBON_DIAGNOSTIC(
+  MYLANG_DIAGNOSTIC(
       ToolFuzzingDisallowed, Error,
       "preventing fuzzing of `{0}` subcommand due to external library",
       std::string);
@@ -21,4 +21,4 @@ auto DriverSubcommand::TestAndDiagnoseIfFuzzingExternalLibraries(
   return true;
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

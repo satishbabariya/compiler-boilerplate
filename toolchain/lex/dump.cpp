@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,7 +10,7 @@
 
 #include "common/raw_string_ostream.h"
 
-namespace Carbon::Lex {
+namespace MyLang::Lex {
 
 LLVM_DUMP_METHOD auto Dump(const TokenizedBuffer& tokens, TokenIndex token)
     -> std::string {
@@ -30,6 +30,6 @@ LLVM_DUMP_METHOD auto Dump(const TokenizedBuffer& tokens, TokenIndex token)
   return out.TakeStr();
 }
 
-}  // namespace Carbon::Lex
+}  // namespace MyLang::Lex
 
 #endif  // NDEBUG

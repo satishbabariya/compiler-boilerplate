@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,7 +10,7 @@
 // NOLINTNEXTLINE(readability-identifier-naming): Constant in practice.
 extern const char* CarbonFileTestManifest[];
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 auto GetFileTestManifest() -> llvm::SmallVector<std::string> {
   llvm::SmallVector<std::string> manifest;
@@ -20,4 +20,4 @@ auto GetFileTestManifest() -> llvm::SmallVector<std::string> {
   return manifest;
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

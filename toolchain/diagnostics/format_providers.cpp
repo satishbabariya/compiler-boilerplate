@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -7,8 +7,8 @@
 #include "common/check.h"
 #include "llvm/ADT/StringExtras.h"
 
-auto llvm::format_provider<Carbon::Diagnostics::BoolAsSelect>::format(
-    const Carbon::Diagnostics::BoolAsSelect& wrapper, raw_ostream& out,
+auto llvm::format_provider<MyLang::Diagnostics::BoolAsSelect>::format(
+    const MyLang::Diagnostics::BoolAsSelect& wrapper, raw_ostream& out,
     StringRef style) -> void {
   if (style.empty()) {
     llvm::format_provider<bool>::format(wrapper.value, out, style);
@@ -16,11 +16,11 @@ auto llvm::format_provider<Carbon::Diagnostics::BoolAsSelect>::format(
   }
 
   auto sep = style.find('|');
-  CARBON_CHECK(
+  MYLANG_CHECK(
       sep != llvm::StringRef::npos,
       "BoolAsSelect requires a `|` separating true and false results: `{0}`",
       style);
-  CARBON_CHECK(style.find('|', sep + 1) == llvm::StringRef::npos,
+  MYLANG_CHECK(style.find('|', sep + 1) == llvm::StringRef::npos,
                "BoolAsSelect only allows one `|`: `{0}`", style);
 
   if (wrapper.value) {
@@ -30,8 +30,8 @@ auto llvm::format_provider<Carbon::Diagnostics::BoolAsSelect>::format(
   }
 }
 
-auto llvm::format_provider<Carbon::Diagnostics::IntAsSelect>::format(
-    const Carbon::Diagnostics::IntAsSelect& wrapper, raw_ostream& out,
+auto llvm::format_provider<MyLang::Diagnostics::IntAsSelect>::format(
+    const MyLang::Diagnostics::IntAsSelect& wrapper, raw_ostream& out,
     StringRef style) -> void {
   if (style == "s") {
     if (wrapper.value != 1) {
@@ -54,7 +54,7 @@ auto llvm::format_provider<Carbon::Diagnostics::IntAsSelect>::format(
     }
 
     auto pair_sep = token.find(':');
-    CARBON_CHECK(pair_sep != llvm::StringRef::npos,
+    MYLANG_CHECK(pair_sep != llvm::StringRef::npos,
                  "IntAsSelect requires a `:` separating each comparison and "
                  "output string: `{0}`",
                  style);
@@ -64,7 +64,7 @@ auto llvm::format_provider<Carbon::Diagnostics::IntAsSelect>::format(
 
     if (comp.empty()) {
       // Default case.
-      CARBON_CHECK(cursor.empty(),
+      MYLANG_CHECK(cursor.empty(),
                    "IntAsSelect requires the default case be last: `{0}`",
                    style);
       out << output_string;
@@ -75,7 +75,7 @@ auto llvm::format_provider<Carbon::Diagnostics::IntAsSelect>::format(
       // Comparison.
       comp = comp.drop_front(op.size());
       int value;
-      CARBON_CHECK(to_integer(comp, value),
+      MYLANG_CHECK(to_integer(comp, value),
                    "IntAsSelect has invalid value in comparison: `{0}`", style);
       auto result = llvm::StringSwitch<std::optional<bool>>(op)
                         .Case("=", wrapper.value == value)
@@ -85,16 +85,16 @@ auto llvm::format_provider<Carbon::Diagnostics::IntAsSelect>::format(
                         .Case(">=", wrapper.value >= value)
                         .Default(std::nullopt);
       if (!result) {
-        CARBON_FATAL("IntAsSelect has unrecognized comparison: `{0}`", style);
+        MYLANG_FATAL("IntAsSelect has unrecognized comparison: `{0}`", style);
       }
       if (*result) {
         out << output_string;
         return;
       }
     } else {
-      CARBON_FATAL("IntAsSelect has unrecognized syntax: `{0}`", style);
+      MYLANG_FATAL("IntAsSelect has unrecognized syntax: `{0}`", style);
     }
   }
 
-  CARBON_FATAL("IntAsSelect doesn't handle `{0}`: `{1}`", wrapper.value, style);
+  MYLANG_FATAL("IntAsSelect doesn't handle `{0}`: `{1}`", wrapper.value, style);
 }

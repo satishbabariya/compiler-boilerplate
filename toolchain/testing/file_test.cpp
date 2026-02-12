@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DRIVER_DRIVER_FILE_TEST_BASE_H_
-#define CARBON_TOOLCHAIN_DRIVER_DRIVER_FILE_TEST_BASE_H_
+#ifndef MYLANG_TOOLCHAIN_DRIVER_DRIVER_FILE_TEST_BASE_H_
+#define MYLANG_TOOLCHAIN_DRIVER_DRIVER_FILE_TEST_BASE_H_
 
 #include <filesystem>
 #include <memory>
@@ -22,7 +22,7 @@
 #include "testing/file_test/file_test_base.h"
 #include "toolchain/driver/driver.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 namespace {
 
 // Adds a file to the fs.
@@ -57,21 +57,21 @@ static auto GetSharedTestData(llvm::StringRef exe_path)
   static ErrorOr<SharedTestData> data = [&]() -> ErrorOr<SharedTestData> {
     SharedTestData data = {.installation =
                                InstallPaths::MakeForBazelRunfiles(exe_path)};
-    CARBON_ASSIGN_OR_RETURN(data.prelude_files,
+    MYLANG_ASSIGN_OR_RETURN(data.prelude_files,
                             data.installation.ReadPreludeManifest());
     for (const auto& file : data.prelude_files) {
-      CARBON_RETURN_IF_ERROR(AddFile(*data.file_system, file));
+      MYLANG_RETURN_IF_ERROR(AddFile(*data.file_system, file));
     }
 
     llvm::SmallVector<std::string> clang_header_files;
-    CARBON_ASSIGN_OR_RETURN(clang_header_files,
+    MYLANG_ASSIGN_OR_RETURN(clang_header_files,
                             data.installation.ReadClangHeadersManifest());
     for (const auto& file : clang_header_files) {
-      CARBON_RETURN_IF_ERROR(AddFile(*data.file_system, file));
+      MYLANG_RETURN_IF_ERROR(AddFile(*data.file_system, file));
     }
     return data;
   }();
-  CARBON_CHECK(data.ok(), "{0}", data.error());
+  MYLANG_CHECK(data.ok(), "{0}", data.error());
   return &*data;
 }
 
@@ -128,14 +128,14 @@ class ToolchainFileTest : public FileTestBase {
 
 }  // namespace
 
-CARBON_FILE_TEST_FACTORY(ToolchainFileTest)
+MYLANG_FILE_TEST_FACTORY(ToolchainFileTest)
 
 // Returns the toolchain subdirectory being tested.
 static auto GetComponent(llvm::StringRef test_name) -> llvm::StringRef {
   // This handles cases where the toolchain directory may be copied into a
   // repository that doesn't put it at the root.
   auto pos = test_name.find("toolchain/");
-  CARBON_CHECK(pos != llvm::StringRef::npos, "{0}", test_name);
+  MYLANG_CHECK(pos != llvm::StringRef::npos, "{0}", test_name);
   test_name = test_name.drop_front(pos + strlen("toolchain/"));
   test_name = test_name.take_front(test_name.find("/"));
   return test_name;
@@ -244,7 +244,7 @@ auto ToolchainFileTest::GetDefaultArgs() const
   } else if (component_ == "codegen") {
     // codegen tests specify flags as needed.
   } else {
-    CARBON_FATAL("Unexpected test component {0}: {1}", component_, test_name());
+    MYLANG_FATAL("Unexpected test component {0}: {1}", component_, test_name());
   }
 
   args.push_back("%s");
@@ -360,6 +360,6 @@ auto ToolchainFileTest::FinalizeCheckLines(CheckLineArray& check_lines,
   }
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TOOLCHAIN_DRIVER_DRIVER_FILE_TEST_BASE_H_
+#endif  // MYLANG_TOOLCHAIN_DRIVER_DRIVER_FILE_TEST_BASE_H_

@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,7 +10,7 @@
 #include "toolchain/base/fixed_size_value_store.h"
 #include "toolchain/lex/token_index.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 TreeAndSubtrees::TreeAndSubtrees(const Lex::TokenizedBuffer& tokens,
                                  const Tree& tree)
@@ -26,16 +26,16 @@ TreeAndSubtrees::TreeAndSubtrees(const Lex::TokenizedBuffer& tokens,
     auto kind = tree.node_kind(n);
     if (kind.has_child_count()) {
       // When the child count is set, remove the specific number from the stack.
-      CARBON_CHECK(
+      MYLANG_CHECK(
           static_cast<int32_t>(size_stack.size()) >= kind.child_count(),
           "Need {0} children for {1}, have {2} available", kind.child_count(),
           kind, size_stack.size());
       for (auto i : llvm::seq(kind.child_count())) {
         auto child = size_stack.pop_back_val();
-        CARBON_CHECK(static_cast<size_t>(child.index) < subtree_sizes_.size());
+        MYLANG_CHECK(static_cast<size_t>(child.index) < subtree_sizes_.size());
         size += subtree_sizes_.Get(child);
         if (kind.has_bracket() && i == kind.child_count() - 1) {
-          CARBON_CHECK(
+          MYLANG_CHECK(
               kind.bracket() == tree.node_kind(child),
               "NodeId {0} ({1}) with child count {2} needs bracket {3}, found "
               "wrong bracket {4}",
@@ -45,7 +45,7 @@ TreeAndSubtrees::TreeAndSubtrees(const Lex::TokenizedBuffer& tokens,
       }
     } else {
       while (true) {
-        CARBON_CHECK(!size_stack.empty(),
+        MYLANG_CHECK(!size_stack.empty(),
                      "NodeId {0} ({1}) is missing bracket {2}", kind, n,
                      kind.bracket());
         auto child = size_stack.pop_back_val();
@@ -60,12 +60,12 @@ TreeAndSubtrees::TreeAndSubtrees(const Lex::TokenizedBuffer& tokens,
   }
 
   // Remaining nodes should all be roots in the tree; make sure they line up.
-  CARBON_CHECK(
+  MYLANG_CHECK(
       size_stack.back().index == static_cast<int32_t>(tree_->size()) - 1,
       "{0} {1}", size_stack.back(), tree_->size() - 1);
   int prev_index = -1;
   for (const auto& n : size_stack) {
-    CARBON_CHECK(n.index - subtree_sizes_.Get(n) == prev_index,
+    MYLANG_CHECK(n.index - subtree_sizes_.Get(n) == prev_index,
                  "NodeId {0} is a root {1} with subtree_size {2}, but previous "
                  "root was at {3}.",
                  n, tree_->node_kind(n), subtree_sizes_.Get(n), prev_index);
@@ -76,7 +76,7 @@ TreeAndSubtrees::TreeAndSubtrees(const Lex::TokenizedBuffer& tokens,
 auto TreeAndSubtrees::VerifyExtract(NodeId node_id, NodeKind kind,
                                     ErrorBuilder* trace) const -> bool {
   switch (kind) {
-#define CARBON_PARSE_NODE_KIND(Name) \
+#define MYLANG_PARSE_NODE_KIND(Name) \
   case NodeKind::Name:               \
     return VerifyExtractAs<Name>(node_id, trace).has_value();
 #include "toolchain/parse/node_kind.def"
@@ -125,7 +125,7 @@ auto TreeAndSubtrees::postorder(NodeId n) const
 
 auto TreeAndSubtrees::children(NodeId n) const
     -> llvm::iterator_range<SiblingIterator> {
-  CARBON_CHECK(n.has_value());
+  MYLANG_CHECK(n.has_value());
   int end_index = n.index - subtree_sizes_.Get(n);
   return llvm::iterator_range<SiblingIterator>(
       SiblingIterator(*this, NodeId(n.index - 1)),
@@ -217,7 +217,7 @@ auto TreeAndSubtrees::PrintPreorder(llvm::raw_ostream& output) const -> void {
     }
 
     int next_depth = node_stack.empty() ? 0 : node_stack.back().second;
-    CARBON_CHECK(next_depth <= depth, "Cannot have the next depth increase!");
+    MYLANG_CHECK(next_depth <= depth, "Cannot have the next depth increase!");
     for ([[maybe_unused]] auto _ : llvm::seq(depth - next_depth)) {
       output << "]}";
     }
@@ -294,4 +294,4 @@ auto TreeAndSubtrees::SiblingIterator::Print(llvm::raw_ostream& output) const
   output << node_;
 }
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse

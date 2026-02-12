@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -18,7 +18,7 @@
 #include "llvm/Support/FormatVariadic.h"
 #include "toolchain/lex/token_kind.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 auto SourceGen::Global() -> SourceGen& {
   static SourceGen global_gen;
@@ -157,7 +157,7 @@ auto SourceGen::ClassGenState::GetValidTypeName() -> llvm::StringRef {
       return type_names_.pop_back_val();
     }
 
-    CARBON_CHECK(last_type_name_index_ != initial_last_type_name_index,
+    MYLANG_CHECK(last_type_name_index_ != initial_last_type_name_index,
                  "Failed to find a valid type name with {0} candidates, an "
                  "initial index of {1}, and with {2} classes left to emit!",
                  type_names_.size(), initial_last_type_name_index,
@@ -176,7 +176,7 @@ auto SourceGen::ClassGenState::GetValidTypeName() -> llvm::StringRef {
 // weights.
 //
 // For each of the fixed types, `type_use_params` provides a spelling for both
-// Carbon and C++.
+// MyLang and C++.
 //
 // We distribute our references to declared class names evenly to the extent
 // possible.
@@ -219,7 +219,7 @@ auto SourceGen::ClassGenState::BuildClassAndTypeNames(
   // stable subset.
   type_names_.append(class_names_.begin(),
                      class_names_.begin() + (num_declared_types % num_classes));
-  CARBON_CHECK(static_cast<int>(type_names_.size()) == num_declared_types);
+  MYLANG_CHECK(static_cast<int>(type_names_.size()) == num_declared_types);
 
   // Use each fixed type weight to append the expected number of copies of that
   // type. This isn't exact however, and is designed to stop short.
@@ -242,7 +242,7 @@ auto SourceGen::ClassGenState::BuildClassAndTypeNames(
                                         : fixed_type_weight.carbon_spelling);
     }
   }
-  CARBON_CHECK(static_cast<int>(type_names_.size()) == num_types);
+  MYLANG_CHECK(static_cast<int>(type_names_.size()) == num_types);
   last_type_name_index_ = num_types;
 
   // Now shuffle both the class names and the type names.
@@ -251,7 +251,7 @@ auto SourceGen::ClassGenState::BuildClassAndTypeNames(
 }
 
 // Some heuristic numbers used when formatting generated code. These heuristics
-// are loosely based on what we expect to make Carbon code readable, and might
+// are loosely based on what we expect to make MyLang code readable, and might
 // not fit as well in C++, but we use the same heuristics across languages for
 // simplicity and to make the output in different languages more directly
 // comparable.
@@ -324,14 +324,14 @@ auto SourceGen::GenApiFileDenseDecls(int target_lines,
   // needs a blank line.
   constexpr int NumFileCommentLines = 4;
   double avg_class_lines = EstimateAvgClassDefLines(params.class_params);
-  CARBON_CHECK(target_lines > NumFileCommentLines + avg_class_lines,
+  MYLANG_CHECK(target_lines > NumFileCommentLines + avg_class_lines,
                "Not enough target lines to generate a single class!");
   int num_classes = static_cast<double>(target_lines - NumFileCommentLines) /
                     (avg_class_lines + 1);
   int expected_lines =
       NumFileCommentLines + num_classes * (avg_class_lines + 1);
 
-  source << "// Generated " << (!IsCpp() ? "Carbon" : "C++")
+  source << "// Generated " << (!IsCpp() ? "MyLang" : "C++")
          << " source file.\n";
   source << llvm::formatv(
                 "// {0} target lines: {1} classes, {2} expected lines",
@@ -339,7 +339,7 @@ auto SourceGen::GenApiFileDenseDecls(int target_lines,
          << "\n";
   source << "//\n// Generating as an API file with dense declarations.\n";
 
-  // Carbon uses an implicitly imported prelude to get builtin types, but C++
+  // MyLang uses an implicitly imported prelude to get builtin types, but C++
   // requires header files so include those.
   if (IsCpp()) {
     source << "\n";
@@ -357,12 +357,12 @@ auto SourceGen::GenApiFileDenseDecls(int target_lines,
   }
 
   // Make sure we consumed all the state.
-  CARBON_CHECK(class_gen_state.public_function_param_counts().empty());
-  CARBON_CHECK(class_gen_state.public_method_param_counts().empty());
-  CARBON_CHECK(class_gen_state.private_function_param_counts().empty());
-  CARBON_CHECK(class_gen_state.private_method_param_counts().empty());
-  CARBON_CHECK(class_gen_state.class_names().empty());
-  CARBON_CHECK(class_gen_state.type_names().empty());
+  MYLANG_CHECK(class_gen_state.public_function_param_counts().empty());
+  MYLANG_CHECK(class_gen_state.public_method_param_counts().empty());
+  MYLANG_CHECK(class_gen_state.private_function_param_counts().empty());
+  MYLANG_CHECK(class_gen_state.private_method_param_counts().empty());
+  MYLANG_CHECK(class_gen_state.class_names().empty());
+  MYLANG_CHECK(class_gen_state.type_names().empty());
 
   return source.TakeStr();
 }
@@ -379,7 +379,7 @@ auto SourceGen::GetShuffledIdentifiers(int number, int min_length,
 auto SourceGen::GetShuffledUniqueIdentifiers(int number, int min_length,
                                              int max_length, bool uniform)
     -> llvm::SmallVector<llvm::StringRef> {
-  CARBON_CHECK(min_length >= 4,
+  MYLANG_CHECK(min_length >= 4,
                "Cannot trivially guarantee enough distinct, unique identifiers "
                "for lengths <= 3");
   llvm::SmallVector<llvm::StringRef> idents =
@@ -405,7 +405,7 @@ auto SourceGen::GetIdentifiers(int number, int min_length, int max_length,
 auto SourceGen::GetUniqueIdentifiers(int number, int min_length, int max_length,
                                      bool uniform)
     -> llvm::SmallVector<llvm::StringRef> {
-  CARBON_CHECK(min_length >= 4,
+  MYLANG_CHECK(min_length >= 4,
                "Cannot trivially guarantee enough distinct, unique identifiers "
                "for lengths <= 3");
   llvm::SmallVector<llvm::StringRef> idents =
@@ -434,7 +434,7 @@ auto SourceGen::GetSingleLengthIdentifiers(int length, int number)
       llvm::StringRef new_id(ident_storage.data(), length);
       idents.push_back(new_id);
     }
-    CARBON_CHECK(static_cast<int>(idents.size()) == number);
+    MYLANG_CHECK(static_cast<int>(idents.size()) == number);
   }
   return llvm::ArrayRef(idents).slice(0, number);
 }
@@ -474,7 +474,7 @@ constexpr static llvm::StringRef NonCarbonCppKeywords[] = {
 // Returns a random identifier string of the specified length.
 //
 // Ensures this is a valid identifier, avoiding any overlapping syntaxes or
-// keywords both in Carbon and C++.
+// keywords both in MyLang and C++.
 //
 // This routine is somewhat expensive and so is useful to cache and reduce the
 // frequency of calls. However, each time it is called it computes a completely
@@ -560,7 +560,7 @@ auto SourceGen::AppendUniqueIdentifiers(
       --number;
     }
   });
-  CARBON_CHECK(number == 0);
+  MYLANG_CHECK(number == 0);
 }
 
 // An array of the counts that should be used for each identifier length to
@@ -640,8 +640,8 @@ auto SourceGen::GetIdentifiersImpl(int number, int min_length, int max_length,
                                    bool uniform,
                                    llvm::function_ref<AppendFn> append)
     -> llvm::SmallVector<llvm::StringRef> {
-  CARBON_CHECK(min_length <= max_length);
-  CARBON_CHECK(
+  MYLANG_CHECK(min_length <= max_length);
+  MYLANG_CHECK(
       uniform || max_length <= 64,
       "Cannot produce a meaningful non-uniform distribution of lengths longer "
       "than 64 as those are exceedingly rare in our observed data sets.");
@@ -655,7 +655,7 @@ auto SourceGen::GetIdentifiersImpl(int number, int min_length, int max_length,
   auto length_counts =
       llvm::ArrayRef(IdentifierLengthCounts).slice(min_length - 1, num_lengths);
   int count_sum = uniform ? num_lengths : Sum(length_counts);
-  CARBON_CHECK(count_sum >= 1);
+  MYLANG_CHECK(count_sum >= 1);
 
   int number_rem = number % count_sum;
 
@@ -674,8 +674,8 @@ auto SourceGen::GetIdentifiersImpl(int number, int min_length, int max_length,
     }
     append(length, length_count, idents);
   }
-  CARBON_CHECK(number_rem == 0, "Unexpected number remaining: {0}", number_rem);
-  CARBON_CHECK(static_cast<int>(idents.size()) == number,
+  MYLANG_CHECK(number_rem == 0, "Unexpected number remaining: {0}", number_rem);
+  MYLANG_CHECK(static_cast<int>(idents.size()) == number,
                "Ended up with {0} identifiers instead of the requested {1}",
                idents.size(), number);
 
@@ -700,7 +700,7 @@ auto SourceGen::GetShuffledInts(int number, int min, int max)
     i_count += i < (min + (number % num_values));
     ints.append(i_count, i);
   }
-  CARBON_CHECK(static_cast<int>(ints.size()) == number);
+  MYLANG_CHECK(static_cast<int>(ints.size()) == number);
 
   std::shuffle(ints.begin(), ints.end(), rng_);
   return ints;
@@ -751,7 +751,7 @@ class SourceGen::UniqueIdentifierPopper {
       if (it_ != data_->rbegin()) {
         std::swap(*data_->rbegin(), *it_);
       }
-      CARBON_CHECK(insert.key() == data_->back());
+      MYLANG_CHECK(insert.key() == data_->back());
       return data_->pop_back_val();
     }
 
@@ -917,4 +917,4 @@ auto SourceGen::GenerateClassDef(const ClassParams& params,
   os << "}" << (IsCpp() ? ";" : "") << "\n";
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

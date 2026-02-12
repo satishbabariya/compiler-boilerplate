@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SOURCE_SOURCE_BUFFER_H_
-#define CARBON_TOOLCHAIN_SOURCE_SOURCE_BUFFER_H_
+#ifndef MYLANG_TOOLCHAIN_SOURCE_SOURCE_BUFFER_H_
+#define MYLANG_TOOLCHAIN_SOURCE_SOURCE_BUFFER_H_
 
 #include <memory>
 #include <string>
@@ -13,18 +13,18 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "toolchain/diagnostics/emitter.h"
 
-namespace Carbon {
+namespace MyLang {
 
-// A buffer of Carbon source code.
+// A buffer of MyLang source code.
 //
-// This class holds a buffer of Carbon source code as text and makes it
-// available for use in the rest of the Carbon compiler. It owns the memory for
+// This class holds a buffer of MyLang source code as text and makes it
+// available for use in the rest of the MyLang compiler. It owns the memory for
 // the underlying source code text and ensures it lives as long as the buffer
 // objects.
 //
-// Every buffer of source code text is notionally loaded from a Carbon source
+// Every buffer of source code text is notionally loaded from a MyLang source
 // file, even if provided directly when constructing the buffer. The name that
-// should be used for that Carbon source file is also retained and made
+// should be used for that MyLang source file is also retained and made
 // available.
 //
 // Because the underlying memory for the source code text may have been read
@@ -97,6 +97,6 @@ class SourceBuffer {
   bool is_regular_file_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_SOURCE_SOURCE_BUFFER_H_
+#endif  // MYLANG_TOOLCHAIN_SOURCE_SOURCE_BUFFER_H_

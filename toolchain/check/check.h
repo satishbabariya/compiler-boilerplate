@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_CHECK_CHECK_H_
-#define CARBON_TOOLCHAIN_CHECK_CHECK_H_
+#ifndef MYLANG_TOOLCHAIN_CHECK_CHECK_H_
+#define MYLANG_TOOLCHAIN_CHECK_CHECK_H_
 
 #include "common/ostream.h"
 #include "toolchain/base/shared_value_stores.h"
@@ -14,9 +14,9 @@
 #include "toolchain/sem_ir/ids.h"
 
 // TODO: Implement your language's semantic checking here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
-namespace Carbon::Check {
+namespace MyLang::Check {
 
 // Checking information that's tracked per file. All members are caller-owned.
 // Other than `timings`, members must be non-null.
@@ -83,6 +83,6 @@ auto CheckParseTrees(
     const CheckParseTreesOptions& options,
     std::shared_ptr<clang::CompilerInvocation> clang_invocation) -> void;
 
-}  // namespace Carbon::Check
+}  // namespace MyLang::Check
 
-#endif  // CARBON_TOOLCHAIN_CHECK_CHECK_H_
+#endif  // MYLANG_TOOLCHAIN_CHECK_CHECK_H_

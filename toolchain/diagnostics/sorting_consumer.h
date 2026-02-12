@@ -1,15 +1,15 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DIAGNOSTICS_SORTING_CONSUMER_H_
-#define CARBON_TOOLCHAIN_DIAGNOSTICS_SORTING_CONSUMER_H_
+#ifndef MYLANG_TOOLCHAIN_DIAGNOSTICS_SORTING_CONSUMER_H_
+#define MYLANG_TOOLCHAIN_DIAGNOSTICS_SORTING_CONSUMER_H_
 
 #include "common/check.h"
 #include "llvm/ADT/STLExtras.h"
 #include "toolchain/diagnostics/emitter.h"
 
-namespace Carbon::Diagnostics {
+namespace MyLang::Diagnostics {
 
 // Buffers incoming diagnostics for printing and sorting.
 //
@@ -29,7 +29,7 @@ class SortingConsumer : public Consumer {
     // likely to refer to data that gets destroyed before the diagnostics
     // consumer is destroyed, because the diagnostics consumer is typically
     // created before the objects that diagnostics refer into are created.
-    CARBON_CHECK(diagnostics_.empty(),
+    MYLANG_CHECK(diagnostics_.empty(),
                  "Must flush diagnostics consumer before destroying it");
   }
 
@@ -71,6 +71,6 @@ class SortingConsumer : public Consumer {
   Consumer* next_consumer_;
 };
 
-}  // namespace Carbon::Diagnostics
+}  // namespace MyLang::Diagnostics
 
-#endif  // CARBON_TOOLCHAIN_DIAGNOSTICS_SORTING_CONSUMER_H_
+#endif  // MYLANG_TOOLCHAIN_DIAGNOSTICS_SORTING_CONSUMER_H_

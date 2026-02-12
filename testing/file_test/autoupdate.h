@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TESTING_FILE_TEST_AUTOUPDATE_H_
-#define CARBON_TESTING_FILE_TEST_AUTOUPDATE_H_
+#ifndef MYLANG_TESTING_FILE_TEST_AUTOUPDATE_H_
+#define MYLANG_TESTING_FILE_TEST_AUTOUPDATE_H_
 
 #include <filesystem>
 #include <utility>
@@ -15,7 +15,7 @@
 #include "re2/re2.h"
 #include "testing/file_test/line.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 class FileTestAutoupdater {
  public:
@@ -124,11 +124,11 @@ class FileTestAutoupdater {
             [&](const CheckLine& line) { return line.line_number() != -1; })),
         non_check_line_(non_check_lines_.begin()) {
     for (const auto& replacement : line_number_replacements_) {
-      CARBON_CHECK(replacement.has_file || default_file_re_,
+      MYLANG_CHECK(replacement.has_file || default_file_re_,
                    "For replacement with pattern `{0}` to have has_file=false, "
                    "override GetDefaultFileRE.",
                    replacement.re->pattern());
-      CARBON_CHECK(replacement.re->ok(), "Invalid line replacement RE2: {0}",
+      MYLANG_CHECK(replacement.re->ok(), "Invalid line replacement RE2: {0}",
                    replacement.re->error());
     }
   }
@@ -259,6 +259,6 @@ class FileTestAutoupdater {
   int output_line_number_ = 0;
 };
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TESTING_FILE_TEST_AUTOUPDATE_H_
+#endif  // MYLANG_TESTING_FILE_TEST_AUTOUPDATE_H_

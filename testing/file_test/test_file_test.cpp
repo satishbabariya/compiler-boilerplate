@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -22,7 +22,7 @@
 // NOLINTNEXTLINE(readability-identifier-naming): manifest.cpp dictates spelling
 const char* CarbonFileTestManifest[] = {nullptr};
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // Dummy unusable FileTestBase.
 class DummyFileTest : public FileTestBase {
@@ -35,14 +35,14 @@ class DummyFileTest : public FileTestBase {
            FILE* /*input_stream*/, llvm::raw_pwrite_stream& /*output_stream*/,
            llvm::raw_pwrite_stream& /*error_stream*/) const
       -> ErrorOr<RunResult> override {
-    CARBON_FATAL("Called method of dummy object");
+    MYLANG_FATAL("Called method of dummy object");
   }
 
   auto GetDefaultArgs() const -> llvm::SmallVector<std::string> override {
-    CARBON_FATAL("Called method of dummy object");
+    MYLANG_FATAL("Called method of dummy object");
   }
 };
-CARBON_FILE_TEST_FACTORY(DummyFileTest)
+MYLANG_FILE_TEST_FACTORY(DummyFileTest)
 
 namespace {
 
@@ -167,4 +167,4 @@ More text
 }
 
 }  // namespace
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

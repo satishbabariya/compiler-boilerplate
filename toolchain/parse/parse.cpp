@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -8,7 +8,7 @@
 #include "toolchain/parse/node_kind.h"
 #include "toolchain/parse/tree_and_subtrees.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 auto Parse(Lex::TokenizedBuffer& tokens, ParseOptions options) -> Tree {
   // TODO: Implement your language's parser here.
@@ -20,7 +20,7 @@ auto Parse(Lex::TokenizedBuffer& tokens, ParseOptions options) -> Tree {
   // - Error recovery for malformed input
   // - Reporting syntax errors via diagnostics
   //
-  // See the Carbon Language compiler for reference implementation patterns.
+  // See MyLang compiler for reference implementation patterns.
 
   auto* consumer =
       options.consumer ? options.consumer : &Diagnostics::ConsoleConsumer();
@@ -35,7 +35,7 @@ auto Parse(Lex::TokenizedBuffer& tokens, ParseOptions options) -> Tree {
   if (options.vlog_stream || options.dump_stream) {
     consumer->Flush();
   }
-  CARBON_VLOG_TO(options.vlog_stream, "*** Parse::Tree ***\n{0}", tree);
+  MYLANG_VLOG_TO(options.vlog_stream, "*** Parse::Tree ***\n{0}", tree);
   if (options.dump_stream) {
     Parse::TreeAndSubtrees tree_and_subtrees(tokens, tree);
     if (options.dump_preorder_parse_tree) {
@@ -47,4 +47,4 @@ auto Parse(Lex::TokenizedBuffer& tokens, ParseOptions options) -> Tree {
   return tree;
 }
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse

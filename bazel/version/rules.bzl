@@ -1,4 +1,4 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -20,7 +20,7 @@ files, a prefix of `STABLE_` will be removed from the key if present.
 [1]: https://docs.python.org/3/library/string.html#template-strings
 
 The substituted keys, and any guidance on values:
-- `VERSION` (the version string for Carbon)
+- `VERSION` (the version string for MyLang)
 - `BUILD_EMBED_LABEL` (value of --embed_label)
 - `BUILD_HOST` (the name of the host machine running the build)
 - `BUILD_USER` (the name of the user running the build)

@@ -1,10 +1,10 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-"""The base version of the Carbon repository.
+"""The base version of the MyLang repository.
 
-Carbon's version is defined here for export to various layers
+MyLang's version is defined here for export to various layers
 where it is needed. This is not the currently *released* version, but the
 version under *active development*.
 
@@ -14,9 +14,8 @@ to describe the development activity. We also never plan to make even a
 non-development pre-release of 0.0.0, only nightly development pre-releases are
 expected.
 
-For more details on Carbon's versioning, see:
+For more details on versioning, see:
   https://semver.org/
-  TODO: Add Carbon-specific link.
 """
 
 version_base = "0.0.0"

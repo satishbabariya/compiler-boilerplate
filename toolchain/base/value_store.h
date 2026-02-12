@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_VALUE_STORE_H_
-#define CARBON_TOOLCHAIN_BASE_VALUE_STORE_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_VALUE_STORE_H_
+#define MYLANG_TOOLCHAIN_BASE_VALUE_STORE_H_
 
 #include <bit>
 #include <cstddef>
@@ -23,7 +23,7 @@
 #include "toolchain/base/value_store_types.h"
 #include "toolchain/base/yaml.h"
 
-namespace Carbon {
+namespace MyLang {
 
 namespace Internal {
 
@@ -97,33 +97,33 @@ class ValueStore
     // This routine is especially hot and the check here relatively expensive
     // for the value provided, so only do this in non-optimized builds to make
     // tracking down issues easier.
-    CARBON_DCHECK(size_ < std::numeric_limits<int32_t>::max(), "Id overflow");
+    MYLANG_DCHECK(size_ < std::numeric_limits<int32_t>::max(), "Id overflow");
 
     IdType id = tag_.Apply(size_);
     auto [chunk_index, pos] = RawIndexToChunkIndices(size_);
     ++size_;
 
-    CARBON_DCHECK(static_cast<size_t>(chunk_index) <= chunks_.size(),
+    MYLANG_DCHECK(static_cast<size_t>(chunk_index) <= chunks_.size(),
                   "{0} <= {1}", chunk_index, chunks_.size());
     if (static_cast<size_t>(chunk_index) == chunks_.size()) {
       chunks_.emplace_back();
     }
 
-    CARBON_DCHECK(pos == chunks_[chunk_index].size());
+    MYLANG_DCHECK(pos == chunks_[chunk_index].size());
     chunks_[chunk_index].Add(std::move(value));
     return id;
   }
 
   // Returns a mutable value for an ID.
   auto Get(IdType id) -> RefType {
-    CARBON_DCHECK(id.index >= 0, "{0}", id);
+    MYLANG_DCHECK(id.index >= 0, "{0}", id);
     auto [chunk_index, pos] = IdToChunkIndices(id);
     return chunks_[chunk_index].Get(pos);
   }
 
   // Returns the value for an ID.
   auto Get(IdType id) const -> ConstRefType {
-    CARBON_DCHECK(id.index >= 0, "{0}", id);
+    MYLANG_DCHECK(id.index >= 0, "{0}", id);
     auto [chunk_index, pos] = IdToChunkIndices(id);
     return chunks_[chunk_index].Get(pos);
   }
@@ -133,7 +133,7 @@ class ValueStore
   auto GetWithDefault(IdType id,  //
                       ConstRefType default_value [[clang::lifetimebound]]) const
       -> ConstRefType {
-    CARBON_DCHECK(id.index >= 0, "{0}", id);
+    MYLANG_DCHECK(id.index >= 0, "{0}", id);
     auto index = tag_.Remove(id);
     if (index >= size_) {
       return default_value;
@@ -232,7 +232,7 @@ class ValueStore
 
   auto GetIdTag() const -> IdTagType { return tag_; }
   auto GetRawIndex(IdT id) const -> int32_t {
-    CARBON_DCHECK(id.index >= 0, "{0}", index);
+    MYLANG_DCHECK(id.index >= 0, "{0}", index);
     auto index = tag_.Remove(id);
 #ifndef NDEBUG
     if (index >= size_) {
@@ -242,7 +242,7 @@ class ValueStore
       // TODO: Teach ValueStore the type of the tag id with a template, then we
       // can print it with proper formatting instead of just as an integer.
       auto [id_tag, id_untagged_index] = IdTagType::DecomposeWithBestEffort(id);
-      CARBON_DCHECK(
+      MYLANG_DCHECK(
           index < size_,
           "Untagged index was outside of container range. Tagged index {0}. "
           "Best-effort decomposition: Tag: {1}, Index: {2}. "
@@ -334,16 +334,16 @@ class ValueStore
     }
 
     auto Get(int32_t i) -> ValueType& {
-      CARBON_DCHECK(i < num_, "{0}", i);
+      MYLANG_DCHECK(i < num_, "{0}", i);
       return buf_[i];
     }
     auto Get(int32_t i) const -> const ValueType& {
-      CARBON_DCHECK(i < num_, "{0}", i);
+      MYLANG_DCHECK(i < num_, "{0}", i);
       return buf_[i];
     }
 
     auto Add(ValueType&& value) -> void {
-      CARBON_DCHECK(num_ < Capacity());
+      MYLANG_DCHECK(num_ < Capacity());
       std::construct_at(buf_ + num_, std::move(value));
       ++num_;
     }
@@ -352,7 +352,7 @@ class ValueStore
     // respectively.
     auto UninitializedFill(int32_t fill_count, ConstRefType default_value)
         -> void {
-      CARBON_DCHECK(num_ + fill_count <= Capacity());
+      MYLANG_DCHECK(num_ + fill_count <= Capacity());
       std::uninitialized_fill_n(buf_ + num_, fill_count, default_value);
       num_ += fill_count;
     }
@@ -412,6 +412,6 @@ class ValueStore
   llvm::SmallVector<Chunk, 1> chunks_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_BASE_VALUE_STORE_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_VALUE_STORE_H_

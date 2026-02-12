@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -11,7 +11,7 @@
 #include "common/version.h"
 #include "toolchain/driver/compile_subcommand.h"
 
-namespace Carbon {
+namespace MyLang {
 
 namespace {
 struct Options {
@@ -36,7 +36,7 @@ struct Options {
 }  // namespace
 
 const CommandLine::CommandInfo Options::Info = {
-    .name = "carbon",
+    .name = "mylang",
     .version = Version::ToolchainInfo,
     .help = R"""(
 This is the unified compiler toolchain driver. Its subcommands provide
@@ -78,11 +78,11 @@ When printing diagnostics, include the diagnostic kind as part of output.
 
 auto Driver::RunCommand(llvm::ArrayRef<llvm::StringRef> args) -> DriverResult {
   PrettyStackTraceFunction trace_version([&](llvm::raw_ostream& out) {
-    out << "Carbon version: " << Version::String << "\n";
+    out << "MyLang version: " << Version::String << "\n";
   });
 
   if (driver_env_.installation->error()) {
-    CARBON_DIAGNOSTIC(DriverInstallInvalid, Error, "{0}", std::string);
+    MYLANG_DIAGNOSTIC(DriverInstallInvalid, Error, "{0}", std::string);
     driver_env_.emitter.Emit(DriverInstallInvalid,
                              driver_env_.installation->error()->str());
     return {.success = false};
@@ -98,7 +98,7 @@ auto Driver::RunCommand(llvm::ArrayRef<llvm::StringRef> args) -> DriverResult {
       options.include_diagnostic_kind);
 
   if (!result.ok()) {
-    CARBON_DIAGNOSTIC(DriverCommandLineParseFailed, Error, "{0}", std::string);
+    MYLANG_DIAGNOSTIC(DriverCommandLineParseFailed, Error, "{0}", std::string);
     driver_env_.emitter.Emit(DriverCommandLineParseFailed,
                              PrintToString(result.error()));
     return {.success = false};
@@ -113,8 +113,8 @@ auto Driver::RunCommand(llvm::ArrayRef<llvm::StringRef> args) -> DriverResult {
     driver_env_.fuzzing = true;
   }
 
-  CARBON_CHECK(options.selected_subcommand != nullptr);
+  MYLANG_CHECK(options.selected_subcommand != nullptr);
   return options.selected_subcommand->Run(driver_env_);
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

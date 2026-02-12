@@ -1,16 +1,16 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_CODEGEN_CODEGEN_H_
-#define CARBON_TOOLCHAIN_CODEGEN_CODEGEN_H_
+#ifndef MYLANG_TOOLCHAIN_CODEGEN_CODEGEN_H_
+#define MYLANG_TOOLCHAIN_CODEGEN_CODEGEN_H_
 
 #include "llvm/IR/Module.h"
 #include "llvm/Target/TargetMachine.h"
 #include "toolchain/diagnostics/consumer.h"
 #include "toolchain/diagnostics/file_diagnostics.h"
 
-namespace Carbon {
+namespace MyLang {
 
 class CodeGen {
  public:
@@ -48,6 +48,6 @@ class CodeGen {
   Diagnostics::FileEmitter emitter_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_CODEGEN_CODEGEN_H_
+#endif  // MYLANG_TOOLCHAIN_CODEGEN_CODEGEN_H_

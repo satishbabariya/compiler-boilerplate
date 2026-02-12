@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_RELATIONAL_VALUE_STORE_H_
-#define CARBON_TOOLCHAIN_BASE_RELATIONAL_VALUE_STORE_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_RELATIONAL_VALUE_STORE_H_
+#define MYLANG_TOOLCHAIN_BASE_RELATIONAL_VALUE_STORE_H_
 
 #include <optional>
 
@@ -11,7 +11,7 @@
 #include "toolchain/base/value_store.h"
 #include "toolchain/base/value_store_types.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // A ValueStore that builds a 1:1 relationship between two IDs.
 // * `RelatedStoreT` represents a related ValueStore with ids that can be used
@@ -49,7 +49,7 @@ class RelationalValueStore {
     auto related_index = related_store_->GetRawIndex(related_id);
     values_.Resize(related_index + 1, std::nullopt);
     auto& opt = values_.Get(related_id);
-    CARBON_CHECK(!opt.has_value(),
+    MYLANG_CHECK(!opt.has_value(),
                  "Add with `related_id` that was already added to the store");
     opt.emplace(std::move(value));
     return IdT(related_store_->GetIdTag().Apply(related_index).index);
@@ -80,6 +80,6 @@ class RelationalValueStore {
   const RelatedStoreT* related_store_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_BASE_RELATIONAL_VALUE_STORE_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_RELATIONAL_VALUE_STORE_H_

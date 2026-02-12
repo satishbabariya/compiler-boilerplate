@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -15,7 +15,7 @@
 #include "toolchain/parse/tree_and_subtrees.h"
 #include "toolchain/parse/typed_nodes.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 namespace {
 // Implementation of the process of extracting a typed node structure from the
@@ -404,18 +404,18 @@ auto TreeAndSubtrees::TryExtractNodeFromChildren(
 }
 
 // Manually instantiate Tree::TryExtractNodeFromChildren
-#define CARBON_PARSE_NODE_KIND(KindName)                               \
+#define MYLANG_PARSE_NODE_KIND(KindName)                               \
   template auto TreeAndSubtrees::TryExtractNodeFromChildren<KindName>( \
       NodeId node_id,                                                  \
       llvm::iterator_range<TreeAndSubtrees::SiblingIterator> children, \
       ErrorBuilder * trace) const -> std::optional<KindName>;
 
 // Also instantiate for `File`, even though it isn't a parse node.
-CARBON_PARSE_NODE_KIND(File)
+MYLANG_PARSE_NODE_KIND(File)
 #include "toolchain/parse/node_kind.def"
 
 auto TreeAndSubtrees::ExtractFile() const -> File {
   return ExtractNodeFromChildren<File>(NodeId::None, roots());
 }
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse

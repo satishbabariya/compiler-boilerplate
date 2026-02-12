@@ -1,18 +1,18 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_FUNCTION_H_
-#define CARBON_TOOLCHAIN_SEM_IR_FUNCTION_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_FUNCTION_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_FUNCTION_H_
 
 #include "toolchain/base/value_store.h"
 #include "toolchain/sem_ir/ids.h"
 #include "toolchain/sem_ir/typed_insts.h"
 
 // TODO: Implement your language's function representation here.
-// See the Carbon Language compiler for reference implementation patterns.
+// See MyLang compiler for reference implementation patterns.
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 class File;
 
@@ -99,6 +99,6 @@ auto GetCalleeAsFunction(const File& sem_ir, InstId callee_id,
                          SpecificId caller_specific_id = SpecificId::None)
     -> CalleeFunction;
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_FUNCTION_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_FUNCTION_H_

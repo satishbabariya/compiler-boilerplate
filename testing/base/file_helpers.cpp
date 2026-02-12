@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -12,7 +12,7 @@
 #include <string>
 #include <system_error>
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 auto GetTempDirectory() -> std::filesystem::path {
   if (char* tmpdir_env = getenv("TEST_TMPDIR"); tmpdir_env != nullptr) {
@@ -62,4 +62,4 @@ auto WriteTestFile(llvm::StringRef name, llvm::StringRef contents)
   return test_file;
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

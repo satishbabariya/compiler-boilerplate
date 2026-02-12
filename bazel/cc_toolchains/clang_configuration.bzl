@@ -1,4 +1,4 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -186,8 +186,8 @@ def _configure_clang_toolchain_impl(repository_ctx):
     )
     if clang_version and clang_version < 19:
         fail("Found clang {0}. ".format(clang_version) +
-             "Carbon requires clang >=19. See " +
-             "https://github.com/carbon-language/carbon-lang/blob/trunk/docs/project/contribution_tools.md#old-llvm-versions")
+             "MyLang requires clang >=19. See " +
+             "https://TODO: Update with your project URL/blob/trunk/docs/project/contribution_tools.md#old-llvm-versions")
 
     clang_cpp = clang.dirname.get_child("clang++")
 

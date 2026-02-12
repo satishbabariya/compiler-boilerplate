@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_LEX_TOKENIZED_BUFFER_H_
-#define CARBON_TOOLCHAIN_LEX_TOKENIZED_BUFFER_H_
+#ifndef MYLANG_TOOLCHAIN_LEX_TOKENIZED_BUFFER_H_
+#define MYLANG_TOOLCHAIN_LEX_TOKENIZED_BUFFER_H_
 
 #include <cstdint>
 
@@ -23,7 +23,7 @@
 #include "toolchain/lex/token_kind.h"
 #include "toolchain/source/source_buffer.h"
 
-namespace Carbon::Lex {
+namespace MyLang::Lex {
 
 class TokenizedBuffer;
 
@@ -93,7 +93,7 @@ struct InclusiveTokenRange {
   TokenIndex end;
 };
 
-// A buffer of tokenized Carbon source code.
+// A buffer of tokenized MyLang source code.
 //
 // This is constructed by lexing the source code text into a series of tokens.
 // The buffer provides lightweight handles to tokens and other lexed entities,
@@ -381,6 +381,6 @@ inline auto TokenizedBuffer::AddToken(TokenInfo info) -> TokenIndex {
   return token_infos_.Add(info);
 }
 
-}  // namespace Carbon::Lex
+}  // namespace MyLang::Lex
 
-#endif  // CARBON_TOOLCHAIN_LEX_TOKENIZED_BUFFER_H_
+#endif  // MYLANG_TOOLCHAIN_LEX_TOKENIZED_BUFFER_H_

@@ -1,13 +1,13 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TESTING_BASE_CAPTURE_STD_STREAMS_H_
-#define CARBON_TESTING_BASE_CAPTURE_STD_STREAMS_H_
+#ifndef MYLANG_TESTING_BASE_CAPTURE_STD_STREAMS_H_
+#define MYLANG_TESTING_BASE_CAPTURE_STD_STREAMS_H_
 
 #include <string>
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // Implementation details.
 namespace Internal {
@@ -32,6 +32,6 @@ static auto CallWithCapturedOutput(std::string& out, std::string& err,
   return result;
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TESTING_BASE_CAPTURE_STD_STREAMS_H_
+#endif  // MYLANG_TESTING_BASE_CAPTURE_STD_STREAMS_H_

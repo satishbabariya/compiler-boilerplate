@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,9 +10,9 @@
 
 auto main(int orig_argc, char** orig_argv) -> int {
   // Do LLVM's initialization first, this will also transform UTF-16 to UTF-8.
-  Carbon::InitLLVM init_llvm(orig_argc, orig_argv);
+  MyLang::InitLLVM init_llvm(orig_argc, orig_argv);
 
-  Carbon::Testing::SetExePath(orig_argv[0]);
+  MyLang::Testing::SetExePath(orig_argv[0]);
 
   // Inject a flag to override the defaults for benchmarks. This can still be
   // disabled by user arguments.

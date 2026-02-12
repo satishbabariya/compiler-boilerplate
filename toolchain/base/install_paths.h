@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_INSTALL_PATHS_H_
-#define CARBON_TOOLCHAIN_BASE_INSTALL_PATHS_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_INSTALL_PATHS_H_
+#define MYLANG_TOOLCHAIN_BASE_INSTALL_PATHS_H_
 
 #include <filesystem>
 
@@ -14,15 +14,15 @@
 #include "llvm/ADT/Twine.h"
 #include "toolchain/base/llvm_tools.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Locates the toolchain installation and provides paths to various components.
 //
-// The Carbon toolchain expects to be installed into a tree rooted at `root_`.
+// The MyLang toolchain expects to be installed into a tree rooted at `root_`.
 // This root contains the marker file and the busy box binary.
 //
 // In a Unix-like filesystem environment, the root is typically located as
-// `<some prefix>/lib/carbon`, with symlinks in the other parts of the FHS-based
+// `<some prefix>/lib/mylang`, with symlinks in the other parts of the FHS-based
 // layout back to entries below this tree. However, this class and the toolchain
 // itself should only directly use things below the installation root to support
 // non-FHS usage.
@@ -45,7 +45,7 @@ namespace Carbon {
 // that component.
 //
 // TODO: Need to check the installation structure of LLVM on Windows and figure
-// out what Carbon's should be within a Windows prefix and how much of the
+// out what MyLang's should be within a Windows prefix and how much of the
 // structure we can share with the Unix-y layout of the prefix.
 //
 // TODO: InstallPaths is typically called from places using a VFS (both tests
@@ -60,15 +60,15 @@ class InstallPaths {
   // Provide the current executable's path, and use that to detect a Bazel or
   // Bazel-compatible runfiles install root. This should only be used where it
   // is reasonable to rely on this rather than a fixed install location such as
-  // for internal development purposes or other Bazel users of the Carbon
+  // for internal development purposes or other Bazel users of the MyLang
   // library.
   //
   // This method of construction also ensures the result is valid. If detection
-  // fails for any reason, it will `CARBON_CHECK` fail with the error message.
+  // fails for any reason, it will `MYLANG_CHECK` fail with the error message.
   static auto MakeForBazelRunfiles(llvm::StringRef exe_path) -> InstallPaths;
 
   // Provide an explicit install paths root. This is useful for testing or for
-  // using Carbon in an environment with an unusual path to the installed files.
+  // using MyLang in an environment with an unusual path to the installed files.
   static auto Make(llvm::StringRef install_root) -> InstallPaths;
 
   // Returns the contents of the prelude manifest file. This is the list of
@@ -148,7 +148,7 @@ class InstallPaths {
   auto SetError(llvm::Twine message) -> void;
 
   // Check that the install paths have a marker file at
-  // `root()/lib/carbon/carbon_install.txt". If not, calls `SetError` with the
+  // `root()/lib/mylang/mylang_install.txt". If not, calls `SetError` with the
   // relevant error message.
   auto CheckMarkerFile() -> void;
 
@@ -162,14 +162,14 @@ class InstallPaths {
   //
   // When run from Bazel (for example, in unit tests or development binaries)
   // this will look like:
-  // `bazel-bin/some/bazel/target.runfiles/_main/toolchain/install/prefix/lib/carbon`
+  // `bazel-bin/some/bazel/target.runfiles/_main/toolchain/install/prefix/lib/mylang`
   //
   // When installed, it's expected to be similar to the CMake install prefix,
-  // followed by `lib/carbon`:
+  // followed by `lib/mylang`:
   //
-  // - `/usr/lib/carbon` or `/usr/local/lib/carbon` on Linux and most BSDs.
-  // - `/opt/homebrew/lib/carbon` or similar on macOS with Homebrew.
-  // - TODO: Figure out if this is `C:/Program Files/Carbon` or something else
+  // - `/usr/lib/mylang` or `/usr/local/lib/mylang` on Linux and most BSDs.
+  // - `/opt/homebrew/lib/mylang` or similar on macOS with Homebrew.
+  // - TODO: Figure out if this is `C:/Program Files/MyLang` or something else
   //   on Windows.
   //
   // See https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html
@@ -177,7 +177,7 @@ class InstallPaths {
   // our installation to behave in a similar and compatible way.
   //
   // The hierarchy of files beneath the install root can be found in the
-  // BUILD's `install_dirs` entry for `lib/carbon`.
+  // BUILD's `install_dirs` entry for `lib/mylang`.
   std::filesystem::path root_;
 
   // The opened root directory.
@@ -186,6 +186,6 @@ class InstallPaths {
   std::optional<std::string> error_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_BASE_INSTALL_PATHS_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_INSTALL_PATHS_H_

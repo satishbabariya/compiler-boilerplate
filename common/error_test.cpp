@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -12,11 +12,11 @@
 #include "common/error_test_helpers.h"
 #include "common/raw_string_ostream.h"
 
-namespace Carbon {
+namespace MyLang {
 namespace {
 
-using ::Carbon::Testing::IsError;
-using ::Carbon::Testing::IsSuccess;
+using ::MyLang::Testing::IsError;
+using ::MyLang::Testing::IsSuccess;
 using ::testing::_;
 using ::testing::Eq;
 using ::testing::VariantWith;
@@ -173,8 +173,8 @@ TYPED_TEST(ErrorOrTest, NestedMatching) {
 TYPED_TEST(ErrorOrTest, ReturnIfErrorNoError) {
   using TestErrorOr = ErrorOr<Success, TypeParam>;
   auto result = []() -> TestErrorOr {
-    CARBON_RETURN_IF_ERROR(TestErrorOr(Success()));
-    CARBON_RETURN_IF_ERROR(TestErrorOr(Success()));
+    MYLANG_RETURN_IF_ERROR(TestErrorOr(Success()));
+    MYLANG_RETURN_IF_ERROR(TestErrorOr(Success()));
     return Success();
   }();
   EXPECT_TRUE(result.ok());
@@ -183,8 +183,8 @@ TYPED_TEST(ErrorOrTest, ReturnIfErrorNoError) {
 TYPED_TEST(ErrorOrTest, ReturnIfErrorHasError) {
   using TestErrorOr = ErrorOr<Success, TypeParam>;
   auto result = [this]() -> TestErrorOr {
-    CARBON_RETURN_IF_ERROR(TestErrorOr(Success()));
-    CARBON_RETURN_IF_ERROR(TestErrorOr(this->MakeError()));
+    MYLANG_RETURN_IF_ERROR(TestErrorOr(Success()));
+    MYLANG_RETURN_IF_ERROR(TestErrorOr(this->MakeError()));
     return Success();
   }();
   EXPECT_THAT(result, IsError(this->ErrorStr()));
@@ -193,10 +193,10 @@ TYPED_TEST(ErrorOrTest, ReturnIfErrorHasError) {
 TYPED_TEST(ErrorOrTest, AssignOrReturnNoError) {
   using TestErrorOr = ErrorOr<int, TypeParam>;
   auto result = []() -> TestErrorOr {
-    CARBON_ASSIGN_OR_RETURN(int a, TestErrorOr(1));
-    CARBON_ASSIGN_OR_RETURN(const int b, TestErrorOr(2));
+    MYLANG_ASSIGN_OR_RETURN(int a, TestErrorOr(1));
+    MYLANG_ASSIGN_OR_RETURN(const int b, TestErrorOr(2));
     int c = 0;
-    CARBON_ASSIGN_OR_RETURN(c, TestErrorOr(3));
+    MYLANG_ASSIGN_OR_RETURN(c, TestErrorOr(3));
     return a + b + c;
   }();
   EXPECT_THAT(result, IsSuccess(Eq(6)));
@@ -205,7 +205,7 @@ TYPED_TEST(ErrorOrTest, AssignOrReturnNoError) {
 TYPED_TEST(ErrorOrTest, AssignOrReturnHasDirectError) {
   using TestErrorOr = ErrorOr<int, TypeParam>;
   auto result = [this]() -> TestErrorOr {
-    CARBON_RETURN_IF_ERROR(TestErrorOr(this->MakeError()));
+    MYLANG_RETURN_IF_ERROR(TestErrorOr(this->MakeError()));
     return 0;
   }();
   EXPECT_THAT(result, IsError(this->ErrorStr()));
@@ -214,7 +214,7 @@ TYPED_TEST(ErrorOrTest, AssignOrReturnHasDirectError) {
 TYPED_TEST(ErrorOrTest, AssignOrReturnHasErrorInExpected) {
   using TestErrorOr = ErrorOr<int, TypeParam>;
   auto result = [this]() -> TestErrorOr {
-    CARBON_ASSIGN_OR_RETURN(int a, TestErrorOr(this->MakeError()));
+    MYLANG_ASSIGN_OR_RETURN(int a, TestErrorOr(this->MakeError()));
     return a;
   }();
   EXPECT_THAT(result, IsError(this->ErrorStr()));
@@ -232,13 +232,13 @@ class AnotherCustomError : public ErrorBase<AnotherCustomError> {
 TYPED_TEST(ErrorOrTest, AssignOrReturnNoErrorAcrossErrorTypes) {
   using TestErrorOr = ErrorOr<int, TypeParam>;
   auto result = []() -> ErrorOr<int> {
-    CARBON_ASSIGN_OR_RETURN(int a, TestErrorOr(1));
-    CARBON_ASSIGN_OR_RETURN(const int b, []() -> TestErrorOr {
-      CARBON_ASSIGN_OR_RETURN(int inner, (ErrorOr<int, AnotherCustomError>(2)));
+    MYLANG_ASSIGN_OR_RETURN(int a, TestErrorOr(1));
+    MYLANG_ASSIGN_OR_RETURN(const int b, []() -> TestErrorOr {
+      MYLANG_ASSIGN_OR_RETURN(int inner, (ErrorOr<int, AnotherCustomError>(2)));
       return inner;
     }());
     int c = 0;
-    CARBON_ASSIGN_OR_RETURN(c, TestErrorOr(3));
+    MYLANG_ASSIGN_OR_RETURN(c, TestErrorOr(3));
     return a + b + c;
   }();
   EXPECT_THAT(result, IsSuccess(Eq(6)));
@@ -247,14 +247,14 @@ TYPED_TEST(ErrorOrTest, AssignOrReturnNoErrorAcrossErrorTypes) {
 TYPED_TEST(ErrorOrTest, AssignOrReturnErrorAcrossErrorTypes) {
   using TestErrorOr = ErrorOr<int, TypeParam>;
   auto result = []() -> ErrorOr<int> {
-    CARBON_ASSIGN_OR_RETURN(int a, TestErrorOr(1));
-    CARBON_ASSIGN_OR_RETURN(const int b, []() -> TestErrorOr {
-      CARBON_ASSIGN_OR_RETURN(
+    MYLANG_ASSIGN_OR_RETURN(int a, TestErrorOr(1));
+    MYLANG_ASSIGN_OR_RETURN(const int b, []() -> TestErrorOr {
+      MYLANG_ASSIGN_OR_RETURN(
           int inner, (ErrorOr<int, AnotherCustomError>(AnotherCustomError())));
       return inner;
     }());
     int c = 0;
-    CARBON_ASSIGN_OR_RETURN(c, TestErrorOr(3));
+    MYLANG_ASSIGN_OR_RETURN(c, TestErrorOr(3));
     return a + b + c;
   }();
 
@@ -269,4 +269,4 @@ TYPED_TEST(ErrorOrTest, AssignOrReturnErrorAcrossErrorTypes) {
 }
 
 }  // namespace
-}  // namespace Carbon
+}  // namespace MyLang

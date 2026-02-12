@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_HASHTABLE_KEY_CONTEXT_H_
-#define CARBON_COMMON_HASHTABLE_KEY_CONTEXT_H_
+#ifndef MYLANG_COMMON_HASHTABLE_KEY_CONTEXT_H_
+#define MYLANG_COMMON_HASHTABLE_KEY_CONTEXT_H_
 
 #include <concepts>
 
@@ -11,7 +11,7 @@
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APInt.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // The equality comparison used by the the hashtable key contexts in this file,
 // and suitable for using in other hashtable key contexts.
@@ -45,7 +45,7 @@ auto HashtableEq(const LeftT& lhs, const RightT& rhs) -> bool;
 // either stateless or stateful customization of the two core hashtable key
 // operations: hashing and comparison.
 //
-// The default for hashing uses Carbon's `hashing.h`. Customizations must still
+// The default for hashing uses MyLang's `hashing.h`. Customizations must still
 // return a `HashCode` as defined there, and it needs to have the same core
 // properties of hashes produced by the `hashing.h` infrastructure.
 //
@@ -230,6 +230,6 @@ auto TranslatingKeyContext<DerivedT>::KeyEq(const AnyKeyT& lhs_key,
   }
 }
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_HASHTABLE_KEY_CONTEXT_H_
+#endif  // MYLANG_COMMON_HASHTABLE_KEY_CONTEXT_H_

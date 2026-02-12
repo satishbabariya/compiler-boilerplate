@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -11,11 +11,11 @@
 ABSL_FLAG(std::string, testdata_manifest, "",
           "A path to a file containing repo-relative names of test files.");
 
-namespace Carbon::Diagnostics {
+namespace MyLang::Diagnostics {
 namespace {
 
 constexpr Kind Kinds[] = {
-#define CARBON_DIAGNOSTIC_KIND(Name) Kind::Name,
+#define MYLANG_DIAGNOSTIC_KIND(Name) Kind::Name,
 #include "toolchain/diagnostics/kind.def"
 };
 
@@ -76,4 +76,4 @@ TEST(Coverage, Kind) {
 }
 
 }  // namespace
-}  // namespace Carbon::Diagnostics
+}  // namespace MyLang::Diagnostics

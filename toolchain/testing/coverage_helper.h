@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_TESTING_COVERAGE_HELPER_H_
-#define CARBON_TOOLCHAIN_TESTING_COVERAGE_HELPER_H_
+#ifndef MYLANG_TOOLCHAIN_TESTING_COVERAGE_HELPER_H_
+#define MYLANG_TOOLCHAIN_TESTING_COVERAGE_HELPER_H_
 
 #include <gtest/gtest.h>
 
@@ -15,7 +15,7 @@
 #include "llvm/ADT/StringExtras.h"
 #include "re2/re2.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // Looks for kinds that aren't covered by a file_test in the manifest path.
 // Kinds are identified by the provided regular expression kind_pattern.
@@ -80,6 +80,6 @@ auto TestKindCoverage(const std::string& manifest_path,
       << llvm::join(unexpected_matches, Bullet);
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TOOLCHAIN_TESTING_COVERAGE_HELPER_H_
+#endif  // MYLANG_TOOLCHAIN_TESTING_COVERAGE_HELPER_H_

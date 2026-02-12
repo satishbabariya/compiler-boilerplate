@@ -1,4 +1,4 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -17,9 +17,9 @@ load("pkg_helpers.bzl", "pkg_naming_variables", "pkg_tar_and_test")
 
 package(default_visibility = ["//visibility:public"])
 
-# Build rules supporting the install data tree for the Carbon toolchain.
+# Build rules supporting the install data tree for the MyLang toolchain.
 #
-# This populates a synthetic Carbon toolchain installation under the
+# This populates a synthetic MyLang toolchain installation under the
 # `prefix` directory. For details on its layout, see `install_dirs` below.
 
 cc_library(
@@ -51,7 +51,7 @@ cc_test(
 # This target doesn't include prelude libraries. To get a target that has the
 # prelude available, use //toolchain.
 cc_binary(
-    name = "carbon-busybox",
+    name = "mylang-busybox",
     srcs = ["busybox_main.cpp"],
     deps = [
         ":busybox_info",
@@ -191,8 +191,8 @@ configure_cmake_file(
         "_LIBCPP_ABI_FORCE_ITANIUM": "OFF",
         "_LIBCPP_ABI_FORCE_MICROSOFT": "OFF",
 
-        # We use the unstable ABI and define a custom, Carbon-specific ABI
-        # namespace. This also matches the mangling prefix used for Carbon
+        # We use the unstable ABI and define a custom, MyLang-specific ABI
+        # namespace. This also matches the mangling prefix used for MyLang
         # symbols.
         "_LIBCPP_ABI_NAMESPACE": "_C",
         # TODO: Fix the need to define _LIBCPP_ABI_VERSION when the unstable
@@ -207,7 +207,7 @@ configure_cmake_file(
         #
         # - We enable threads, and use auto-detection rather than forcing an
         #   API.
-        # - Availability annotations do not apply to Carbon's libc++, so those
+        # - Availability annotations do not apply to MyLang's libc++, so those
         #   are disabled.
         #
         # Where there are platform differences in the features, we disable them
@@ -297,9 +297,9 @@ filegroup(
 # Given a CMake-style install prefix[1], the hierarchy looks like:
 #
 # - prefix/bin: Binaries intended for direct use.
-# - prefix/lib/carbon: Private data and files.
-# - prefix/lib/carbon/core: The `Core` package files.
-# - prefix/lib/carbon/llvm/bin: LLVM binaries.
+# - prefix/lib/mylang: Private data and files.
+# - prefix/lib/mylang/core: The `Core` package files.
+# - prefix/lib/mylang/llvm/bin: LLVM binaries.
 #
 # This will be how installs are provided on Unix-y platforms, and is loosely
 # based on the FHS (Filesystem Hierarchy Standard). See the CMake install prefix
@@ -309,15 +309,15 @@ filegroup(
 install_dirs = {
     "bin": [
         install_symlink(
-            "carbon",
-            "../lib/carbon/carbon-busybox",
+            "mylang",
+            "../lib/mylang/mylang-busybox",
             is_driver = True,
         ),
     ],
-    "lib/carbon": [
+    "lib/mylang": [
         install_target("MODULE.bazel", "bazel/install.MODULE.bazel"),
         install_target("BUILD", "bazel/install.BUILD"),
-        install_target("carbon_install.txt", "carbon_install.txt"),
+        install_target("mylang_install.txt", "mylang_install.txt"),
         install_target(
             "install_digest.txt",
             ":install_digest.txt",
@@ -326,8 +326,8 @@ install_dirs = {
             is_driver = True,
         ),
         install_target(
-            "carbon-busybox",
-            ":carbon-busybox",
+            "mylang-busybox",
+            ":mylang-busybox",
             executable = True,
             is_driver = True,
         ),
@@ -336,18 +336,18 @@ install_dirs = {
         # runtimes. It is a bit of both -- standard library, and runtimes.
         install_filegroup("core", "//core:prelude"),
     ],
-    "lib/carbon/bazel": [
+    "lib/mylang/bazel": [
         install_target("carbon_cc_toolchain_config.bzl", "bazel/carbon_cc_toolchain_config.bzl"),
         install_target("carbon_detected_variables.tpl.bzl", "bazel/carbon_detected_variables.tpl.bzl"),
         install_target("carbon_toolchain.bzl", "bazel/carbon_toolchain.bzl"),
         install_target("BUILD", "bazel/empty.BUILD"),
     ],
-    "lib/carbon/llvm/bin": [install_symlink(
+    "lib/mylang/llvm/bin": [install_symlink(
         name,
-        "../../carbon-busybox",
+        "../../mylang-busybox",
         is_driver = True,
     ) for name in llvm_binaries],
-    "lib/carbon/runtimes": [
+    "lib/mylang/runtimes": [
         install_filegroup(
             "builtins",
             ":clang_builtins_runtimes",
@@ -357,17 +357,17 @@ install_dirs = {
         install_filegroup("libcxxabi", ":libcxxabi"),
         install_filegroup("libunwind", ":libunwind"),
     ],
-    "lib/carbon/runtimes/libc": [
+    "lib/mylang/runtimes/libc": [
         install_filegroup("internal", ":libc_internal"),
     ],
-    "lib/carbon/runtimes/libcxx": [
+    "lib/mylang/runtimes/libcxx": [
         install_filegroup(
             "include",
             ":libcxx_gen_files",
             remove_prefix = "staging_libcxx/include/",
         ),
     ],
-    "lib/carbon/llvm/lib/clang/" + LLVM_VERSION_MAJOR: [
+    "lib/mylang/llvm/lib/clang/" + LLVM_VERSION_MAJOR: [
         install_filegroup(
             "include",
             ":clang_headers",
@@ -375,7 +375,7 @@ install_dirs = {
             remove_prefix = "staging/include/",
         ),
     ],
-    "lib/carbon/llvm/lib/clang/" + LLVM_VERSION_MAJOR + "/include": [
+    "lib/mylang/llvm/lib/clang/" + LLVM_VERSION_MAJOR + "/include": [
         install_filegroup(
             "fuzzer",
             "@llvm-project//compiler-rt:fuzzer_installed_hdrs",
@@ -472,9 +472,9 @@ pkg_naming_variables(
 pkg_tar_and_test(
     srcs = [":pkg_data"],
     install_data_manifest = ":install_data_manifest.txt",
-    name_base = "carbon_toolchain",
-    package_dir = "carbon_toolchain-$(version)",
-    package_file_name_base = "carbon_toolchain-$(version)",
+    name_base = "mylang_toolchain",
+    package_dir = "mylang_toolchain-$(version)",
+    package_file_name_base = "mylang_toolchain-$(version)",
     package_variables = ":packaging_variables",
     stamp = -1,  # Allow `--stamp` builds to produce file timestamps.
 )

@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_ID_TAG_H_
-#define CARBON_TOOLCHAIN_BASE_ID_TAG_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_ID_TAG_H_
+#define MYLANG_TOOLCHAIN_BASE_ID_TAG_H_
 
 #include <stdint.h>
 
@@ -13,7 +13,7 @@
 #include "common/ostream.h"
 #include "llvm/Support/MathExtras.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // A sentinel type to construct an IdTag without tagging.
 struct Untagged : Printable<Untagged> {
@@ -67,26 +67,26 @@ struct IdTag {
         initial_reserved_ids_(initial_reserved_ids) {}
 
   auto Apply(int32_t index) const -> IdT {
-    CARBON_DCHECK(index >= 0, "{0}", index);
+    MYLANG_DCHECK(index >= 0, "{0}", index);
     if (index < initial_reserved_ids_) {
       return IdT(index);
     }
     // TODO: Assert that tag_ doesn't have the second highest bit set.
     auto tagged_index = index ^ tag_;
-    CARBON_DCHECK(tagged_index >= 0, "{0}", tagged_index);
+    MYLANG_DCHECK(tagged_index >= 0, "{0}", tagged_index);
     return IdT(tagged_index);
   }
 
   auto Remove(IdT id) const -> int32_t {
-    CARBON_DCHECK(id.index >= 0, "{0}", id);
+    MYLANG_DCHECK(id.index >= 0, "{0}", id);
     if (!HasTag(id.index)) {
-      CARBON_DCHECK(id.index < initial_reserved_ids_,
+      MYLANG_DCHECK(id.index < initial_reserved_ids_,
                     "This untagged index is outside the initial reserved ids "
                     "and should have been tagged.");
       return id.index;
     }
     auto untagged_index = id.index ^ tag_;
-    CARBON_DCHECK(untagged_index >= initial_reserved_ids_,
+    MYLANG_DCHECK(untagged_index >= initial_reserved_ids_,
                   "When removing tagging bits, found an index that "
                   "shouldn't've been tagged in the first place.");
     return untagged_index;
@@ -165,6 +165,6 @@ struct IdTag {
   int32_t initial_reserved_ids_ = std::numeric_limits<int32_t>::max();
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_BASE_ID_TAG_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_ID_TAG_H_

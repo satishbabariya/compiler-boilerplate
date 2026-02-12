@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -14,19 +14,19 @@
 // The `DumpNoNewline` functions are helpers that exclude a trailing newline.
 // They're intended to be composed by `Dump` function implementations.
 
-#ifndef CARBON_TOOLCHAIN_LEX_DUMP_H_
-#define CARBON_TOOLCHAIN_LEX_DUMP_H_
+#ifndef MYLANG_TOOLCHAIN_LEX_DUMP_H_
+#define MYLANG_TOOLCHAIN_LEX_DUMP_H_
 
 #ifndef NDEBUG
 
 #include "toolchain/lex/tokenized_buffer.h"
 
-namespace Carbon::Lex {
+namespace MyLang::Lex {
 
 auto Dump(const TokenizedBuffer& tokens, TokenIndex token) -> std::string;
 
-}  // namespace Carbon::Lex
+}  // namespace MyLang::Lex
 
 #endif  // NDEBUG
 
-#endif  // CARBON_TOOLCHAIN_LEX_DUMP_H_
+#endif  // MYLANG_TOOLCHAIN_LEX_DUMP_H_

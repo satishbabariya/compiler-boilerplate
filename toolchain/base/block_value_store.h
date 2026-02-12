@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_BLOCK_VALUE_STORE_H_
-#define CARBON_TOOLCHAIN_BASE_BLOCK_VALUE_STORE_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_BLOCK_VALUE_STORE_H_
+#define MYLANG_TOOLCHAIN_BASE_BLOCK_VALUE_STORE_H_
 
 #include <type_traits>
 
@@ -15,7 +15,7 @@
 #include "toolchain/base/value_store.h"
 #include "toolchain/base/yaml.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 // Provides a block-based ValueStore, which uses slab allocation of added
 // blocks. This allows references to values to outlast vector resizes that might
@@ -41,7 +41,7 @@ class BlockValueStore
     auto empty = RefType();
     auto empty_val = canonical_blocks_.Insert(
         empty, [&] { return values_.Add(empty); }, KeyContext(this));
-    CARBON_CHECK(empty_val.key() == IdT::Empty);
+    MYLANG_CHECK(empty_val.key() == IdT::Empty);
   }
 
   // Adds a block with the given content, returning an ID to reference it.
@@ -156,6 +156,6 @@ class BlockValueStore<IdT, ElementT, TagIdT>::KeyContext
   const BlockValueStore* store_;
 };
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_BASE_BLOCK_VALUE_STORE_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_BLOCK_VALUE_STORE_H_

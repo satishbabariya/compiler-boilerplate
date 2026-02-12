@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -71,7 +71,7 @@ ABSL_FLAG(int, print_slowest_tests, 5,
           "The number of tests to print when showing slowest tests. Set to 0 "
           "to disabling printing. Set to -1 to print all tests.");
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // Information for a test case.
 struct FileTestInfo {
@@ -206,7 +206,7 @@ auto FileTestCase::TestBody() -> void {
     return;
   }
 
-  CARBON_CHECK(test_info_->test_result,
+  MYLANG_CHECK(test_info_->test_result,
                "Expected test to be run prior to TestBody: {0}",
                test_info_->test_name);
 
@@ -552,14 +552,14 @@ auto FileTestEventListener::OnTestProgramStart(
   }
 }
 
-// Implements main() within the Carbon::Testing namespace for convenience.
+// Implements main() within the MyLang::Testing namespace for convenience.
 static auto Main(int argc, char** argv) -> ErrorOr<int> {
   // Default to brief because we expect lots of tests, and `FileTestBase`
   // provides some summaries. Note `--test_arg=--gtest_brief=0` works to restore
   // output.
   absl::SetFlag(&FLAGS_gtest_brief, 1);
 
-  Carbon::InitLLVM init_llvm(argc, argv);
+  MyLang::InitLLVM init_llvm(argc, argv);
   testing::InitGoogleTest(&argc, argv);
   auto args = absl::ParseCommandLine(argc, argv);
 
@@ -596,7 +596,7 @@ static auto Main(int argc, char** argv) -> ErrorOr<int> {
 
   // Inline 0 entries because it will always be too large to store on the stack.
   llvm::SmallVector<FileTestInfo, 0> tests;
-  CARBON_RETURN_IF_ERROR(RegisterTests(&test_factory, exe_path, tests));
+  MYLANG_RETURN_IF_ERROR(RegisterTests(&test_factory, exe_path, tests));
 
   testing::TestEventListeners& listeners =
       testing::UnitTest::GetInstance()->listeners();
@@ -610,10 +610,10 @@ static auto Main(int argc, char** argv) -> ErrorOr<int> {
   return RUN_ALL_TESTS();
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
 auto main(int argc, char** argv) -> int {
-  if (auto result = Carbon::Testing::Main(argc, argv); result.ok()) {
+  if (auto result = MyLang::Testing::Main(argc, argv); result.ok()) {
     return *result;
   } else {
     llvm::errs() << result.error() << "\n";

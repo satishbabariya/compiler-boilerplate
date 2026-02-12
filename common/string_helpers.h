@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_STRING_HELPERS_H_
-#define CARBON_COMMON_STRING_HELPERS_H_
+#ifndef MYLANG_COMMON_STRING_HELPERS_H_
+#define MYLANG_COMMON_STRING_HELPERS_H_
 
 #include <optional>
 #include <string>
@@ -14,12 +14,12 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Note llvm StringExtras has significant functionality which is intended to be
 // complementary to this.
 
-// Unescapes Carbon escape sequences in the source string. Returns std::nullopt
+// Unescapes MyLang escape sequences in the source string. Returns std::nullopt
 // on bad input. `is_block_string` enables escaping unique to block string
 // literals, such as \<newline>.
 auto UnescapeStringLiteral(llvm::StringRef source, int hashtag_num = 0,
@@ -65,6 +65,6 @@ auto BuildCStrArgs(llvm::StringRef tool_path,
                    llvm::BumpPtrAllocator& alloc)
     -> llvm::SmallVector<const char*, 64>;
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_STRING_HELPERS_H_
+#endif  // MYLANG_COMMON_STRING_HELPERS_H_

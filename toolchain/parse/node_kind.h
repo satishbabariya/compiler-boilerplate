@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_PARSE_NODE_KIND_H_
-#define CARBON_TOOLCHAIN_PARSE_NODE_KIND_H_
+#ifndef MYLANG_TOOLCHAIN_PARSE_NODE_KIND_H_
+#define MYLANG_TOOLCHAIN_PARSE_NODE_KIND_H_
 
 #include <cstdint>
 
@@ -12,10 +12,10 @@
 #include "toolchain/lex/token_kind.h"
 #include "toolchain/parse/node_category.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
-CARBON_DEFINE_RAW_ENUM_CLASS(NodeKind, uint16_t) {
-#define CARBON_PARSE_NODE_KIND(Name) CARBON_RAW_ENUM_ENUMERATOR(Name)
+MYLANG_DEFINE_RAW_ENUM_CLASS(NodeKind, uint16_t) {
+#define MYLANG_PARSE_NODE_KIND(Name) MYLANG_RAW_ENUM_ENUMERATOR(Name)
 #include "toolchain/parse/node_kind.def"
 };
 
@@ -31,9 +31,9 @@ CARBON_DEFINE_RAW_ENUM_CLASS(NodeKind, uint16_t) {
 //
 // or both. This is required even for nodes for which `Tree::node_has_errors`
 // returns `true`.
-class NodeKind : public CARBON_ENUM_BASE(NodeKind) {
+class NodeKind : public MYLANG_ENUM_BASE(NodeKind) {
  public:
-#define CARBON_PARSE_NODE_KIND(Name) CARBON_ENUM_CONSTANT_DECL(Name)
+#define MYLANG_PARSE_NODE_KIND(Name) MYLANG_ENUM_CONSTANT_DECL(Name)
 #include "toolchain/parse/node_kind.def"
 
   // Validates that a `node_kind` parser node can be generated for a
@@ -76,12 +76,12 @@ class NodeKind : public CARBON_ENUM_BASE(NodeKind) {
   auto definition() const -> const Definition&;
 };
 
-#define CARBON_PARSE_NODE_KIND(Name) \
-  CARBON_ENUM_CONSTANT_DEFINITION(NodeKind, Name)
+#define MYLANG_PARSE_NODE_KIND(Name) \
+  MYLANG_ENUM_CONSTANT_DEFINITION(NodeKind, Name)
 #include "toolchain/parse/node_kind.def"
 
 inline constexpr int NodeKind::ValidCount = 0
-#define CARBON_PARSE_NODE_KIND(Name) +1
+#define MYLANG_PARSE_NODE_KIND(Name) +1
 #include "toolchain/parse/node_kind.def"
     ;
 
@@ -122,7 +122,7 @@ class NodeKind::Definition : public NodeKind {
   // Returns the bracketing node kind for the current node kind. Requires that
   // has_bracket is true.
   constexpr auto bracket() const -> NodeKind {
-    CARBON_CHECK(has_bracket(), "{0}", *this);
+    MYLANG_CHECK(has_bracket(), "{0}", *this);
     return bracket_;
   }
 
@@ -132,7 +132,7 @@ class NodeKind::Definition : public NodeKind {
   // Returns the number of children that the node must have, often 0. Requires
   // that has_child_count is true.
   constexpr auto child_count() const -> int32_t {
-    CARBON_CHECK(has_child_count(), "{0}", *this);
+    MYLANG_CHECK(has_child_count(), "{0}", *this);
     return child_count_;
   }
 
@@ -145,7 +145,7 @@ class NodeKind::Definition : public NodeKind {
   // This is factored out and non-constexpr to improve the compile-time error
   // message if the check below fails.
   auto MustSpecifyEitherBracketingNodeOrChildCount() -> void {
-    CARBON_FATAL("Must specify either bracketing node or fixed child count.");
+    MYLANG_FATAL("Must specify either bracketing node or fixed child count.");
   }
 
   constexpr explicit Definition(NodeKind kind, DefinitionArgs args)
@@ -176,6 +176,6 @@ inline constexpr bool HasKindMember = false;
 template <typename T>
 inline constexpr bool HasKindMember<T, decltype(&T::Kind)> = true;
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse
 
-#endif  // CARBON_TOOLCHAIN_PARSE_NODE_KIND_H_
+#endif  // MYLANG_TOOLCHAIN_PARSE_NODE_KIND_H_

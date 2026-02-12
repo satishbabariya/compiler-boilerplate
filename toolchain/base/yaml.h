@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_YAML_H_
-#define CARBON_TOOLCHAIN_BASE_YAML_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_YAML_H_
+#define MYLANG_TOOLCHAIN_BASE_YAML_H_
 
 #include "common/check.h"
 #include "common/ostream.h"
@@ -15,7 +15,7 @@
 // non-const expectations of the llvm::yaml that make it difficult to otherwise
 // use the trait-based approach.
 
-namespace Carbon::Yaml {
+namespace MyLang::Yaml {
 
 // Helper for printing YAML, to maintain a consistent configuration.
 template <typename T>
@@ -26,10 +26,10 @@ inline auto Print(llvm::raw_ostream& out, T yaml) -> void {
 
 // Similar to the standard Printable<T>, but relies on OutputYaml for printing.
 template <typename T>
-class Printable : public Carbon::Printable<T> {
+class Printable : public MyLang::Printable<T> {
  public:
   auto Print(llvm::raw_ostream& out) const -> void {
-    Carbon::Yaml::Print(out, static_cast<const T*>(this)->OutputYaml());
+    MyLang::Yaml::Print(out, static_cast<const T*>(this)->OutputYaml());
   }
 };
 
@@ -43,7 +43,7 @@ class OutputScalar {
 
   explicit OutputScalar(const llvm::APInt& val)
       : output_([&](llvm::raw_ostream& out) -> void {
-          // Carbon's plain APInt storage is typically unsigned.
+          // MyLang's plain APInt storage is typically unsigned.
           val.print(out, /*isSigned=*/false);
         }) {}
 
@@ -84,33 +84,33 @@ class OutputMapping {
   std::function<auto(OutputMapping::Map)->void> output_;
 };
 
-}  // namespace Carbon::Yaml
+}  // namespace MyLang::Yaml
 
 // Link OutputScalar to the llvm::yaml::IO API.
 template <>
-struct llvm::yaml::ScalarTraits<Carbon::Yaml::OutputScalar> {
-  static auto output(const Carbon::Yaml::OutputScalar& value, void* /*ctxt*/,
+struct llvm::yaml::ScalarTraits<MyLang::Yaml::OutputScalar> {
+  static auto output(const MyLang::Yaml::OutputScalar& value, void* /*ctxt*/,
                      llvm::raw_ostream& out) -> void {
     value.Output(out);
   }
   static auto input(StringRef /*scalar*/, void* /*ctxt*/,
-                    Carbon::Yaml::OutputScalar& /*value*/) -> StringRef {
-    CARBON_FATAL("Input is unsupported.");
+                    MyLang::Yaml::OutputScalar& /*value*/) -> StringRef {
+    MYLANG_FATAL("Input is unsupported.");
   }
   static auto mustQuote(StringRef /*value*/) -> QuotingType {
     return QuotingType::None;
   }
 };
-static_assert(llvm::yaml::has_ScalarTraits<Carbon::Yaml::OutputScalar>::value);
+static_assert(llvm::yaml::has_ScalarTraits<MyLang::Yaml::OutputScalar>::value);
 
 // Link OutputMapping to the llvm::yaml::IO API.
 template <>
-struct llvm::yaml::MappingTraits<Carbon::Yaml::OutputMapping> {
-  static auto mapping(IO& io, Carbon::Yaml::OutputMapping& mapping) -> void {
+struct llvm::yaml::MappingTraits<MyLang::Yaml::OutputMapping> {
+  static auto mapping(IO& io, MyLang::Yaml::OutputMapping& mapping) -> void {
     mapping.Output(io);
   }
 };
-static_assert(llvm::yaml::has_MappingTraits<Carbon::Yaml::OutputMapping,
+static_assert(llvm::yaml::has_MappingTraits<MyLang::Yaml::OutputMapping,
                                             llvm::yaml::EmptyContext>::value);
 
-#endif  // CARBON_TOOLCHAIN_BASE_YAML_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_YAML_H_

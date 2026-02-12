@@ -1,4 +1,4 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -19,7 +19,7 @@ def _run_tool_impl(ctx):
         ),
         RunEnvironmentInfo(
             environment = ctx.attr.env |
-                          {"CARBON_ARGV0_OVERRIDE": tool_files[0].short_path},
+                          {"MYLANG_ARGV0_OVERRIDE": tool_files[0].short_path},
         ),
     ]
 

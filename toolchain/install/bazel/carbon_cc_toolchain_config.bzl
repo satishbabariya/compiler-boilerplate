@@ -1,8 +1,8 @@
-# Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+# Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 # Exceptions. See /LICENSE for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-"""Starlark cc_toolchain configuration rules for using the Carbon toolchain"""
+"""Starlark cc_toolchain configuration rules for using the MyLang toolchain"""
 
 load(
     "@carbon_toolchain_config//:carbon_detected_variables.bzl",
@@ -27,12 +27,12 @@ def _impl(ctx):
     # binaries as it is a fixed aspect of the install structure.
     llvm_bindir = "llvm/bin"
 
-    # Only use a sysroot if a non-trivial one is set in Carbon's config.
+    # Only use a sysroot if a non-trivial one is set in MyLang's config.
     builtin_sysroot = None
     if clang_sysroot != "None" and clang_sysroot != "/":
         builtin_sysroot = clang_sysroot
 
-    identifier = "carbon-toolchain-{0}-{1}".format(ctx.attr.target_cpu, ctx.attr.target_os)
+    identifier = "mylang-toolchain-{0}-{1}".format(ctx.attr.target_cpu, ctx.attr.target_os)
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
         features = clang_cc_toolchain_features(

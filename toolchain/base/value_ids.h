@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_BASE_VALUE_IDS_H_
-#define CARBON_TOOLCHAIN_BASE_VALUE_IDS_H_
+#ifndef MYLANG_TOOLCHAIN_BASE_VALUE_IDS_H_
+#define MYLANG_TOOLCHAIN_BASE_VALUE_IDS_H_
 
 #include "common/check.h"
 #include "common/ostream.h"
@@ -12,7 +12,7 @@
 #include "llvm/Support/YAMLParser.h"
 #include "toolchain/base/index_base.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // The value of a real literal token.
 //
@@ -101,7 +101,7 @@ struct PackageNameId : public IdBase<PackageNameId> {
   // Returns the special package name corresponding to this PackageNameId.
   // Requires that this name is not an identifier name.
   auto AsSpecialName() const -> llvm::StringLiteral {
-    CARBON_CHECK(index <= NoneIndex);
+    MYLANG_CHECK(index <= NoneIndex);
     if (*this == None) {
       return "Main";
     }
@@ -111,7 +111,7 @@ struct PackageNameId : public IdBase<PackageNameId> {
     if (*this == Cpp) {
       return "Cpp";
     }
-    CARBON_FATAL("Unknown special package name kind {0}", index);
+    MYLANG_FATAL("Unknown special package name kind {0}", index);
   }
 
   auto Print(llvm::raw_ostream& out) const -> void {
@@ -136,6 +136,6 @@ struct StringLiteralValueId : public IdBase<StringLiteralValueId> {
 inline constexpr StringLiteralValueId StringLiteralValueId::None(
     StringLiteralValueId::NoneIndex);
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_BASE_VALUE_IDS_H_
+#endif  // MYLANG_TOOLCHAIN_BASE_VALUE_IDS_H_

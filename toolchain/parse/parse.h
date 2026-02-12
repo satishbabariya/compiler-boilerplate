@@ -1,16 +1,16 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_PARSE_PARSE_H_
-#define CARBON_TOOLCHAIN_PARSE_PARSE_H_
+#ifndef MYLANG_TOOLCHAIN_PARSE_PARSE_H_
+#define MYLANG_TOOLCHAIN_PARSE_PARSE_H_
 
 #include "common/ostream.h"
 #include "toolchain/diagnostics/emitter.h"
 #include "toolchain/lex/tokenized_buffer.h"
 #include "toolchain/parse/tree.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
 struct ParseOptions {
   // Options must be set individually, not through initialization.
@@ -34,6 +34,6 @@ struct ParseOptions {
 // This is the factory function which is used to build parse trees.
 auto Parse(Lex::TokenizedBuffer& tokens, ParseOptions options) -> Tree;
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse
 
-#endif  // CARBON_TOOLCHAIN_PARSE_PARSE_H_
+#endif  // MYLANG_TOOLCHAIN_PARSE_PARSE_H_

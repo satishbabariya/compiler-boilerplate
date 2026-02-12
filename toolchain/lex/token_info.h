@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_LEX_TOKEN_INFO_H_
-#define CARBON_TOOLCHAIN_LEX_TOKEN_INFO_H_
+#ifndef MYLANG_TOOLCHAIN_LEX_TOKEN_INFO_H_
+#define MYLANG_TOOLCHAIN_LEX_TOKEN_INFO_H_
 
 #include "common/check.h"
 #include "toolchain/base/int.h"
@@ -11,7 +11,7 @@
 #include "toolchain/lex/token_index.h"
 #include "toolchain/lex/token_kind.h"
 
-namespace Carbon::Lex {
+namespace MyLang::Lex {
 
 // A character as a unicode code point.
 //
@@ -64,26 +64,26 @@ class TokenInfo {
   // check that the kind is valid. Some tokens do not include a payload at all
   // and none of these methods may be called.
   auto ident_id() const -> IdentifierId {
-    CARBON_DCHECK(kind() == TokenKind::Identifier);
+    MYLANG_DCHECK(kind() == TokenKind::Identifier);
     return IdentifierId(token_payload_);
   }
   auto set_ident_id(IdentifierId ident_id) -> void {
-    CARBON_DCHECK(kind() == TokenKind::Identifier);
+    MYLANG_DCHECK(kind() == TokenKind::Identifier);
     token_payload_ = ident_id.index;
   }
 
   auto string_literal_id() const -> StringLiteralValueId {
-    CARBON_DCHECK(kind() == TokenKind::StringLiteral);
+    MYLANG_DCHECK(kind() == TokenKind::StringLiteral);
     return StringLiteralValueId(token_payload_);
   }
 
   auto char_literal() const -> CharLiteralValue {
-    CARBON_DCHECK(kind() == TokenKind::CharLiteral);
+    MYLANG_DCHECK(kind() == TokenKind::CharLiteral);
     return CharLiteralValue(token_payload_);
   }
 
   auto int_id() const -> IntId {
-    CARBON_DCHECK(kind() == TokenKind::IntLiteral ||
+    MYLANG_DCHECK(kind() == TokenKind::IntLiteral ||
                   kind() == TokenKind::IntTypeLiteral ||
                   kind() == TokenKind::UnsignedIntTypeLiteral ||
                   kind() == TokenKind::FloatTypeLiteral);
@@ -91,30 +91,30 @@ class TokenInfo {
   }
 
   auto real_id() const -> RealId {
-    CARBON_DCHECK(kind() == TokenKind::RealLiteral);
+    MYLANG_DCHECK(kind() == TokenKind::RealLiteral);
     return RealId(token_payload_);
   }
 
   auto closing_token_index() const -> TokenIndex {
-    CARBON_DCHECK(kind().is_opening_symbol());
+    MYLANG_DCHECK(kind().is_opening_symbol());
     return TokenIndex(token_payload_);
   }
   auto set_closing_token_index(TokenIndex closing_index) -> void {
-    CARBON_DCHECK(kind().is_opening_symbol());
+    MYLANG_DCHECK(kind().is_opening_symbol());
     token_payload_ = closing_index.index;
   }
 
   auto opening_token_index() const -> TokenIndex {
-    CARBON_DCHECK(kind().is_closing_symbol());
+    MYLANG_DCHECK(kind().is_closing_symbol());
     return TokenIndex(token_payload_);
   }
   auto set_opening_token_index(TokenIndex opening_index) -> void {
-    CARBON_DCHECK(kind().is_closing_symbol());
+    MYLANG_DCHECK(kind().is_closing_symbol());
     token_payload_ = opening_index.index;
   }
 
   auto error_length() const -> int {
-    CARBON_DCHECK(kind() == TokenKind::Error);
+    MYLANG_DCHECK(kind() == TokenKind::Error);
     return token_payload_;
   }
 
@@ -189,6 +189,6 @@ class TokenInfo {
 static_assert(sizeof(TokenInfo) == 8,
               "Expected `TokenInfo` to pack to an 8-byte structure.");
 
-}  // namespace Carbon::Lex
+}  // namespace MyLang::Lex
 
-#endif  // CARBON_TOOLCHAIN_LEX_TOKEN_INFO_H_
+#endif  // MYLANG_TOOLCHAIN_LEX_TOKEN_INFO_H_

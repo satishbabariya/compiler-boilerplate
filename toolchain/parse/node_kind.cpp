@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -7,15 +7,15 @@
 #include "llvm/ADT/StringExtras.h"
 #include "toolchain/parse/typed_nodes.h"
 
-namespace Carbon::Parse {
+namespace MyLang::Parse {
 
-CARBON_DEFINE_ENUM_CLASS_NAMES(NodeKind) {
-#define CARBON_PARSE_NODE_KIND(Name) CARBON_ENUM_CLASS_NAME_STRING(Name)
+MYLANG_DEFINE_ENUM_CLASS_NAMES(NodeKind) {
+#define MYLANG_PARSE_NODE_KIND(Name) MYLANG_ENUM_CLASS_NAME_STRING(Name)
 #include "toolchain/parse/node_kind.def"
 };
 
 // Check that each typed node defines a `token` member.
-#define CARBON_PARSE_NODE_KIND(Name) \
+#define MYLANG_PARSE_NODE_KIND(Name) \
   static_assert(requires(Name node) { node.token; });
 #include "toolchain/parse/node_kind.def"
 
@@ -39,10 +39,10 @@ auto NodeKind::category() const -> NodeCategory {
 
 auto NodeKind::definition() const -> const Definition& {
   static constexpr const Definition* Table[] = {
-#define CARBON_PARSE_NODE_KIND(Name) &Parse::Name::Kind,
+#define MYLANG_PARSE_NODE_KIND(Name) &Parse::Name::Kind,
 #include "toolchain/parse/node_kind.def"
   };
   return *Table[AsInt()];
 }
 
-}  // namespace Carbon::Parse
+}  // namespace MyLang::Parse

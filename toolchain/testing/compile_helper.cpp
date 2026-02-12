@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -7,7 +7,7 @@
 #include <string>
 #include <utility>
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 auto CompileHelper::GetTokenizedBuffer(llvm::StringRef text,
                                        Diagnostics::Consumer* consumer)
@@ -53,7 +53,7 @@ auto CompileHelper::GetTokenizedBufferWithTreeAndSubtrees(llvm::StringRef text)
 
 auto CompileHelper::GetSourceBuffer(llvm::StringRef text) -> SourceBuffer& {
   std::string filename = llvm::formatv("test{0}.carbon", ++file_index_);
-  CARBON_CHECK(
+  MYLANG_CHECK(
       fs_.addFile(filename, /*ModificationTime=*/0,
                   llvm::MemoryBuffer::getMemBuffer(
                       text, filename, /*RequiresNullTerminator=*/false)));
@@ -62,4 +62,4 @@ auto CompileHelper::GetSourceBuffer(llvm::StringRef text) -> SourceBuffer& {
   return source_storage_.front();
 }
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

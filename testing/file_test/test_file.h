@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TESTING_FILE_TEST_TEST_FILE_H_
-#define CARBON_TESTING_FILE_TEST_TEST_FILE_H_
+#ifndef MYLANG_TESTING_FILE_TEST_TEST_FILE_H_
+#define MYLANG_TESTING_FILE_TEST_TEST_FILE_H_
 
 #include <gmock/gmock.h>
 
@@ -15,7 +15,7 @@
 #include "testing/file_test/file_test_base.h"
 #include "testing/file_test/line.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 
 // A small timer for getting elapsed durations.
 class Timer {
@@ -108,6 +108,6 @@ struct TestFile {
 auto ProcessTestFile(llvm::StringRef test_name, bool running_autoupdate)
     -> ErrorOr<TestFile>;
 
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
 
-#endif  // CARBON_TESTING_FILE_TEST_TEST_FILE_H_
+#endif  // MYLANG_TESTING_FILE_TEST_TEST_FILE_H_

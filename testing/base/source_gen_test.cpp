@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -14,7 +14,7 @@
 #include "toolchain/base/install_paths_test_helpers.h"
 #include "toolchain/driver/driver.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 namespace {
 
 using ::testing::AllOf;
@@ -167,7 +167,7 @@ TEST(SourceGenTest, GenApiFileDenseDeclsTest) {
   // Should be within 1% of the requested line count.
   EXPECT_THAT(source, Contains('\n').Times(AllOf(Ge(950), Le(1050))));
 
-  // Make sure we generated valid Carbon code.
+  // Make sure we generated valid MyLang code.
   EXPECT_TRUE(TestCompile(source));
 }
 
@@ -181,9 +181,9 @@ TEST(SourceGenTest, GenApiFileDenseDeclsCppTest) {
   // Should be within 10% of the requested line count.
   EXPECT_THAT(source, Contains('\n').Times(AllOf(Ge(900), Le(1100))));
 
-  // TODO: When the driver supports compiling C++ code as easily as Carbon, we
+  // TODO: When the driver supports compiling C++ code as easily as MyLang, we
   // should test that the generated C++ code is valid.
 }
 
 }  // namespace
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing

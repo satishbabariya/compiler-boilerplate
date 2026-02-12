@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -15,7 +15,7 @@
 #include "llvm/TargetParser/Host.h"
 #include "toolchain/diagnostics/consumer.h"
 
-namespace Carbon {
+namespace MyLang {
 
 auto CodeGen::EmitAssembly(llvm::raw_pwrite_stream& out) -> bool {
   return EmitCode(out, llvm::CodeGenFileType::AssemblyFile);
@@ -35,7 +35,7 @@ auto CodeGen::EmitCode(llvm::raw_pwrite_stream& out,
   llvm::legacy::PassManager pass;
   // Note that this returns true on an error.
   if (target_machine_->addPassesToEmitFile(pass, out, nullptr, file_type)) {
-    CARBON_DIAGNOSTIC(CodeGenUnableToEmit, Error,
+    MYLANG_DIAGNOSTIC(CodeGenUnableToEmit, Error,
                       "unable to emit to this file");
     emitter_.Emit(module_->getName(), CodeGenUnableToEmit);
     return false;
@@ -45,4 +45,4 @@ auto CodeGen::EmitCode(llvm::raw_pwrite_stream& out,
   return true;
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

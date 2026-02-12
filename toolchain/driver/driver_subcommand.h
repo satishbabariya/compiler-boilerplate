@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DRIVER_DRIVER_SUBCOMMAND_H_
-#define CARBON_TOOLCHAIN_DRIVER_DRIVER_SUBCOMMAND_H_
+#ifndef MYLANG_TOOLCHAIN_DRIVER_DRIVER_SUBCOMMAND_H_
+#define MYLANG_TOOLCHAIN_DRIVER_DRIVER_SUBCOMMAND_H_
 
 #include "common/command_line.h"
 #include "common/ostream.h"
@@ -11,7 +11,7 @@
 #include "toolchain/base/install_paths.h"
 #include "toolchain/driver/driver_env.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // The result of a driver run.
 struct DriverResult {
@@ -74,6 +74,6 @@ class DriverSubcommand {
   CommandLine::CommandInfo info_;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_DRIVER_DRIVER_SUBCOMMAND_H_
+#endif  // MYLANG_TOOLCHAIN_DRIVER_DRIVER_SUBCOMMAND_H_

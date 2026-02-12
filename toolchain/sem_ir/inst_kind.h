@@ -1,9 +1,9 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_SEM_IR_INST_KIND_H_
-#define CARBON_TOOLCHAIN_SEM_IR_INST_KIND_H_
+#ifndef MYLANG_TOOLCHAIN_SEM_IR_INST_KIND_H_
+#define MYLANG_TOOLCHAIN_SEM_IR_INST_KIND_H_
 
 #include <cstdint>
 #include <optional>
@@ -11,7 +11,7 @@
 #include "common/enum_base.h"
 #include "toolchain/parse/node_ids.h"
 
-namespace Carbon::SemIR {
+namespace MyLang::SemIR {
 
 // Forward-declared to avoid a cycle.
 struct TypeId;
@@ -256,17 +256,17 @@ enum class TerminatorKind : int8_t {
   Terminator,
 };
 
-CARBON_DEFINE_RAW_ENUM_CLASS(InstKind, uint8_t) {
-#define CARBON_SEM_IR_INST_KIND(Name) CARBON_RAW_ENUM_ENUMERATOR(Name)
+MYLANG_DEFINE_RAW_ENUM_CLASS(InstKind, uint8_t) {
+#define MYLANG_SEM_IR_INST_KIND(Name) MYLANG_RAW_ENUM_ENUMERATOR(Name)
 #include "toolchain/sem_ir/inst_kind.def"
 };
 
-class InstKind : public CARBON_ENUM_BASE(InstKind) {
+class InstKind : public MYLANG_ENUM_BASE(InstKind) {
  public:
-#define CARBON_SEM_IR_INST_KIND(Name) CARBON_ENUM_CONSTANT_DECL(Name)
+#define MYLANG_SEM_IR_INST_KIND(Name) MYLANG_ENUM_CONSTANT_DECL(Name)
 #include "toolchain/sem_ir/inst_kind.def"
 
-  // Returns the `InstKind` for an instruction, for `CARBON_KIND_SWITCH`.
+  // Returns the `InstKind` for an instruction, for `MYLANG_KIND_SWITCH`.
   template <typename InstT>
   static constexpr auto& For = InstT::Kind;
 
@@ -368,8 +368,8 @@ class InstKind : public CARBON_ENUM_BASE(InstKind) {
   static auto definition_info(InstKind kind) -> const DefinitionInfo&;
 };
 
-#define CARBON_SEM_IR_INST_KIND(Name) \
-  CARBON_ENUM_CONSTANT_DEFINITION(InstKind, Name)
+#define MYLANG_SEM_IR_INST_KIND(Name) \
+  MYLANG_ENUM_CONSTANT_DEFINITION(InstKind, Name)
 #include "toolchain/sem_ir/inst_kind.def"
 
 // We expect the instruction kind to fit compactly into 8 bits.
@@ -457,6 +457,6 @@ constexpr auto InstKind::Define(DefinitionInfo info) const
   return Definition<TypedNodeId>(*this, info);
 }
 
-}  // namespace Carbon::SemIR
+}  // namespace MyLang::SemIR
 
-#endif  // CARBON_TOOLCHAIN_SEM_IR_INST_KIND_H_
+#endif  // MYLANG_TOOLCHAIN_SEM_IR_INST_KIND_H_

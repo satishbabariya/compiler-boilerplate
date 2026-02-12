@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -21,12 +21,12 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/ConvertUTF.h"
 
-namespace Carbon {
+namespace MyLang {
 
 static constexpr llvm::StringRef TripleQuotes = "'''";
 static constexpr llvm::StringRef HorizontalWhitespaceChars = " \t";
 
-// Carbon only takes uppercase hex input.
+// MyLang only takes uppercase hex input.
 static auto FromHex(char c) -> std::optional<char> {
   if (c >= '0' && c <= '9') {
     return c - '0';
@@ -136,7 +136,7 @@ auto UnescapeStringLiteral(llvm::StringRef source, const int hashtag_num,
       }
     } else if (c == '\t') {
       // Disallow non-` ` horizontal whitespace:
-      // https://github.com/carbon-language/carbon-lang/blob/trunk/docs/design/lexical_conventions/whitespace.md
+      // https://TODO: Update with your project URL
       // TODO: This doesn't handle unicode whitespace.
       return std::nullopt;
     } else {
@@ -244,4 +244,4 @@ auto BuildCStrArgs(llvm::StringRef tool_path,
   return cstr_args;
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

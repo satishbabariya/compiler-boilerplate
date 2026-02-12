@@ -1,15 +1,15 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_DRIVER_CODEGEN_OPTIONS_H_
-#define CARBON_TOOLCHAIN_DRIVER_CODEGEN_OPTIONS_H_
+#ifndef MYLANG_TOOLCHAIN_DRIVER_CODEGEN_OPTIONS_H_
+#define MYLANG_TOOLCHAIN_DRIVER_CODEGEN_OPTIONS_H_
 
 #include "common/command_line.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/TargetParser/Host.h"
 
-namespace Carbon {
+namespace MyLang {
 
 // Shared codegen-related options.
 //
@@ -21,6 +21,6 @@ struct CodegenOptions {
   llvm::StringRef target;
 };
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_TOOLCHAIN_DRIVER_CODEGEN_OPTIONS_H_
+#endif  // MYLANG_TOOLCHAIN_DRIVER_CODEGEN_OPTIONS_H_

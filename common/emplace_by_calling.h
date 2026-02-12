@@ -1,14 +1,14 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_EMPLACE_BY_CALLING_H_
-#define CARBON_COMMON_EMPLACE_BY_CALLING_H_
+#ifndef MYLANG_COMMON_EMPLACE_BY_CALLING_H_
+#define MYLANG_COMMON_EMPLACE_BY_CALLING_H_
 
 #include <type_traits>
 #include <utility>
 
-namespace Carbon {
+namespace MyLang {
 
 // A utility to use when calling an `emplace` function to emplace the result of
 // a function call. Expected usage is:
@@ -61,6 +61,6 @@ class EmplaceByCalling {
 template <typename MakeFnT>
 EmplaceByCalling(MakeFnT) -> EmplaceByCalling<MakeFnT>;
 
-}  // namespace Carbon
+}  // namespace MyLang
 
-#endif  // CARBON_COMMON_EMPLACE_BY_CALLING_H_
+#endif  // MYLANG_COMMON_EMPLACE_BY_CALLING_H_

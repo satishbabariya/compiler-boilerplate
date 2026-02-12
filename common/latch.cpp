@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -6,7 +6,7 @@
 
 #include "common/check.h"
 
-namespace Carbon {
+namespace MyLang {
 
 auto Latch::Inc() -> void {
   // The increment must be _atomic_ but is _relaxed_.
@@ -40,7 +40,7 @@ auto Latch::Dec() -> bool {
   // semantics for efficiency.
   auto previous = count_.fetch_sub(1, std::memory_order_acq_rel);
 
-  CARBON_CHECK(previous > 0);
+  MYLANG_CHECK(previous > 0);
   if (previous == 1) {
     // Ensure that our closure is fully destroyed here, releasing any
     // resources, locks, or other synchronization primitives.
@@ -52,9 +52,9 @@ auto Latch::Dec() -> bool {
 }
 
 auto Latch::Init(llvm::unique_function<auto()->void> on_zero) -> Handle {
-  CARBON_CHECK(count_ == 0);
+  MYLANG_CHECK(count_ == 0);
   on_zero_ = std::move(on_zero);
   return Handle(this);
 }
 
-}  // namespace Carbon
+}  // namespace MyLang

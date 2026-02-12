@@ -1,16 +1,16 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_TOOLCHAIN_LEX_LEX_H_
-#define CARBON_TOOLCHAIN_LEX_LEX_H_
+#ifndef MYLANG_TOOLCHAIN_LEX_LEX_H_
+#define MYLANG_TOOLCHAIN_LEX_LEX_H_
 
 #include "toolchain/base/shared_value_stores.h"
 #include "toolchain/diagnostics/emitter.h"
 #include "toolchain/lex/tokenized_buffer.h"
 #include "toolchain/source/source_buffer.h"
 
-namespace Carbon::Lex {
+namespace MyLang::Lex {
 
 struct LexOptions {
   // Options must be set individually, not through initialization.
@@ -37,6 +37,6 @@ auto Lex(SharedValueStores& value_stores,
          SourceBuffer& source [[clang::lifetimebound]], LexOptions options)
     -> TokenizedBuffer;
 
-}  // namespace Carbon::Lex
+}  // namespace MyLang::Lex
 
-#endif  // CARBON_TOOLCHAIN_LEX_LEX_H_
+#endif  // MYLANG_TOOLCHAIN_LEX_LEX_H_

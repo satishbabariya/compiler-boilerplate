@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -13,7 +13,7 @@
 #include "toolchain/lex/token_kind.h"
 #include "toolchain/lex/tokenized_buffer.h"
 
-namespace Carbon::Lex {
+namespace MyLang::Lex {
 
 auto Lex(SharedValueStores& value_stores, SourceBuffer& source,
          LexOptions options) -> TokenizedBuffer {
@@ -27,7 +27,7 @@ auto Lex(SharedValueStores& value_stores, SourceBuffer& source,
   // - Track line/column information
   // - Report lexical errors via diagnostics
   //
-  // See the Carbon Language compiler for reference implementation patterns.
+  // See MyLang compiler for reference implementation patterns.
 
   auto* consumer =
       options.consumer ? options.consumer : &Diagnostics::ConsoleConsumer();
@@ -43,7 +43,7 @@ auto Lex(SharedValueStores& value_stores, SourceBuffer& source,
   if (options.vlog_stream || options.dump_stream) {
     consumer->Flush();
   }
-  CARBON_VLOG_TO(options.vlog_stream, "*** Lex::TokenizedBuffer ***\n{0}",
+  MYLANG_VLOG_TO(options.vlog_stream, "*** Lex::TokenizedBuffer ***\n{0}",
                  buffer);
   if (options.dump_stream) {
     buffer.Print(*options.dump_stream, options.omit_file_boundary_tokens);
@@ -51,4 +51,4 @@ auto Lex(SharedValueStores& value_stores, SourceBuffer& source,
   return buffer;
 }
 
-}  // namespace Carbon::Lex
+}  // namespace MyLang::Lex

@@ -1,15 +1,15 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#ifndef CARBON_COMMON_VLOG_H_
-#define CARBON_COMMON_VLOG_H_
+#ifndef MYLANG_COMMON_VLOG_H_
+#define MYLANG_COMMON_VLOG_H_
 
 #include "common/ostream.h"
 #include "common/template_string.h"
 #include "llvm/Support/FormatVariadic.h"
 
-namespace Carbon::Internal {
+namespace MyLang::Internal {
 
 // Implements verbose logging.
 //
@@ -24,14 +24,14 @@ template <TemplateString FormatStr, typename... Ts>
   *stream << llvm::formatv(FormatStr.c_str(), std::forward<Ts>(values)...);
 }
 
-}  // namespace Carbon::Internal
+}  // namespace MyLang::Internal
 
-// Logs when verbose logging is enabled. CARBON_VLOG_TO uses a provided stream;
-// CARBON_VLOG requires a member named `vlog_stream_`.
+// Logs when verbose logging is enabled. MYLANG_VLOG_TO uses a provided stream;
+// MYLANG_VLOG requires a member named `vlog_stream_`.
 //
 // For example:
-//   CARBON_VLOG_TO(vlog_stream, "Verbose message: {0}", "extra information");
-//   CARBON_VLOG("Verbose message: {0}", "extra information");
+//   MYLANG_VLOG_TO(vlog_stream, "Verbose message: {0}", "extra information");
+//   MYLANG_VLOG("Verbose message: {0}", "extra information");
 //
 // The first argument must be a string literal format string valid for passing
 // to `llvm::formatv`. If it contains any substitutions, those should be passed
@@ -39,18 +39,18 @@ template <TemplateString FormatStr, typename... Ts>
 //
 // Also supports a legacy syntax where no arguments are passed and the desired
 // logging is streamed into the call:
-//   CARBON_VLOG() << "Legacy verbose message";
+//   MYLANG_VLOG() << "Legacy verbose message";
 //
 // However, the streaming syntax has higher overhead and can inhibit inlining.
 // Code should prefer the format string form, and eventually when all code has
 // migrated the streaming interface will be removed.
-#define CARBON_VLOG_TO(Stream, FormatStr, ...)                         \
+#define MYLANG_VLOG_TO(Stream, FormatStr, ...)                         \
   __builtin_expect(Stream == nullptr, true)                            \
       ? (void)0                                                        \
-      : Carbon::Internal::VLogImpl<"" FormatStr>(Stream __VA_OPT__(, ) \
+      : MyLang::Internal::VLogImpl<"" FormatStr>(Stream __VA_OPT__(, ) \
                                                      __VA_ARGS__)
 
-#define CARBON_VLOG(FormatStr, ...) \
-  CARBON_VLOG_TO(vlog_stream_, FormatStr, __VA_ARGS__)
+#define MYLANG_VLOG(FormatStr, ...) \
+  MYLANG_VLOG_TO(vlog_stream_, FormatStr, __VA_ARGS__)
 
-#endif  // CARBON_COMMON_VLOG_H_
+#endif  // MYLANG_COMMON_VLOG_H_

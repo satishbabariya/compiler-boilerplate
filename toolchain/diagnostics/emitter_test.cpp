@@ -1,4 +1,4 @@
-// Part of the Carbon Language project, under the Apache License v2.0 with LLVM
+// Part of the MyLang compiler project, under the Apache License v2.0 with LLVM
 // Exceptions. See /LICENSE for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
@@ -10,7 +10,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "toolchain/diagnostics/mocks.h"
 
-namespace Carbon::Testing {
+namespace MyLang::Testing {
 namespace {
 
 using testing::ElementsAre;
@@ -36,7 +36,7 @@ class EmitterTest : public ::testing::Test {
 };
 
 TEST_F(EmitterTest, EmitSimpleError) {
-  CARBON_DIAGNOSTIC(TestDiagnostic, Error, "simple error");
+  MYLANG_DIAGNOSTIC(TestDiagnostic, Error, "simple error");
   EXPECT_CALL(consumer_, HandleDiagnostic(IsSingleDiagnostic(
                              Diagnostics::Kind::TestDiagnostic,
                              Diagnostics::Level::Error, 1, 1, "simple error")));
@@ -48,7 +48,7 @@ TEST_F(EmitterTest, EmitSimpleError) {
 }
 
 TEST_F(EmitterTest, EmitSimpleWarning) {
-  CARBON_DIAGNOSTIC(TestDiagnostic, Warning, "simple warning");
+  MYLANG_DIAGNOSTIC(TestDiagnostic, Warning, "simple warning");
   EXPECT_CALL(consumer_,
               HandleDiagnostic(IsSingleDiagnostic(
                   Diagnostics::Kind::TestDiagnostic,
@@ -57,7 +57,7 @@ TEST_F(EmitterTest, EmitSimpleWarning) {
 }
 
 TEST_F(EmitterTest, EmitOneArgDiagnostic) {
-  CARBON_DIAGNOSTIC(TestDiagnostic, Error, "arg: `{0}`", std::string);
+  MYLANG_DIAGNOSTIC(TestDiagnostic, Error, "arg: `{0}`", std::string);
   EXPECT_CALL(consumer_, HandleDiagnostic(IsSingleDiagnostic(
                              Diagnostics::Kind::TestDiagnostic,
                              Diagnostics::Level::Error, 1, 1, "arg: `str`")));
@@ -65,8 +65,8 @@ TEST_F(EmitterTest, EmitOneArgDiagnostic) {
 }
 
 TEST_F(EmitterTest, EmitNote) {
-  CARBON_DIAGNOSTIC(TestDiagnostic, Warning, "simple warning");
-  CARBON_DIAGNOSTIC(TestDiagnosticNote, Note, "note");
+  MYLANG_DIAGNOSTIC(TestDiagnostic, Warning, "simple warning");
+  MYLANG_DIAGNOSTIC(TestDiagnosticNote, Note, "note");
   EXPECT_CALL(
       consumer_,
       HandleDiagnostic(IsDiagnostic(
@@ -115,4 +115,4 @@ TEST_F(EmitterTest, Flush) {
 }
 
 }  // namespace
-}  // namespace Carbon::Testing
+}  // namespace MyLang::Testing
