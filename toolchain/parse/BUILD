@@ -6,6 +6,11 @@ load("//bazel/cc_rules:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "testdata",
+    srcs = glob(["testdata/**/*.carbon"], allow_empty = True),
+)
+
 cc_library(
     name = "node_category",
     srcs = ["node_category.cpp"],
@@ -88,6 +93,7 @@ cc_library(
         ":tree",
         "//common:check",
         "//common:ostream",
+        "//common:vlog",
         "//toolchain/diagnostics:emitter",
         "//toolchain/lex:token_kind",
         "//toolchain/lex:tokenized_buffer",

@@ -184,7 +184,6 @@ class File : public Printable<File> {
  public:
   // Starts a new file for Check::CheckParseTree.
   explicit File(const Parse::Tree* parse_tree, CheckIRId check_ir_id,
-                const std::optional<Parse::Tree::PackagingDecl>& packaging_decl,
                 SharedValueStores& value_stores, std::string filename);
 
   File(const File&) = delete;
@@ -212,8 +211,6 @@ class File : public Printable<File> {
   }
 
   auto check_ir_id() const -> CheckIRId { return check_ir_id_; }
-  auto package_id() const -> PackageNameId { return package_id_; }
-  auto library_id() const -> LibraryNameId { return library_id_; }
 
   // Directly expose SharedValueStores members.
   auto identifiers() -> SharedValueStores::IdentifierStore& {
@@ -290,12 +287,6 @@ class File : public Printable<File> {
 
   // The file's ID.
   CheckIRId check_ir_id_;
-
-  // The file's package.
-  PackageNameId package_id_ = PackageNameId::None;
-
-  // The file's library.
-  LibraryNameId library_id_ = LibraryNameId::None;
 
   // Shared, compile-scoped values.
   SharedValueStores* value_stores_;

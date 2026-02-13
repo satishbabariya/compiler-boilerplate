@@ -184,10 +184,10 @@ def _configure_clang_toolchain_impl(repository_ctx):
     (clang, clang_version, clang_version_for_cache) = _detect_system_clang(
         repository_ctx,
     )
-    if clang_version and clang_version < 19:
+    if clang_version and clang_version < 17:
         fail("Found clang {0}. ".format(clang_version) +
-             "MyLang requires clang >=19. See " +
-             "https://TODO: Update with your project URL/blob/trunk/docs/project/contribution_tools.md#old-llvm-versions")
+             "MyLang requires clang >=17. See " +
+             "docs/project/contribution_tools.md#old-llvm-versions")
 
     clang_cpp = clang.dirname.get_child("clang++")
 
@@ -212,7 +212,17 @@ def _configure_clang_toolchain_impl(repository_ctx):
     if not ar_path.exists:
         ar_path = repository_ctx.which("llvm-ar")
         if not ar_path:
-            fail("`llvm-ar` not found in PATH or adjacent to clang")
+            # Fallback to system `ar` if `llvm-ar` is not found.
+            ar_path = repository_ctx.which("ar")
+            if not ar_path:
+                fail("`llvm-ar` or `ar` not found in PATH or adjacent to clang")
+
+    # Look for llvm-symbolizer
+    symbolizer_path = clang.dirname.get_child("llvm-symbolizer")
+    if not symbolizer_path.exists:
+        symbolizer_path = ar_path.dirname.get_child("llvm-symbolizer")
+        if not symbolizer_path.exists:
+            symbolizer_path = repository_ctx.which("llvm-symbolizer")
 
     # By default Windows uses '\' in its paths. These will be
     # interpreted as escape characters and fail the build, thus
@@ -233,7 +243,7 @@ def _configure_clang_toolchain_impl(repository_ctx):
             "{CLANG_VERSION_FOR_CACHE}": clang_version_for_cache.replace('"', "_").replace("\\", "_"),
             "{CLANG_VERSION}": str(clang_version),
             "{LLVM_BINDIR}": str(ar_path.dirname),
-            "{LLVM_SYMBOLIZER}": str(ar_path.dirname.get_child("llvm-symbolizer")),
+            "{LLVM_SYMBOLIZER}": str(symbolizer_path) if symbolizer_path else "/bin/false",
             "{SYSROOT}": str(sysroot_dir),
         },
         executable = False,
@@ -264,7 +274,7 @@ configure_clang_toolchain = repository_rule(
             default = [
                 Label("//bazel/cc_toolchains:cc_toolchain_actions.bzl"),
                 Label("//bazel/cc_toolchains:cc_toolchain_base_features.bzl"),
-                Label("//bazel/cc_toolchains:cc_toolchain_carbon_project_features.bzl"),
+                Label("//bazel/cc_toolchains:cc_toolchain_mylang_project_features.bzl"),
                 Label("//bazel/cc_toolchains:cc_toolchain_config_features.bzl"),
                 Label("//bazel/cc_toolchains:cc_toolchain_cpp_features.bzl"),
                 Label("//bazel/cc_toolchains:cc_toolchain_debugging.bzl"),

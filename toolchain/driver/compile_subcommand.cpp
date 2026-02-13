@@ -482,8 +482,8 @@ auto CompilationUnit::GetCheckUnit() -> Check::Unit {
   tree_and_subtrees_getter_ = [this]() -> const Parse::TreeAndSubtrees& {
     return this->GetParseTreeAndSubtrees();
   };
-  sem_ir_.emplace(&*parse_tree_, check_ir_id_, parse_tree_->packaging_decl(),
-                  value_stores_, input_filename_);
+  sem_ir_.emplace(&*parse_tree_, check_ir_id_, value_stores_,
+                  input_filename_);
   if (!llvm_context_) {
     llvm_context_ = std::make_unique<llvm::LLVMContext>();
   }

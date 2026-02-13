@@ -38,6 +38,9 @@ MYLANG_DIAGNOSTIC_KIND(FailureRunningClangToLink)
 MYLANG_DIAGNOSTIC_KIND(FormatMultipleFilesToOneOutput)
 MYLANG_DIAGNOSTIC_KIND(ToolFuzzingDisallowed)
 
+MYLANG_DIAGNOSTIC_KIND(CppInteropDriverWarning)
+MYLANG_DIAGNOSTIC_KIND(CppInteropDriverError)
+
 // TODO: Add your language's driver diagnostics here.
 
 // ============================================================================
@@ -109,6 +112,8 @@ MYLANG_DIAGNOSTIC_KIND(LanguageServerOpenDuplicateFile)
 MYLANG_DIAGNOSTIC_KIND(LanguageServerCloseUnknownFile)
 MYLANG_DIAGNOSTIC_KIND(LanguageServerDiagnosticInWrongFile)
 
+MYLANG_DIAGNOSTIC_KIND(LanguageServerNotImplemented)
+
 // TODO: Add your language's language server diagnostics here.
 
 // ============================================================================
@@ -117,6 +122,7 @@ MYLANG_DIAGNOSTIC_KIND(LanguageServerDiagnosticInWrongFile)
 
 // TestDiagnostic is only for unit tests.
 MYLANG_DIAGNOSTIC_KIND(TestDiagnostic)
+MYLANG_DIAGNOSTIC_KIND(TestDiagnosticOnScope)
 MYLANG_DIAGNOSTIC_KIND(TestDiagnosticNote)
 
 // TODO: Add your language's test diagnostics here.

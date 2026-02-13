@@ -226,7 +226,7 @@ struct NameRef {
 // A namespace declaration.
 struct Namespace {
   static constexpr auto Kind =
-      InstKind::Namespace.Define<Parse::AnyNamespaceId>(
+      InstKind::Namespace.Define<Parse::NodeId>(
           {.ir_name = "namespace",
            .expr_category = ExprCategory::NotExpr,
            .constant_kind = InstConstantKind::AlwaysUnique});
@@ -335,7 +335,7 @@ struct SpliceBlock {
 // An `import` declaration.
 struct ImportDecl {
   static constexpr auto Kind =
-      InstKind::ImportDecl.Define<Parse::AnyPackagingDeclId>(
+      InstKind::ImportDecl.Define<Parse::ImportDeclId>(
           {.ir_name = "import",
            .constant_kind = InstConstantKind::Never,
            .is_lowered = false});

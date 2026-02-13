@@ -155,8 +155,8 @@ struct NodeIdOneOf : public NodeId {
 // TODO: Add composite NodeIdOneOf aliases for your language's node kinds.
 using AnyFunctionDeclId =
     NodeIdOneOf<FunctionDeclId, FunctionDefinitionStartId>;
-using AnyFunctionDefinitionId = NodeIdOneOf<FunctionDefinitionId>;
-using AnyPointerDeferenceExprId = NodeIdOneOf<PrefixOperatorStarId>;
+using AnyFunctionDefinitionId = FunctionDefinitionId;
+using AnyPointerDeferenceExprId = PrefixOperatorStarId;
 
 // NodeId with kind that is anything but T::Kind.
 template <typename T>

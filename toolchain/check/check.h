@@ -5,7 +5,9 @@
 #ifndef MYLANG_TOOLCHAIN_CHECK_CHECK_H_
 #define MYLANG_TOOLCHAIN_CHECK_CHECK_H_
 
+#include "clang/Frontend/CompilerInvocation.h"
 #include "common/ostream.h"
+#include "llvm/IR/LLVMContext.h"
 #include "toolchain/base/shared_value_stores.h"
 #include "toolchain/base/timings.h"
 #include "toolchain/diagnostics/emitter.h"

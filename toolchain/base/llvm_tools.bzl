@@ -64,37 +64,37 @@ _DEF_FILE_TEMPLATE = """
 // - `MainFn` is the function symbol name used to run the tool as-if its `main`.
 //
 // There are three X-macros available:
-// - `CARBON_LLVM_TOOL` is available for every tool.
-//   - `CARBON_LLVM_MAIN_TOOL` is available for each tool with a distinct
+// - `MYLANG_LLVM_TOOL` is available for every tool.
+//   - `MYLANG_LLVM_MAIN_TOOL` is available for each tool with a distinct
 //     `MainFn` symbol name.
-//   - `CARBON_LLVM_ALIAS_TOOL` is available for each tool that is an alias of
+//   - `MYLANG_LLVM_ALIAS_TOOL` is available for each tool that is an alias of
 //     some other tool. It's `MainFn` will be the alias-target symbol name.
 //
 // See toolchain/driver/llvm_tools.bzl for more details.
 
-#ifndef CARBON_LLVM_TOOL
-#define CARBON_LLVM_TOOL(Id, Name, BinName, MainFn)
+#ifndef MYLANG_LLVM_TOOL
+#define MYLANG_LLVM_TOOL(Id, Name, BinName, MainFn)
 #endif
 
-#ifndef CARBON_LLVM_MAIN_TOOL
-#define CARBON_LLVM_MAIN_TOOL(Id, Name, BinName, MainFn) \\
-  CARBON_LLVM_TOOL(Id, Name, BinName, MainFn)
+#ifndef MYLANG_LLVM_MAIN_TOOL
+#define MYLANG_LLVM_MAIN_TOOL(Id, Name, BinName, MainFn) \\
+  MYLANG_LLVM_TOOL(Id, Name, BinName, MainFn)
 #endif
 
-#ifndef CARBON_LLVM_ALIAS_TOOL
-#define CARBON_LLVM_ALIAS_TOOL(Id, Name, BinName, MainFn) \\
-  CARBON_LLVM_TOOL(Id, Name, BinName, MainFn)
+#ifndef MYLANG_LLVM_ALIAS_TOOL
+#define MYLANG_LLVM_ALIAS_TOOL(Id, Name, BinName, MainFn) \\
+  MYLANG_LLVM_TOOL(Id, Name, BinName, MainFn)
 #endif
 
 {}
 
-#undef CARBON_LLVM_TOOL
-#undef CARBON_LLVM_MAIN_TOOL
-#undef CARBON_LLVM_ALIAS_TOOL
+#undef MYLANG_LLVM_TOOL
+#undef MYLANG_LLVM_MAIN_TOOL
+#undef MYLANG_LLVM_ALIAS_TOOL
 """
 
 _DEF_MACRO_TEMPLATE = """
-CARBON_LLVM_{kind}TOOL({id}, "{name}", "{bin_name}", {main_fn})
+MYLANG_LLVM_{kind}TOOL({id}, "{name}", "{bin_name}", {main_fn})
 """.strip()
 
 def _build_def_macro(kind, name, bin_name, main_info):

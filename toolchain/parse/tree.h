@@ -73,23 +73,9 @@ class Tree : public Printable<Tree> {
  public:
   class PostorderIterator;
 
-  // Names in packaging, whether the file's packaging or an import. Links back
-  // to the node for diagnostics.
-  struct PackagingNames {
-    AnyPackagingDeclId node_id = AnyPackagingDeclId::None;
-    PackageNameId package_id = PackageNameId::None;
-    // TODO: Move LibraryNameId to Base and use it here.
-    StringLiteralValueId library_id = StringLiteralValueId::None;
-    InlineImportBodyId inline_body_id = InlineImportBodyId::None;
-    // Whether an import is exported. This is on the file's packaging
-    // declaration even though it doesn't apply, for consistency in structure.
-    bool is_export = false;
-  };
-
-  // The file's packaging.
-  struct PackagingDecl {
-    PackagingNames names;
-    bool is_impl;
+  // Tracks an import declaration, linking back to the node for diagnostics.
+  struct ImportInfo {
+    NodeId node_id = NodeId::None;
   };
 
   // Wires up the reference to the tokenized buffer. The `Parse` function should
@@ -161,10 +147,7 @@ class Tree : public Printable<Tree> {
     return T::UnsafeMake(n);
   }
 
-  auto packaging_decl() const -> const std::optional<PackagingDecl>& {
-    return packaging_decl_;
-  }
-  auto imports() const -> llvm::ArrayRef<PackagingNames> { return imports_; }
+  auto imports() const -> llvm::ArrayRef<ImportInfo> { return imports_; }
   auto deferred_definitions() const
       -> const ValueStore<DeferredDefinitionIndex, DeferredDefinition>& {
     return deferred_definitions_;
@@ -264,8 +247,7 @@ class Tree : public Printable<Tree> {
   // nodes, because some tokens may have been skipped.
   bool has_errors_ = false;
 
-  std::optional<PackagingDecl> packaging_decl_;
-  llvm::SmallVector<PackagingNames> imports_;
+  llvm::SmallVector<ImportInfo> imports_;
   ValueStore<DeferredDefinitionIndex, DeferredDefinition> deferred_definitions_;
 };
 

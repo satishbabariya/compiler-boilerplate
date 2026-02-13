@@ -219,7 +219,7 @@ MYLANG_PARSE_NODE_KIND_TOKEN_LITERAL(IntTypeLiteral, IntTypeLiteral)
 // ============================================================================
 
 MYLANG_PARSE_NODE_KIND_PREFIX_OPERATOR(Minus)
-MYLANG_PARSE_NODE_KIND_PREFIX_OPERATOR(Not)
+MYLANG_PARSE_NODE_KIND_PREFIX_OPERATOR(Exclaim)
 MYLANG_PARSE_NODE_KIND_PREFIX_OPERATOR(Star)
 
 // TODO: Add your language's prefix operator parse node kinds here.

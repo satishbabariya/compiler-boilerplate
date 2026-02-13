@@ -6,6 +6,11 @@ load("//bazel/cc_rules:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "testdata",
+    srcs = glob(["testdata/**/*.carbon"], allow_empty = True),
+)
+
 cc_library(
     name = "language_server",
     srcs = ["language_server.cpp"],

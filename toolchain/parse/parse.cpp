@@ -5,6 +5,7 @@
 #include "toolchain/parse/parse.h"
 
 #include "common/check.h"
+#include "common/vlog.h"
 #include "toolchain/parse/node_kind.h"
 #include "toolchain/parse/tree_and_subtrees.h"
 

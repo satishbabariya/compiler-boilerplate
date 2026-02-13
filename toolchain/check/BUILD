@@ -6,6 +6,11 @@ load("//bazel/cc_rules:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "testdata",
+    srcs = glob(["testdata/**/*.carbon"], allow_empty = True),
+)
+
 cc_library(
     name = "check",
     srcs = ["check.cpp"],
@@ -20,6 +25,7 @@ cc_library(
         "//toolchain/sem_ir:file",
         "//toolchain/sem_ir:typed_insts",
         "@llvm-project//clang:frontend",
+        "@llvm-project//llvm:Core",
         "@llvm-project//llvm:Support",
     ],
 )

@@ -279,7 +279,7 @@
   "moduleExtensions": {
     "//bazel/cc_toolchains:clang_configuration.bzl%clang_toolchain_extension": {
       "general": {
-        "bzlTransitiveDigest": "Wh1mi/drvfKovwO/US8OTQ5COvbBRazJYGdgAxBP8A4=",
+        "bzlTransitiveDigest": "HTZ6Y7cVKiatb5yuxROlp92vM9oWe2YvOyUbK2I0iA0=",
         "usagesDigest": "POIoO/Be2JU7GYVtOx9tPcV/ZKywG+DNu2w4sWJUNUM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

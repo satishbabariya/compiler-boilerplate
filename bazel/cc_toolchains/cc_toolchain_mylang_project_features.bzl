@@ -22,7 +22,7 @@ load(
 # An enabled feature that requires the `fastbuild` compilation. This is used
 # to toggle general features on by default, while allowing them to be
 # directly enabled and disabled more generally as desired.
-carbon_project_fastbuild_feature = feature(
+mylang_project_fastbuild_feature = feature(
     name = "enable_in_fastbuild",
     enabled = True,
     requires = [feature_set(["fastbuild"])],
@@ -34,8 +34,8 @@ carbon_project_fastbuild_feature = feature(
     ],
 )
 
-def carbon_project_features(cache_key):
-    return [carbon_project_fastbuild_feature, feature(
+def mylang_project_features(cache_key):
+    return [mylang_project_fastbuild_feature, feature(
         name = "project_flags",
         enabled = True,
         flag_sets = [

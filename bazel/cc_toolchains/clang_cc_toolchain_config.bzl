@@ -6,7 +6,7 @@
 
 load("@rules_cc//cc:defs.bzl", "cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
-load(":cc_toolchain_carbon_project_features.bzl", "carbon_project_features")
+load(":cc_toolchain_mylang_project_features.bzl", "mylang_project_features")
 load(":cc_toolchain_cpp_features.bzl", "libcxx_feature")
 load(":cc_toolchain_features.bzl", "clang_cc_toolchain_features")
 load(
@@ -36,7 +36,7 @@ def _impl(ctx):
         features = clang_cc_toolchain_features(
             target_os = ctx.attr.target_os,
             target_cpu = ctx.attr.target_cpu,
-            project_features = carbon_project_features(clang_version_for_cache),
+            project_features = mylang_project_features(clang_version_for_cache),
             extra_cpp_features = [libcxx_feature(llvm_bindir, clang_bindir)],
         ),
         action_configs = llvm_action_configs(llvm_bindir, clang_bindir),

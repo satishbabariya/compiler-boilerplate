@@ -10,7 +10,6 @@
 
 #include "common/raw_string_ostream.h"
 #include "toolchain/lex/dump.h"
-#include "toolchain/parse/context.h"
 
 namespace MyLang::Parse {
 
@@ -32,16 +31,6 @@ LLVM_DUMP_METHOD auto Dump(const Tree& tree, NodeId node_id) -> std::string {
   out << "NodeId(kind: " << kind
       << ", token: " << Lex::Dump(tree.tokens(), token) << ")";
   return out.TakeStr();
-}
-
-static LLVM_DUMP_METHOD auto Dump(const Context& context, Lex::TokenIndex token)
-    -> std::string {
-  return Dump(context.tree(), token);
-}
-
-static LLVM_DUMP_METHOD auto Dump(const Context& context, NodeId node_id)
-    -> std::string {
-  return Dump(context.tree(), node_id);
 }
 
 }  // namespace MyLang::Parse
